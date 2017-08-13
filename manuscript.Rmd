@@ -1,0 +1,67 @@
+---
+title: "Analysis of high-throughput sequencing data from NIH GEO database"
+author: "Taavi Päll^1^, Tanel Tenson^2^, Ülo Maiväli^2^"
+date: '`r Sys.Date()`'
+bibliography: references.bib
+csl: jbc.csl
+output:
+  bookdown::html_book: 
+    number_sections: FALSE
+    toc: FALSE
+    split_by: none
+---
+
+^1^ Department of Chemistry and Biotechnology, Tallinn University of Technology, Akadeemia tee 15, 12618 Tallinn, Estonia     
+^2^ Institute of Technology, University of Tartu, Nooruse 1, 50411, Tartu, Estonia
+
+```{r setup, include=FALSE}
+library(knitr)
+opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.align='center', fig.path = 'figures/', dev = c('pdf'))
+library(tidyverse)
+library(lubridate)
+library(stringr)
+library(magrittr)
+library(formattable)
+library(Biobase)
+library(grid)
+library(gridExtra)
+```
+
+```{r libs}
+# Load helper functions
+source("lib/helpers.R")
+# Set panel label case
+panel_label_case <- "upper"
+```
+
+## Abstract
+
+Assessing the quality of experiments, both directly and through replication attempts, is becoming a grave concern in biomedicine. 
+This is especially true in omics experiments, where thousands of independent measurements are done in parallel, with the understanding that only a small minority will probe scientifically meaningful effects – a state of affairs conductive to mistaking false positives for scientific discoveries. 
+A currently popular way to deal with false positives in omics is to calculate the Bayesian false-discovery rate (FDR) using, for the prior, the information present in the multitude of parallel measurements of a single omics experiment. 
+To this picture we add a simple method to calculate a retrospective power that is compatible with the FDR. 
+This allows to give a rich account of the quality and potential replicability of the results of almost any omics experiment. 
+As proof of concept we assessed the quality of the __N__ high-throughput sequencing experiments published in Entrez GEO database.
+
+## Introduction
+
+```{r introduction, child = 'introduction.Rmd'}
+
+```
+
+
+## Materials and methods
+
+```{r methods, child = 'methods.Rmd'}
+
+```
+
+
+## Results
+
+```{r results, child = 'results.Rmd'}
+
+```
+
+
+## References
