@@ -23,4 +23,5 @@ sumcont <- get_docsums(Ids)
 
 # Gateway error in previous step may fuck up this step!!!, if this occurs, please just rerun.
 ds <- sumcont %>% lapply(extract_docsums) %>% bind_rows()
+# ds is short of document summaries
 save(ds, file = "data/ds.RData")

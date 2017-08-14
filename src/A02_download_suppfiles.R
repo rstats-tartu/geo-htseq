@@ -44,7 +44,8 @@ local_suppfile_folder <- "/Volumes/Media/srp_example/data" # "data/counts"
 local_files <- list.files(local_suppfile_folder, recursive = T) %>% 
   str_replace(".*\\/","")
 
-data_frame(local_files) %>% filter(str_detect(tolower(local_files), "peak")) %$% 
+data_frame(local_files) %>% 
+  filter(str_detect(tolower(local_files), "peak")) %$% 
   local_files
 
 missing_local <- suppfiles_of_interest %>% 
@@ -53,4 +54,4 @@ missing_local <- suppfiles_of_interest %>%
 
 # Download supplementary files --------------------------------------------
 missing_local %>% 
-  mutate(map2(FTPLink, SuppFileNames, ~ geo_supp_dwnl(.x, .y, "/Volumes/Backup/srp_example/data/counts")))
+  mutate(map2(FTPLink, SuppFileNames, ~ geo_supp_dwnl(.x, .y, local_suppfile_folder)))
