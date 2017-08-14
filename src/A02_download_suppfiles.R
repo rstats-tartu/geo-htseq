@@ -52,22 +52,5 @@ missing_local <- suppfiles_of_interest %>%
            str_replace(tolower(local_files), "\\.(gz|bz2)$",""))
 
 # Download supplementary files --------------------------------------------
-geo_supp_dwnl <- function(ftplink, suppfile, destdir) {
-  message(suppfile)
-  
-  fp <- file.path(ftplink, "suppl", suppfile)
-  dest <- file.path(destdir, suppfile)
-  
-  if(file.exists(dest)){
-    message("File exists!")
-    return()
-  }
-  
-  out <- try(download.file(fp, dest))
-  if(inherits(out, "try-error")){
-    message("Ups! Something went wrong!")
-  }
-}
-
 missing_local %>% 
   mutate(map2(FTPLink, SuppFileNames, ~ geo_supp_dwnl(.x, .y, "/Volumes/Backup/srp_example/data/counts")))
