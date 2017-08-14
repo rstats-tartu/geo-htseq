@@ -11,9 +11,6 @@ library(gridExtra)
 # Load helper functions
 source("lib/helpers.R")
 
-# Set panel label case
-panel_label_case <- "upper"
-
 
 # RNA-seq-dynamics --------------------------------------------------------
 
