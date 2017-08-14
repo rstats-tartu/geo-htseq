@@ -1,4 +1,6 @@
 
+# For development only, not run during article compilation
+
 library(tidyverse)
 library(lubridate)
 library(stringr)
@@ -11,7 +13,6 @@ library(gridExtra)
 # Load helper functions
 source("lib/helpers.R")
 
-
 # RNA-seq-dynamics --------------------------------------------------------
 
 ## @knitr rna-seq-dynamics
@@ -21,6 +22,9 @@ library(lubridate)
 library(stringr)
 library(magrittr)
 library(formattable)
+
+# Last date to consider geo series and suppfilenames
+last_date <- lubridate::ymd("2017-06-19")
 
 ## src/A01b_GEO_RNA-seq-dynamics.R
 load("data/GEO_RNA-seq-dynamics.RData") # all GEO HT-seq expr datasets
@@ -32,6 +36,8 @@ load("data/ds.RData") # mouse and human GEO HT-seq expr datasets
 ds_merge <- bind_rows(ds_all, ds, .id = "id")
 
 pdat <- ds_merge %>% 
+  mutate_at("PDAT", lubridate::ymd) %>% 
+  filter(PDAT <= last_date) %>% # let's keep study time frame fixed
   select(id, PDAT, PubMedIds) %>% 
   mutate(pub = nchar(PubMedIds)!=0) %>% 
   group_by(id, PDAT) %>% 
@@ -69,7 +75,6 @@ ppub <- group_by(pdat, id, key) %>%
   round(digits=1) %>% 
   percent(digits=0)
 
-
 # Missingsuppfiles --------------------------------------------------------
 # In this section we download and analyse supplementary file names
 
@@ -77,15 +82,13 @@ ppub <- group_by(pdat, id, key) %>%
 # src/A02_download_suppfiles.R
 load("data/suppfilenames_2017-06-19.RData")
 
-failed_suppfiles <- suppfilenames %>% 
-  filter(map_lgl(SuppFileNames, ~inherits(.x,"try-error"))) %>% 
-  arrange(PDAT) %>% 
-  group_by(PDAT) %>%
-  summarise(N = n()) %>% 
-  mutate(N = cumsum(N))
+# Let's keep study time frame fixed
+suppfilenames <- suppfilenames %>% 
+  mutate_at("PDAT", lubridate::ymd) %>% 
+  filter(PDAT <= last_date)
 
 failed_suppfiles <- suppfilenames %>% 
-  filter(map_lgl(SuppFileNames, ~inherits(.x,"try-error"))) %>% 
+  filter(map_lgl(SuppFileNames, ~inherits(.x, "try-error"))) %>% 
   select(PDAT, PubMedIds) %>% 
   mutate(pub = nchar(PubMedIds)!=0) %>% 
   arrange(PDAT) %>% 
@@ -109,12 +112,11 @@ fsupp <- ggplot(failed_suppfiles, aes(ymd(PDAT), value, linetype = key)) +
         legend.title = element_blank())
 
 no_suppfile <- suppfilenames %>% 
-  mutate(has_suppfile = !map_lgl(SuppFileNames, ~inherits(.x,"try-error"))) %>% 
+  mutate(has_suppfile = !map_lgl(SuppFileNames, ~inherits(.x, "try-error"))) %>% 
   select(has_suppfile) %>% 
   table
 
 perc_wsuppfile <- percent(round(1-(no_suppfile[1]/sum(no_suppfile)), 2), digits = 0)
-
 
 # Queryfig ----------------------------------------------------------------
 
@@ -132,14 +134,14 @@ grid.draw(pga)
 
 # Single most common filename: filelist.txt
 most_common_filename <- suppfilenames %>% 
-  filter(!map_lgl(SuppFileNames, ~inherits(.x,"try-error"))) %>% 
+  filter(!map_lgl(SuppFileNames, ~inherits(.x, "try-error"))) %>% 
   unnest(SuppFileNames) %>% 
   group_by(SuppFileNames) %>% 
   summarise(N=n())
 
 # Supplemental file names with more than N=10 occurences
 cf <- suppfilenames %>% 
-  filter(!map_lgl(SuppFileNames, ~inherits(.x,"try-error"))) %>% 
+  filter(!map_lgl(SuppFileNames, ~inherits(.x, "try-error"))) %>% 
   unnest(SuppFileNames) %>%
   mutate(common_filenames = str_replace(SuppFileNames, "GSE[0-9]*_", ""),
          common_filenames = str_replace(common_filenames, "\\.gz$", ""), # remove also .gz
