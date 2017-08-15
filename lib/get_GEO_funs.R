@@ -1,5 +1,4 @@
 
-
 # get_GEO_Ids -------------------------------------------------------------
 
 #' @title Get UID vector
@@ -7,6 +6,8 @@
 #' @param database Entrez database, defaults to "gds" == GEO 
 #' @param retmax maximum number of records to return, default is 500
 #' @return A vector or GEO UIDs
+#' @importFrom magrittr "%>%"
+#' 
 get_ids <- function(query, database = "gds", retmax = 500, ...){
   esearch <- "esearch.fcgi"
   base_url <- "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
@@ -35,15 +36,19 @@ get_ids <- function(query, database = "gds", retmax = 500, ...){
 #' @param ids character vector of GEO UIDs
 #' @param database Entrez database, defaults to "gds" == GEO 
 #' @return A list of document summaries of class "xml_document" "xml_node"
+#' 
 get_docsums <- function(ids, database = "gds"){
   esummary <- "esummary.fcgi"
   base_url <- "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
+  
   # Split UIDs into chunks of size max 500
   chunkize <-  function(d, chunksize) split(d, ceiling(seq_along(d)/chunksize))
   UID_chunks <- chunkize(ids, 500)
+  
   get_qsums <- function(uid) {
     httr::GET(file.path(base_url, esummary), query = list(db = database, id = paste(uid, collapse = ",")))
   }
+  
   qsums <- lapply(UID_chunks, get_qsums) 
   lapply(qsums, httr::content)
 }
@@ -52,24 +57,23 @@ get_docsums <- function(ids, database = "gds"){
 # extract_gds_docsums -----------------------------------------------------
 
 #' @title Extract GEO DocSums into tibble
-#' @param xmldocument A GEO query result contents, list of document summaries of class "xml_document" "xml_node"
+#' @param xmldoc A GEO query result contents, list of document summaries of class "xml_document" "xml_node"
 #' @return A tibble of GEO document summaries
-extract_docsums <- function(xmldocument){
-  require(XML)
-  require(dplyr)
-  require(magrittr)
+#' @importFrom magrittr "%>%"
+#' 
+extract_docsums <- function(xmldoc){
   
-  d <-  xmlParse(xmldocument) %>% xmlRoot
+  d <- XML::xmlParse(xmldoc) 
+  d <- XML::xmlRoot(d)
   
   items <- d[1]$DocSum %>% 
-    xmlSApply(xmlGetAttr, name = "Name") %>% 
+    XML::xmlSApply(XML::xmlGetAttr, name = "Name") %>% 
     unlist() %>% 
     c("Id",.) %>% 
     unname()
   
-  d %>% 
-    xmlSApply(. %>% getChildrenStrings) %>% 
-    t %>% 
-    as_data_frame %>% 
-    set_colnames(items)
+  d <- XML::xmlSApply(d, function(x) XML::getChildrenStrings(x)) 
+  d <- dplyr::as_data_frame(t(d)) 
+  colnames(d) <- items
+  return(d)
 }
