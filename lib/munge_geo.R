@@ -1,12 +1,88 @@
 
+
+
+# read excel sheets -------------------------------------------------------
+
+read_excelfs <- function(path) {
+  
+  sheets <- try(readxl::excel_sheets(path), silent = TRUE)
+  
+  rex <- function(path, sheet){
+    tab <- try(readxl::read_excel(path, sheet), silent = TRUE)
+    if(inherits(tab, "try-error")){
+      return(tibble())
+    }
+    return(tab)
+  }
+  
+  if(!inherits(sheets, "try-error")){
+    tablist <- lapply(sheets, function(x) rex(path, sheet = x))
+    names(tablist) <- sheets
+  } else {
+    return(tibble())
+  }
+  
+  if(length(tablist) == 1){
+    tab <- tablist[[1]]
+    return(tab)
+  }
+  
+  return(tablist)
+}
+
+
+# read_geotabs ------------------------------------------------------------
+
+read_geotabs <- function(path){
+  
+  message(path)
+  system(paste("echo '", path, "' >> log.txt"))
+  
+  if(stringr::str_detect(path, "xlsx?")){
+    tab <- read_excelfs(path)
+    return(tab)
+  }
+  
+  if(stringr::str_detect(path, "gct$")){
+    tab <- CePa::read.gct(path)
+    return(tab)
+  }
+  
+  if(stringr::str_detect(path, "\\.gz$")){
+    path <- paste0("zcat < ", path)
+  }
+  
+  tab <- try(data.table::fread(path, data.table = F))
+  
+  if(inherits(tab, "try-error")){
+    message <- tab[1]
+    system(paste("echo '", path, "\n", message,"' >> log.txt"))
+    return(tibble())
+  }
+  
+  if(tibble::has_rownames(tab)){
+    tab <- tibble::rownames_to_column(tab)
+  }
+  
+  tab <- try(tibble::as_tibble(tab))
+  
+  if(inherits(tab, "try-error")){
+    message <- cat("as_tibble: ", tab[1])
+    system(paste("echo '", path, "\n", message,"' >> log.txt"))
+    return(tibble())
+  }
+  
+  return(tab)
+}
+
 #' @param countfile GSE supplemental file name
 #' @param eset nested esets
 #' @param path path to GSE supplemental file, defaults to .
-munge_geo <- function(eset, countfile, path = ".") {
+munge_geo <- function(eset, countfile, dir = ".") {
   # message(countfile)
   # Import supplemental file
-  fullpath <- file.path(path, countfile)
-  supptab <- readGEOtabs(fullpath)
+  path <- file.path(dir, countfile)
+  supptab <- read_geotabs(path)
   
   # Convert to list if single table
   if(is.data.frame(supptab)|is.matrix(supptab)){
@@ -36,7 +112,7 @@ munge_geo <- function(eset, countfile, path = ".") {
   
   if(sum(gplmatch)==0){
     dims <- unlist(map(supptab, dim))
-    dims <- data_frame(features=dims[1], columns=dims[2])
+    dims <- data_frame(features = dims[1], columns = dims[2])
     message("No raw reads!")
     
     if(all(map_lgl(pvalues, is.null))){
