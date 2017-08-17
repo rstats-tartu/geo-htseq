@@ -75,11 +75,72 @@ read_geotabs <- function(path){
   return(tab)
 }
 
+
+# get_pvalues_basemean ----------------------------------------------------
+#' @import magrittr
+#' @import stringr
+get_pvalues_basemean <- function(restab){
+  
+  if(inherits(restab, "try-error")){
+    return(NA)
+  }
+  
+  rescols <- colnames(restab) %>% .[!is.na(.)] %>% .[!duplicated(.)]
+  
+  if(is.matrix(restab)){
+    restab %<>% as.data.frame
+  }
+  
+  # Fix colnames
+  if(str_detect(tail(rescols, 1), "V[0-9]")){
+    colnames(restab) <- c(tail(rescols, 1), setdiff(rescols, tail(rescols, 1)))
+  }
+  
+  restab %<>% "["(rescols)
+  restab <- restab[str_detect(colnames(restab), "base[Mm]ean|^p(-)?val") & !str_detect(colnames(restab), "[Aa]dj|FDR|Corrected")]
+  
+  if(ncol(restab) == 0 || !any(str_detect(colnames(restab), "p(-)?val"))){
+    # message('No column with p-values!')
+    return(NULL)
+  }
+  
+  if(any(str_detect(colnames(restab), "base[Mm]ean"))) {
+    restab %<>% 
+      mutate(bmean = rowMeans(select(., matches("basemean"))))
+  }
+  
+  restab %<>% select(matches("bmean|p(-)?val"))
+  colnames(restab)[str_detect(colnames(restab),"p(-)?val")] <- "pvalue"
+  
+  if(any(str_detect(colnames(restab), "bmean"))){
+    colnames(restab)[str_detect(colnames(restab),"bmean")] <- "basemean"
+  } else {
+    restab$basemean <- NA
+  }
+  
+  return(restab)
+}
+
+# munge_geo function ------------------------------------------------------
+
+geosupplement <- function(pvals = NULL, dims = NULL, eset = NULL) {
+  
+  ## Assign outputs to list
+  geo <- list(pvalues = pvals, dims = dims, eset = eset)
+  
+  ## Set the name for the class
+  class(geo) <- append(class(geo), "geosupplement")
+  return(geo)
+}
+
 #' @param countfile GSE supplemental file name
 #' @param eset nested esets
 #' @param path path to GSE supplemental file, defaults to .
+#' @import purrr
+#' @import dplyr
+#' @import GEOquery
 munge_geo <- function(eset, countfile, dir = ".") {
-  # message(countfile)
+  
   # Import supplemental file
   path <- file.path(dir, countfile)
   supptab <- read_geotabs(path)
@@ -98,7 +159,8 @@ munge_geo <- function(eset, countfile, dir = ".") {
     supptab <- supptab[map_lgl(pvalues, is.null)]
     pvalues <- pvalues[!map_lgl(pvalues, is.null)]
     if(length(supptab)==0){
-      return(pvalues)
+      out <- geosupplement(pvals = pvalues)
+      return(out)
     }
   }
   
@@ -116,17 +178,19 @@ munge_geo <- function(eset, countfile, dir = ".") {
     message("No raw reads!")
     
     if(all(map_lgl(pvalues, is.null))){
-      return(dims)
+      out <- geosupplement(dims = dims)
+      return(out)
     }
     
-    return(c(pvalues, dims))
+    out <- geosupplement(pvals = pvalues, dims = dims)
+    return(out)
   }
   
   # message("Returning raw reads!")
   exprs <- counts[gplmatch][[1]]
   rownames(exprs) <- make.names(rownames(exprs), unique = T)
   
-  title <- pData(esets[gplmatch][[1]])[,1, drop = FALSE]
+  title <- pData(esets[gplmatch][[1]])[, 1, drop = FALSE]
   title$title  <- rm_punct_tolower(title$title)
   exprs <- exprs[, title$title]
   colnames(exprs) <- rownames(title)
@@ -136,5 +200,6 @@ munge_geo <- function(eset, countfile, dir = ".") {
                            experimentData = experimentData(esets[gplmatch][[1]]),
                            annotation = annotation(esets[gplmatch][[1]]))
   
-  c(pvalues, neweset)
+  out <- geosupplement(pvals = pvalues, eset = neweset)
+  return(out)
 }
