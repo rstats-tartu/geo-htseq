@@ -52,3 +52,23 @@ ref_labels <- function(label, case = c("upper", "lower")){
     return(tolower(label))
   } 
 }
+
+
+# geofile dataframe -------------------------------------------------------
+
+geofile_df <- function(dir){
+  data_frame(suppfiles = list.files(dir)) %>% 
+    mutate(Accession = str_extract(toupper(suppfiles), "GSE[[:digit:]]*")) %>% 
+    select(Accession, suppfiles)
+}
+
+
+# get file extension ------------------------------------------------------
+
+get_filext <- function(x) {
+  x <- sub("\\.(gz|bz2)$", "", tolower(x))
+  m <- regexpr("\\.[_A-z0-9]*$", x)
+  regmatches(x, m)
+}
+
+
