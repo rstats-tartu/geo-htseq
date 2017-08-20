@@ -125,47 +125,47 @@ get_pvalues <- function(restab, Accession = NULL){
   restab
 }
 
-get_pvalues_basemean <- function(restab){
-  
-  if(inherits(restab, "try-error")){
-    return(NA)
-  }
-  
-  rescols <- colnames(restab) %>% .[!is.na(.)] %>% .[!duplicated(.)]
-  
-  if(is.matrix(restab)){
-    restab %<>% as.data.frame
-  }
-  
-  # Fix colnames
-  if(str_detect(tail(rescols, 1), "V[0-9]")){
-    colnames(restab) <- c(tail(rescols, 1), setdiff(rescols, tail(rescols, 1)))
-  }
-
-  restab %<>% "["(rescols)
-  restab <- restab[str_detect(colnames(restab), "base[Mm]ean|^p(-)?val") & !str_detect(colnames(restab), "[Aa]dj|FDR|Corrected")]
-  
-  if(ncol(restab) == 0 || !any(str_detect(colnames(restab), "p(-)?val"))){
-    # message('No column with p-values!')
-    return(NULL)
-  }
-  
-  if(any(str_detect(colnames(restab), "base[Mm]ean"))) {
-    restab %<>% 
-      mutate(bmean = rowMeans(select(., matches("basemean"))))
-  }
-  
-  restab %<>% select(matches("bmean|p(-)?val"))
-  colnames(restab)[str_detect(colnames(restab),"p(-)?val")] <- "pvalue"
-  
-  if(any(str_detect(colnames(restab), "bmean"))){
-  colnames(restab)[str_detect(colnames(restab),"bmean")] <- "basemean"
-  } else {
-    restab$basemean <- NA
-  }
-  
-  return(restab)
-}
+# get_pvalues_basemean <- function(restab){
+#   
+#   if(inherits(restab, "try-error")){
+#     return(NA)
+#   }
+#   
+#   rescols <- colnames(restab) %>% .[!is.na(.)] %>% .[!duplicated(.)]
+#   
+#   if(is.matrix(restab)){
+#     restab %<>% as.data.frame
+#   }
+#   
+#   # Fix colnames
+#   if(str_detect(tail(rescols, 1), "V[0-9]")){
+#     colnames(restab) <- c(tail(rescols, 1), setdiff(rescols, tail(rescols, 1)))
+#   }
+# 
+#   restab %<>% "["(rescols)
+#   restab <- restab[str_detect(colnames(restab), "base[Mm]ean|^p(-)?val") & !str_detect(colnames(restab), "[Aa]dj|FDR|Corrected")]
+#   
+#   if(ncol(restab) == 0 || !any(str_detect(colnames(restab), "p(-)?val"))){
+#     # message('No column with p-values!')
+#     return(NULL)
+#   }
+#   
+#   if(any(str_detect(colnames(restab), "base[Mm]ean"))) {
+#     restab %<>% 
+#       mutate(bmean = rowMeans(select(., matches("basemean"))))
+#   }
+#   
+#   restab %<>% select(matches("bmean|p(-)?val"))
+#   colnames(restab)[str_detect(colnames(restab),"p(-)?val")] <- "pvalue"
+#   
+#   if(any(str_detect(colnames(restab), "bmean"))){
+#   colnames(restab)[str_detect(colnames(restab),"bmean")] <- "basemean"
+#   } else {
+#     restab$basemean <- NA
+#   }
+#   
+#   return(restab)
+# }
 
 # # Destring function -------------------------------------------------------
 # 
@@ -388,32 +388,43 @@ my_DESeq <- function(object, id=NULL, test=c("Wald","LRT"), reduced=~1, ...){
 # results(out)
 
 # Model input voom-limma --------------------------------------------------
-
-get_counts <- function(counts, samplenames, id=NULL){
+#' @title Extract counts from supplementary table 
+#' @description Match geo series matrix titles with supplementary table column names and keep this subset.
+#' @param counts Data frame imported from geo series supplementary file.
+#' @param samplenames Character vector. Geo series sample names obtained from series matrix file column 'title'.
+#' @param id Character string. An optional supplementary file name.
+#' @import dplyr
+#' @import stringr
+#' 
+get_counts <- function(counts, samplenames, id = NULL){
+  
+  ## Output table id 
   message(id)
   
-  # Match metadata titles with counts column names
+  ## Match metadata titles with counts column names
   colnames(counts) <- colnames(counts) %>% rm_punct_tolower()
-  # Prepend samplenames with 'x' when string starts with digit
+  
+  ## Prepend samplenames with 'x' when string starts with digit
   samplenames <-  rm_punct_tolower(samplenames) %>% 
     str_replace("(^[:digit:])", "x\\1")
   countdata <- try(counts[, samplenames, drop = FALSE], silent = T)
   
+  ## When no match between series matrix titles and table colnames
   if(inherits(countdata,"try-error")){
-    warning("No match between sample names and counts colnames!", immediate. = T)
+    message("No match between sample names and counts colnames!")
     return(NULL)
   }
   
-  # Convert strings in tables to NA and drop rows with NA-s
-  colclasses <- sapply(countdata, class) %>% grepl("character", .) %>% any
+  ## Convert strings in tables to NA and drop rows with NA-s
+  colclasses <- vapply(countdata, class, character(1)) %>% grepl("character", .)
   
-  if(colclasses){
+  if(any(colclasses)){
     countdata <- vapply(countdata, readr::parse_number, numeric(nrow(countdata)))
   }
   
-  # If not matrix
+  ## If not matrix
   if(!is.matrix(countdata)){
-    # First col is ususally feature names
+    ## First column contains usually feature names
     rn <- counts[[1]]
     countdata <- as.matrix(countdata)
     row.names(countdata) <- rn
