@@ -82,7 +82,7 @@ read_geotabs <- function(path){
 get_pvalues_basemean <- function(restab){
   
   if(inherits(restab, "try-error")){
-    return(NA)
+    stop("No table to look into!")
   }
   
   rescols <- colnames(restab) %>% .[!is.na(.)] %>% .[!duplicated(.)]
@@ -100,7 +100,6 @@ get_pvalues_basemean <- function(restab){
   restab <- restab[str_detect(colnames(restab), "base[Mm]ean|^p(-)?val") & !str_detect(colnames(restab), "[Aa]dj|FDR|Corrected")]
   
   if(ncol(restab) == 0 || !any(str_detect(colnames(restab), "p(-)?val"))){
-    # message('No column with p-values!')
     return(NULL)
   }
   
@@ -123,7 +122,7 @@ get_pvalues_basemean <- function(restab){
 
 # munge_geo function ------------------------------------------------------
 
-geosupplement <- function(pvals = NULL, dims = NULL, eset = NULL) {
+geosupplement <- function(pvals = list(), dims = list(), eset = ExpressionSet()) {
   
   ## Assign outputs to list
   geo <- list(pvalues = pvals, dims = dims, eset = eset)
@@ -133,6 +132,9 @@ geosupplement <- function(pvals = NULL, dims = NULL, eset = NULL) {
   return(geo)
 }
 
+#' If geo supplementary table has only normalised read counts, return dims.
+#' When table has pvalues return pvalues along with basemean if possible.
+#' When table contains raw read counts, return eset.
 #' @param countfile GSE supplemental file name
 #' @param eset nested esets
 #' @param path path to GSE supplemental file, defaults to .
@@ -141,65 +143,84 @@ geosupplement <- function(pvals = NULL, dims = NULL, eset = NULL) {
 #' @import GEOquery
 munge_geo <- function(eset, countfile, dir = ".") {
   
-  # Import supplemental file
+  
   path <- file.path(dir, countfile)
+  
+  ## Import supplemental file, 
   supptab <- read_geotabs(path)
   
-  # Convert to list if single table
+  ## Convert to list if single table
   if(is.data.frame(supptab)|is.matrix(supptab)){
     supptab <- list(supptab) 
   }
   
-  # Check for pvalues
+  ## Check for pvalues
   pvalues <- map(supptab, ~try(get_pvalues_basemean(.x)))
+  
+  ## Exclude tables which failed to import
   pvalues <- pvalues[!map_lgl(pvalues, ~inherits(.x, "try-error"))]
   
   if(any(!map_lgl(pvalues, is.null))){
-    message("Found P-values!")
+    
     supptab <- supptab[map_lgl(pvalues, is.null)]
+    
     pvalues <- pvalues[!map_lgl(pvalues, is.null)]
+    
     if(length(supptab)==0){
-      out <- geosupplement(pvals = pvalues)
-      return(out)
+      
+      return(pvalues)
     }
   }
   
-  # Munge eset
+  ## Munge series matrix to eset
   esets <- eset %>% as.list %>% unlist
+  
+  ## Get sample names from eset
   titles <- map(esets, ~as.character(pData(.x)[,"title"]))
+  
+  ## Get counts from table
   counts <- map(titles, ~get_counts(supptab[[1]], .x))
   
-  # Test for integers
+  ## Test for integers
   gplmatch <- map_lgl(counts, ~testInteger(.x))
   
+  ## If not integers and no pvalues, return only dim
   if(sum(gplmatch)==0){
+
     dims <- unlist(map(supptab, dim))
+    
     dims <- data_frame(features = dims[1], columns = dims[2])
-    message("No raw reads!")
     
     if(all(map_lgl(pvalues, is.null))){
-      out <- geosupplement(dims = dims)
-      return(out)
-    }
+      
+      return(dims)
     
-    out <- geosupplement(pvals = pvalues, dims = dims)
-    return(out)
+      }
+    
+    return(c(pvalues, dims))
   }
   
-  # message("Returning raw reads!")
+  ## Return raw read counts
   exprs <- counts[gplmatch][[1]]
+  
+  ## Add feature names
   rownames(exprs) <- make.names(rownames(exprs), unique = T)
   
+  ## Create eset
   title <- pData(esets[gplmatch][[1]])[, 1, drop = FALSE]
+  
   title$title  <- rm_punct_tolower(title$title)
+  
   exprs <- exprs[, title$title]
+  
   colnames(exprs) <- rownames(title)
+  
   phenoData <- new("AnnotatedDataFrame", data = pData(esets[gplmatch][[1]]))
+  
   neweset <- ExpressionSet(assayData = exprs,
                            phenoData = phenoData,
                            experimentData = experimentData(esets[gplmatch][[1]]),
                            annotation = annotation(esets[gplmatch][[1]]))
   
-  out <- geosupplement(pvals = pvalues, eset = neweset)
-  return(out)
+  return(c(pvalues, neweset))
 }
