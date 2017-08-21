@@ -55,13 +55,25 @@ ref_labels <- function(label, case = c("upper", "lower")){
 
 
 # geofile dataframe -------------------------------------------------------
+#' Takes geo file name with accession name string and extracts Accession nr.
+#' @param dir directory to look into for file names.
+#' @param var a chracter string with column name for file names.
+#' @return data_frame with two columns: 'Accession' and var.
+#' @import dplyr
+#' @example \notrun{
+#' df <- geofile_df("data", "gsematrixfile")
+#' }
+#' 
+geofile_df <- function(dir, var){
+  
+  ## List files and extract filenames
+  files <- list.files(dir)
+  acc <- stringr::str_extract(stringr::str_to_upper(files), "GSE[[:digit:]]*")
 
-geofile_df <- function(dir){
-  data_frame(suppfiles = list.files(dir)) %>% 
-    mutate(Accession = str_extract(toupper(suppfiles), "GSE[[:digit:]]*")) %>% 
-    select(Accession, suppfiles)
+  ## Add accession nr and file names from dir into data_frame
+  df <- data_frame(acc, files)
+  setNames(df, c("Accession", var))
 }
-
 
 # get file extension ------------------------------------------------------
 
