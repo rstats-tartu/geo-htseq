@@ -174,16 +174,21 @@ get_pvalues <- function(restab, Accession = NULL){
 # }
 
 
-# test integer function ---------------------------------------------------
+# Test integer function ---------------------------------------------------
 testInteger <- function(x, id = NULL){
-  message(id)
+  
+  if(!is.null(id)){
+    message(id)
+  }
+  
   if(!is.matrix(x)){
     message("Not matrix!")
     return(FALSE)
   }
+  
   x <- x[sample(nrow(x), 100),]
-  x <- sapply(x, function(z) as.integer(z) == z)
-  all(sapply(x, all))
+  x <- vapply(x, function(z) as.integer(z) == z, logical(1L))
+  all(vapply(x, all, logical(1L)))
 }
 
 # Check for matrix rank ---------------------------------------------------
@@ -387,7 +392,9 @@ my_DESeq <- function(object, id=NULL, test=c("Wald","LRT"), reduced=~1, ...){
 # out <- my_DESeq(dds, id="fuck")
 # results(out)
 
-# Model input voom-limma --------------------------------------------------
+
+# Get counts --------------------------------------------------------------
+
 #' @title Extract counts from supplementary table 
 #' @description Match geo series matrix titles with supplementary table column names and keep this subset.
 #' @param counts Data frame imported from geo series supplementary file.
@@ -399,7 +406,9 @@ my_DESeq <- function(object, id=NULL, test=c("Wald","LRT"), reduced=~1, ...){
 get_counts <- function(counts, samplenames, id = NULL){
   
   ## Output table id 
-  message(id)
+  if(!is.null(id)){
+    message(id)
+  }
   
   ## Match metadata titles with counts column names
   colnames(counts) <- colnames(counts) %>% rm_punct_tolower()
@@ -407,7 +416,7 @@ get_counts <- function(counts, samplenames, id = NULL){
   ## Prepend samplenames with 'x' when string starts with digit
   samplenames <-  rm_punct_tolower(samplenames) %>% 
     str_replace("(^[:digit:])", "x\\1")
-  countdata <- try(counts[, samplenames, drop = FALSE], silent = T)
+  countdata <- try(counts[, samplenames, drop = FALSE], silent = TRUE)
   
   ## When no match between series matrix titles and table colnames
   if(inherits(countdata,"try-error")){
@@ -432,6 +441,8 @@ get_counts <- function(counts, samplenames, id = NULL){
 
   countdata %>% .[complete.cases(.),]
 }
+
+# Get model ---------------------------------------------------------------
 
 get_model <- function(metadata, moderated.vars=NULL, id=NULL){
   message(id)
