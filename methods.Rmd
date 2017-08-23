@@ -21,7 +21,8 @@ Metadata was extracted from document summaries using xmlSApply function from XML
 We excluded from downloading supplemental files which contained pattern: `r paste(paste0("'", out_strings[1:4],"' ", collapse=","), "in the file name and we also excluded flies with following pattern ", 
 paste0("'", out_strings[-c(1:4)],"' ", collapse=","))` in the file extension.
 Flat tables were imported into R using fread command from package data.table `r myversion("data.table")` [@Dowle2016].
-MS Excel files were imported using read_excel command from package readxl `r myversion("readxl")` [@Wickham2016].
+MS Excel xls(x) files were imported using read_excel command from package readxl `r myversion("readxl")` [@Wickham2016].
+Compressed xls(x) files were uncompressed before import using gzip.
 HT-seq experiment metadata was extracted from series matrix files. 
 Series matrix files were downloaded using GEOquery package `r myversion("GEOquery")` [@Davis2007].
 
