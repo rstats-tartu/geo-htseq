@@ -99,6 +99,11 @@ get_pvalues_basemean <- function(restab){
   restab %<>% "["(rescols)
   restab <- restab[str_detect(colnames(restab), "base[Mm]ean|^p(-)?val") & !str_detect(colnames(restab), "[Aa]dj|FDR|Corrected")]
   
+  ## Check if p values are in the 0 to 1 range
+  pvals_ok <- vapply(restab, function(x) {all(x>=0 & x<=1)}, logical(1))
+  bm <- str_detect(colnames(restab), "base[Mm]ean")
+  restab <- restab[mapply(any, pvals_ok, bm)]
+  
   if(ncol(restab) == 0 || !any(str_detect(colnames(restab), "p(-)?val"))){
     return(NULL)
   }
@@ -143,7 +148,7 @@ geosupplement <- function(pvals = list(), dims = list(), eset = ExpressionSet())
 #' @import GEOquery
 munge_geo <- function(eset, countfile, dir = ".") {
   
-  
+  ## Assemble path to supplementary file
   path <- file.path(dir, countfile)
   
   ## Import supplemental file, 
@@ -224,3 +229,4 @@ munge_geo <- function(eset, countfile, dir = ".") {
   
   return(c(pvalues, neweset))
 }
+
