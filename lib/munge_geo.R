@@ -95,6 +95,10 @@ get_pvalues_basemean <- function(x){
   colns <- colns[!is.na(colns)] 
   colns <- colns[!duplicated(colns)]
   
+  if(length(colns)==0){
+    stop("No colnames!")
+  }
+  
   ## If matrix convert to data.frame
   if(is.matrix(x)){
     x <- as.data.frame(x)
@@ -273,7 +277,7 @@ munge_geo2 <- function(countfile, dir = ".") {
   
   ## Check for pvalues
   pvalues <- map(supptab, ~try(get_pvalues_basemean(.x)))
-  heads <- map(supptab, head)
+  heads <- map(supptab, head, n = 100)
   features <- map_int(supptab, nrow)
   columns <- map_int(supptab, ncol)
   supptab_names <- names(supptab)
