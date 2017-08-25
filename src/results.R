@@ -17,42 +17,31 @@ source("lib/helpers.R")
 
 ## @knitr rna-seq-dynamics
 
-library(tidyverse)
-library(lubridate)
-library(stringr)
-library(magrittr)
-library(formattable)
-
 # Last date to consider geo series and suppfilenames
-last_date <- lubridate::ymd("2017-06-19")
-
-## src/A01b_GEO_RNA-seq-dynamics.R
-load("data/GEO_RNA-seq-dynamics.RData") # all GEO HT-seq expr datasets
-ds_all <- ds
+last_date <- ymd("2017-06-19")
 
 ## src/A01_GEO_query.R
 load("data/ds.RData") # mouse and human GEO HT-seq expr datasets
+ds_all <- filter(ds, ymd(PDAT) <= last_date)
+ds <- filter(ds_all, str_detect(taxon, "Mus musculus|Homo sapiens"))
 
-ds_merge <- bind_rows(ds_all, ds, .id = "id")
+ds_merge <- bind_rows(ds_all, ds, .id = "id") %>% 
+  mutate_at("PDAT", lubridate::ymd)
 
 pdat <- ds_merge %>% 
-  mutate_at("PDAT", lubridate::ymd) %>% 
-  filter(PDAT <= last_date) %>% # let's keep study time frame fixed
   select(id, PDAT, PubMedIds) %>% 
-  mutate(pub = nchar(PubMedIds)!=0) %>% 
+  mutate(pub = nchar(PubMedIds) != 0) %>% 
   group_by(id, PDAT) %>% 
   summarise(N = n(),
             pub = sum(pub)) %>% 
   mutate_at(vars(N, pub), cumsum)
 
-pdat %<>% gather(key, value, -PDAT, -id) 
+pdat <- gather(pdat, key, value, -PDAT, -id) 
 
-pdat %<>% 
-  ungroup() %>% 
-  mutate(id = if_else(id==1, "All taxa", "Human and mouse"))
+pdat <- ungroup(pdat) %>% mutate(id = if_else(id == 1, "All taxa", "Human and mouse"))
 
 geop <- pdat %>% 
-  ggplot(aes(ymd(PDAT), value, linetype=key)) + 
+  ggplot(aes(ymd(PDAT), value, linetype = key)) + 
   geom_line() +
   facet_wrap(~id) +
   ylab("Number of GEO series") +
@@ -72,8 +61,8 @@ ppub <- group_by(pdat, id, key) %>%
   ungroup %>% 
   summarise(ppub = mean(ppub)) %>% 
   .$ppub %>% 
-  round(digits=1) %>% 
-  percent(digits=0)
+  round(digits = 1) %>% 
+  percent(digits = 0)
 
 # Missingsuppfiles --------------------------------------------------------
 # In this section we download and analyse supplementary file names
@@ -127,9 +116,7 @@ pg <- add_labels(pg, case = panel_label_case)
 pga <- arrangeGrob(grobs = pg, ncol = 2, widths = c(2, 1))
 grid.draw(pga)
 
-
 # Commonfilenames ---------------------------------------------------------
-
 ## @knitr commonfilenames
 
 # Single most common filename: filelist.txt
@@ -178,6 +165,10 @@ supp_raw_perc <- percent(n_distinct(filter(cf, str_detect(common_filenames, "raw
 # Filter downloaded supplementary file names ------------------------------
 # In this section, we filter supplementary file names for patterns: 
 # we are looking anly for tabular data. 
+out_string1 <- c("filelist|annotation|readme|error|raw.tar|csfasta|bam|sam|bed|[:punct:]hic|hdf5|bismark|map|barcode|peaks")
+out_string2 <- c("tar","gtf","(big)?bed(\\.txt|12|graph|pk)?","bw","wig","hic","gct(x)?","tdf",
+                 "gff(3)?","pdf","png","zip","sif","narrowpeak","fa", "r$", "rda(ta)?$")
+
 suppfiles_of_interest <- suppfilenames %>% 
   unnest(SuppFileNames) %>%
   filter(!str_detect(tolower(SuppFileNames), out_string1),
@@ -187,5 +178,8 @@ suppfiles_of_interest <- suppfilenames %>%
 
 suppf_oi_perc <- percent(1-(n_distinct(suppfiles_of_interest$Accession)/n_distinct(suppfilenames$Accession)), 0)
 
+# Import of tabular supplementary files -----------------------------------
+
+load("data/st.RData")
 
 
