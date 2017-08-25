@@ -1,7 +1,7 @@
 
-library(tidyverse)
+library(dplyr)
+library(purrr)
 library(stringr)
-library(magrittr)
 library(GEOquery)
 
 # Munge matrixfiles -------------------------------------------------------
@@ -12,9 +12,9 @@ matrixfiles <- list.files(local_matrixfile_folder)
 matrixfiles <- data_frame(matrixfiles) %>% 
   mutate(Accession = str_extract(toupper(matrixfiles), "GSE[[:digit:]]*"))
 
-countfiles <- list.files(local_suppfile_folder)
-countfiles <- data_frame(countfiles) %>% 
-  mutate(Accession = str_extract(toupper(countfiles), "GSE[[:digit:]]*"))
+suppfiles <- list.files(local_suppfile_folder)
+suppfiles <- data_frame(suppfiles) %>% 
+  mutate(Accession = str_extract(toupper(suppfiles), "GSE[[:digit:]]*"))
 
 my_getGEO <- function(x, path = "data/matrix/") {
   message(x)
@@ -22,12 +22,9 @@ my_getGEO <- function(x, path = "data/matrix/") {
 }
 
 # Unique series matrix files
-matrixfiles <- left_join(countfiles, matrixfiles) %>% 
-  select(-countfiles) %>%
+matrixfiles <- left_join(suppfiles, matrixfiles) %>% 
+  select(-suppfiles) %>%
   distinct()
 
 gsem <- mutate(matrixfiles, gsematrix = map(matrixfiles, my_getGEO, path = local_matrixfile_folder))
-gsem <- filter(gsem, map_lgl(gsematrix, function(x) class(x)=="ExpressionSet")) 
-
-gsem <- mutate(gsem, samples = map_int(gsematrix, ~nrow(pData(.x))))
 save(gsem, file = "data/gsem.RData")
