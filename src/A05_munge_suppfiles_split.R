@@ -85,9 +85,9 @@ bad <- c("GSE93374_Merged_all_020816_DGE.txt.gz",
 supptabs <- filter(supptabs, !(suppfiles %in% bad))
 
 # Merge gsem ExpressionSets to supptabs
-supptabs <- select(gsem, -matrixfiles) %>% 
+supptabs <- select(gsem, Accession, gsematrix) %>% 
   nest(gsematrix, .key = "matrixfiles") %>% 
-  inner_join(supptabs, .)
+  left_join(supptabs, .)
 
 source("lib/munge_geo.R")
 source("lib/checkFullRank.R")
@@ -113,10 +113,10 @@ res <- mutate(st, sheetnames = map(result, ~if(!is.data.frame(.x)) {str_c("_", n
        excelfiles = map2(suppfiles, sheetnames, str_c, sep = "")) %>%
   select(-sheetnames)
 
-# filter(res, str_detect(excelfiles, "xls(x)?_")) %>% 
-#   select(Accession, excelfiles, result) %>% 
-#   sample_n(10) %>% 
-#   .$result
+sampl <- filter(res, str_detect(excelfiles, "xls(x)?_")) %>%
+  select(Accession, excelfiles, result) %>%
+  sample_n(10) 
+
 
 # Code to be removed don't delete yet! ------------------------------------
 
