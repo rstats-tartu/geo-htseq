@@ -66,3 +66,7 @@ missing_local <- suppfiles_of_interest %>%
 
 # Download supplementary files --------------------------------------------
 mutate(missing_local, map2(FTPLink, SuppFileNames, ~ geo_supp_dwnl(.x, .y, local_suppfile_folder)))
+
+## Some readme files still passed the filter, let's remove those ----------
+slippedin_readmes <- list.files(local_suppfile_folder, full.names = T)[str_detect(tolower(list.files(local_suppfile_folder)), "readme")]
+system(sprintf("rm %s", paste(slippedin_readmes, collapse = " ")))
