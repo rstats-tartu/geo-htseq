@@ -11,9 +11,6 @@ load("data/ds.RData")
 ftplinks <- filter(ds, ymd(PDAT) <= "2017-06-19", 
                    str_detect(taxon, "Mus musculus|Homo sapiens"))
 
-
-which(ftplinks$Accession=="GSE9306")
-
 start <- Sys.time()
 suppfilenames <- mutate(ftplinks, url = file.path(FTPLink, "suppl/")) %>% 
   sample_n(100) %>% 
@@ -25,4 +22,4 @@ cat(sprintf("Downloading filenames took %s", end-start), file = "suppfilename.lo
 save(suppfilenames, file = "data/suppfilenames_2017-08-25.RData")
 suppfilenames  <- filter(suppfilenames, !map_lgl(r, inherits, "try-error")) %>% 
   mutate(suppfiles = map(r, get_dirlist))
-# save(suppfilenames, file = "data/suppfilenames_2017-08-25.RData")
+
