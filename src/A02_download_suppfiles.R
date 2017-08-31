@@ -1,6 +1,6 @@
 
 freshgeoquery <- FALSE
-if(freshgeoquery&&!file.exists("data/ds.RData")){
+if(freshgeoquery && !file.exists("data/ds.RData")){
   source("src/A01_GEO_query.R")
 } else{
   load("data/ds.RData")
