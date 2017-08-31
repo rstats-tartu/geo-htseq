@@ -90,12 +90,12 @@ get_dirlist <- function(r){
 
 # download supplementary files --------------------------------------------
 
-geo_supp_dwnl <- function(ftplink, slug = c("suppl", "miniml"), suppfile, destdir) {
+geo_supp_dwnl <- function(ftplink, slug = c("suppl", "miniml"), filename, destdir) {
   
-  message(suppfile)
+  message(filename)
   
-  fp <- file.path(ftplink, slug, suppfile)
-  dest <- file.path(destdir, suppfile)
+  fp <- file.path(ftplink, slug, filename)
+  dest <- file.path(destdir, filename)
   
   if(file.exists(dest)){
     message("File exists!")
@@ -104,7 +104,7 @@ geo_supp_dwnl <- function(ftplink, slug = c("suppl", "miniml"), suppfile, destdi
   
   out <- try(download.file(fp, dest))
   if(inherits(out, "try-error")){
-    message("Ups! Something went wrong!")
+    message("Download failed!")
   }
 }
 
