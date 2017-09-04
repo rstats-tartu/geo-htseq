@@ -10,7 +10,6 @@ if(newquery) {
   load("data/ds.RData")
 }
 
-
 # GEOquery ----------------------------------------------------------------
 
 # Folder where downloaded supplementary files are stored
