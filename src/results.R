@@ -131,7 +131,7 @@ cf <- suppfilenames %>%
   filter(!map_lgl(SuppFileNames, ~inherits(.x, "try-error"))) %>% 
   unnest(SuppFileNames) %>%
   mutate(common_filenames = str_replace(SuppFileNames, "GSE[0-9]*_", ""),
-         common_filenames = str_replace(common_filenames, "\\.gz$", ""), # remove also .gz
+         common_filenames = str_replace(common_filenames, "\\.gz$", ""), 
          common_filenames = tolower(common_filenames))
 
 cfn <- group_by(cf, common_filenames) %>% 
