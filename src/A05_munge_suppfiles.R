@@ -12,7 +12,9 @@ source("lib/text_funs.R")
 
 ## GEO query results and document summaries --------------------------------
 ## source("src/A01_GEO_query.R")
-load("data/ds.RData")
+if(!"ds" %in% ls()){
+  load("data/ds.RData")
+}
 
 ## Load series matrix data frames ----------------------------
 update_geoseriesmatrix_files <- FALSE
