@@ -2,13 +2,11 @@
 title: "Analysis of high-throughput sequencing data from NIH GEO database"
 author: "Taavi Päll^1^, Tanel Tenson^2^, Ülo Maiväli^2^"
 date: '`r Sys.Date()`'
+site: bookdown::bookdown_site
+output: bookdown::gitbook
+documentclass: book
 bibliography: references.bib
-csl: jbc.csl
-output:
-  bookdown::html_book: 
-    number_sections: FALSE
-    toc: FALSE
-    split_by: none
+biblio-style: apalike
 ---
 
 ^1^ Department of Chemistry and Biotechnology, Tallinn University of Technology, Akadeemia tee 15, 12618 Tallinn, Estonia     

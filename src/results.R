@@ -165,14 +165,22 @@ supp_raw_perc <- percent(n_distinct(filter(cf, str_detect(common_filenames, "raw
 # Filter downloaded supplementary file names ------------------------------
 # In this section, we filter supplementary file names for patterns: 
 # we are looking only for tabular data. 
-out_string1 <- c("filelist|annotation|readme|error|raw.tar|csfasta|bam|sam|bed|[:punct:]hic|hdf5|bismark|map|barcode|peaks")
-out_string2 <- c("tar","gtf","(big)?bed(\\.txt|12|graph|pk)?","bw","wig","hic","gct(x)?","tdf",
-                 "gff(3)?","pdf","png","zip","sif","narrowpeak","fa", "r$", "rda(ta)?$")
+## @knitr out_strings
+out_string1 <- c("filelist","annotation","readme","error","raw.tar","csfasta",
+                 "bam","sam","bed","[:punct:]hic","hdf5","bismark","map",
+                 "barcode","peaks")
+out_string2 <- c("tar","gtf","(big)?bed(\\.txt|12|graph|pk)?","bw","wig",
+                 "hic","gct(x)?","tdf","gff(3)?","pdf","png","zip","sif",
+                 "narrowpeak","fa", "r$", "rda(ta)?$")
 
+## @knitr filesofinterest
 suppfiles_of_interest <- suppfilenames %>% 
   unnest(SuppFileNames) %>%
-  filter(!str_detect(tolower(SuppFileNames), out_string1),
-         !str_detect(tolower(SuppFileNames), paste0(out_string2, "(\\.gz|\\.bz2)?$", collapse = "|"))) %>% 
+  filter(!str_detect(tolower(SuppFileNames), 
+                     paste0(out_string1, collapse = "|")),
+         !str_detect(tolower(SuppFileNames), 
+                     paste0(out_string2, "(\\.gz|\\.bz2)?$", 
+                            collapse = "|"))) %>% 
   select(Accession, SuppFileNames, FTPLink, PDAT) %>% 
   mutate(filext = str_extract(tolower(SuppFileNames), "\\.[:alpha:]+([:punct:][bgz2]+)?$")) 
 
@@ -180,6 +188,7 @@ suppf_oi_perc <- percent(1-(n_distinct(suppfiles_of_interest$Accession)/n_distin
 
 # Import of tabular supplementary files -----------------------------------
 
+## @knitr loadst
 load("data/st.RData")
 
 

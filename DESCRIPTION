@@ -1,0 +1,18 @@
+Package: placeholder
+Type: Book
+Title: Does not matter.
+Version: 0.0.1
+Imports: 
+    bookdown,
+    tidyverse,
+    magrittr,
+    stringr,
+    lubridate,
+    formattable,
+    devtools, 
+    ggthemes, 
+    grid, 
+    gridExtra
+Remotes: 
+    rstudio/bookdown,
+    tpall/entrezquery
