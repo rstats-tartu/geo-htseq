@@ -3,5 +3,8 @@
 .RData
 .Ruserdata
 *.html
-figures
-libs
+data/
+figures/
+libs/
+log.txt
+*.log

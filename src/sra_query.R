@@ -4,53 +4,12 @@ library(entrezquery)
 q <- '("Homo sapiens"[Organism] OR "Mus musculus"[Organism]) AND rna seq[Strategy]'
 sra <- entrezquery::entrez_docsums(q, db = "sra", retmax = 360000)
 save(sra, file = sprintf("data/sra_%s.RData", Sys.Date()))
+load("data/sra_2017-09-02.RData")
 
 library(dplyr)
 library(purrr)
 library(xml2)
 library(lubridate)
-
-# sra$ExpXml[[7]] %>% extract_expxml()
-# xmlstring <- sra$ExpXml[[1]]
-#
-# node <- body_contents[[1]]
-# xml_length(body_contents, only_elements = FALSE)
-#
-# node <- body_contents[[2]]
-# node <- body_contents[[8]]
-# node <- body_contents[[9]]
-#
-# lapply(body_contents, function(x) xml_length(x)>0)
-#
-# nodename <- xml2::xml_name(node)
-# nodename
-# node <- xml2::xml_contents(node)
-# node
-#
-# fuck <- function(x) {
-#   if(xml2::xml_length(x)>0){
-#     nodedata <- get_deepnode(x)
-#   } else {
-#     nodedata <- get_nodedata(x)
-#   }
-#   nodedata
-# }
-#
-# nodelist <- lapply(node, fuck)
-# nodelist
-#
-# ## Works if data present
-# node[[5]] %>% xml_name()
-# deepnode_name <- node[[5]] %>% xml_contents() %>% xml_name()
-# deepnode_data <- node[[5]] %>% get_deepnode()
-# if(length(deepnode_data)==0) {
-#   deepnode_data <- NA
-# }
-# deepnode_attr_names <- names(deepnode_data)
-# names(deepnode_data) <- paste0(deepnode_name, '.', deepnode_attr_name)
-#
-
-# Link SRA data to GEO ---------------------------------------------------------
 
 get_bodyconts <- function(xmlstring) {
   xmlstr <- xml2::read_html(xmlstring)
@@ -58,15 +17,15 @@ get_bodyconts <- function(xmlstring) {
   xml2::xml_contents(body)
 }
 
-
 sra <- mutate(sra, body = map(ExpXml, get_bodyconts))
-sra$body[[2000]] %>%
-  .[[9]] %>%
-  xml_text()
 
-sra <- mutate(sra, bioproject = map_chr(body, ~xml_text(.x[[9]])))
-sra <- mutate_at(sra, vars(CreateDate, UpdateDate), ymd)
-sra_filt <- filter(sra, CreateDate <= "2017/06/19")
+## Make smaller sample
+sra_sample <- sample_frac(sra, 0.01)
+sra_sample <- mutate(sra_sample, bioproject = map_chr(body, ~xml_text(.x[[9]])))
+sra_sample <- mutate_at(sra_sample, vars(CreateDate, UpdateDate), ymd)
+
+## Filter dates
+sra_filt <- filter(sra_sample, CreateDate <= "2017/06/19")
 bp <- unique(sra_filt$bioproject)
 
 i <- sample(1:length(bp), size = 500)

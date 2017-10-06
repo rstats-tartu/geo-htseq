@@ -16,3 +16,6 @@ This leads to a quality control procedure that works by sequential elimination a
 We believe that the health of a field of science can be best and cheapest gauged by a sequential elimination procedure: (1) estimating the fraction of reproducible publications in it, (2) actually reproducing its analyses, where possible, and checking for signs of failed experimental design and data analyses, (3) from the publications that by reproducibility criteria are worthy of replication attempts, estimating the statistical power of the experimental systems to provide reproducible results in replication studies, as well as the number of true effects left undiscovered in the original study that could be found in the replication study, (4) estimating the magnitude of changes to the experimental protocol (especially to sample size) that would allow high-powered replication studies.   
  
 Here we offer an integrated picture of the reproducibility and expected replicability of a modern and popular method of determining differential expression levels of RNAs, namely expression profiling by RNA sequencing. 
+
+[@Davis2007]
+
