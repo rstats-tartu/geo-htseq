@@ -38,7 +38,8 @@ pdat <- ds_merge %>%
 
 pdat <- gather(pdat, key, value, -PDAT, -id) 
 
-pdat <- ungroup(pdat) %>% mutate(id = if_else(id == 1, "All taxa", "Human and mouse"))
+pdat <- ungroup(pdat) %>% mutate(id = if_else(id == 1, "All taxa", 
+                                              "Human and mouse"))
 
 geop <- pdat %>% 
   ggplot(aes(ymd(PDAT), value, linetype = key)) + 
@@ -53,11 +54,11 @@ geop <- pdat %>%
         legend.title = element_blank())
 
 ## formattable::percent()
-perc_mmhs <- percent(round(nrow(ds)/nrow(ds_all), 1), digits = 0)
+perc_mmhs <- percent(round(nrow(ds) / nrow(ds_all), 1), digits = 0)
 ppub <- group_by(pdat, id, key) %>% 
   summarise_at("value", max) %>% 
   group_by(id) %>% 
-  summarise(ppub = value[key=="pub"]/value[key=="N"]) %>% 
+  summarise(ppub = value[key=="pub"] / value[key=="N"]) %>% 
   ungroup %>% 
   summarise(ppub = mean(ppub)) %>% 
   .$ppub %>% 
@@ -105,7 +106,8 @@ no_suppfile <- suppfilenames %>%
   select(has_suppfile) %>% 
   table
 
-perc_wsuppfile <- percent(round(1-(no_suppfile[1]/sum(no_suppfile)), 2), digits = 0)
+perc_wsuppfile <- percent(round(1-(no_suppfile[1] / sum(no_suppfile)), 2), 
+                          digits = 0)
 
 # Queryfig ----------------------------------------------------------------
 
@@ -160,7 +162,14 @@ cfraw <- filter(cf, str_detect(common_filenames, "raw.tar")) %>%
   geom_line()
 
 # Percent GEO ids submit raw data as supplemental file
-supp_raw_perc <- percent(n_distinct(filter(cf, str_detect(common_filenames, "raw.tar"))$Accession)/n_distinct(suppfilenames$Accession), 0)
+n_raw <- cf %>% 
+  filter(str_detect(common_filenames, "raw.tar")) %>% 
+  n_distinct()
+## total nr of accessions
+n_acc <- suppfilenames %>% 
+  select(Accession) %>% 
+  n_distinct()
+supp_raw_perc <- percent(n_raw / n_acc, 0)
 
 # Filter downloaded supplementary file names ------------------------------
 # In this section, we filter supplementary file names for patterns: 
@@ -184,7 +193,12 @@ suppfiles_of_interest <- suppfilenames %>%
   select(Accession, SuppFileNames, FTPLink, PDAT) %>% 
   mutate(filext = str_extract(tolower(SuppFileNames), "\\.[:alpha:]+([:punct:][bgz2]+)?$")) 
 
-suppf_oi_perc <- percent(1-(n_distinct(suppfiles_of_interest$Accession)/n_distinct(suppfilenames$Accession)), 0)
+## number accessions with files of interest
+filesofinterest <- suppfiles_of_interest %>% 
+  select(Accession) %>% 
+  n_distinct()
+
+suppf_oi_perc <- percent(1 - (filesofinterest / n_acc), 0)
 
 # Import of tabular supplementary files -----------------------------------
 

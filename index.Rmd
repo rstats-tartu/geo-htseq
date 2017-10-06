@@ -3,7 +3,6 @@ title: "Analysis of high-throughput sequencing data from NIH GEO database"
 author: "Taavi Päll^1^, Tanel Tenson^2^, Ülo Maiväli^2^"
 date: '`r Sys.Date()`'
 site: bookdown::bookdown_site
-output: bookdown::gitbook
 documentclass: book
 bibliography: references.bib
 biblio-style: apalike
@@ -14,7 +13,7 @@ biblio-style: apalike
 
 ```{r setup, include=FALSE}
 library(knitr)
-opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.align='center', fig.path = 'figures/', dev = c('pdf'))
+opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.path = 'figures/', dev = c('pdf'))
 library(tidyverse)
 library(lubridate)
 library(stringr)
