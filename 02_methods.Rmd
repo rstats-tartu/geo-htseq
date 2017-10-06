@@ -1,5 +1,5 @@
 
-# Materials and methods
+## Materials and methods {-}
 
 ```{r}
 read_chunk("src/A01_GEO_query.R")
@@ -14,7 +14,7 @@ read_chunk("src/results.R")
 # also suppfiles_of_interest is generated
 ```
 
-## Data query and import
+### Data query and import {-}
 Data was queried from NCBI GEO database by using eSearch E-Util with search string `r paste0('"_', query,'_"')` using GET function from httr R package [@Wickham2016httr].
 GEO UIDs were extracted from query results with xml2 package `r myversion("xml2")` [@Wickham2017xml2].
 UIDs were used to retrieve GEO document summaries using eSummary E-Util.
@@ -27,6 +27,6 @@ Compressed xls(x) files were uncompressed before import using gzip.
 HT-seq experiment metadata was extracted from series matrix files. 
 Series matrix files were downloaded using GEOquery package `r myversion("GEOquery")` [@Davis2007].
 
-## Code availability
+### Code availability {-}
 Source code is available in github repo `org/reponame`.
 

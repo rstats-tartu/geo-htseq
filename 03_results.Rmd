@@ -1,12 +1,13 @@
 
-# Results
+## Results {-}
 
 ```{r}
 read_chunk("src/results.R")
 ```
 
 
-## Checklist, I never leave home without: 
+Checklist, I never leave home without
+
 1.	Reproducibility: is data usable for reanalysis? (deposition to a public database) – search naively from pubmed and look into a random sample for database submissions.
 2.	Compliance with GEO database submission requirements – random sample or all GEO submissions?
 3.	How many of the GEO submissions provide p value tables?
@@ -18,7 +19,7 @@ read_chunk("src/results.R")
 ```
 
 
-## HT-sequencing expression data in GEO database
+### HT-sequencing expression data in GEO database {-}
 
 NCBI GEO database shows fast-growing number of high-throughput sequencing data set submissions.
 Majority (`r ppub`) of data sets are linked to their respective primary publication (Fig. \@ref(fig:queryfig)`r ref_labels("A", panel_label_case)`).
@@ -42,7 +43,7 @@ Whereas data sets that lack supplemental files show similar publication rate as 
 
 ```
 
-## Compliance with GEO database submission requirements and data usability for reanalysis
+### Compliance with GEO database submission requirements and data usability for reanalysis {-}
 
 Supplemental HT-seq files uplodaded to NCBI GEO contain most commonly raw sequence data files with 'raw.tar' file extension and associated automatically generated 'filelist.txt' file (Fig. \@ref(fig:commonfilenames)).
 

@@ -1,10 +1,10 @@
 
-# Introduction
+## Introduction {-}
 
 Poor reproducibility (the inability of reproducing, by using the original data, the original data analysis exactly) and replicability (the inability of reproducing, by new experiments, the original data approximately) have become major concerns in experimental biomedical science.
 So far reproducibility and replicability issues have been mostly addressed in different studies, making it difficult to prise apart their relative contributions to the quality of an experimental system in the wild {Iqbal:2016es} REFS. 
 
-> Determining the reproducibility of a study is relatively straightforward – one needs to ascertain that the original data analysis methods are described in sufficient detail and that the original data is obtainable in an analysable form.
+Determining the reproducibility of a study is relatively straightforward – one needs to ascertain that the original data analysis methods are described in sufficient detail and that the original data is obtainable in an analysable form.
 
 Reproducibility of a study merely suggest that the data analysis of the original study was done, if not correctly, at least successfully by following the published plan.
 Reproducibility is a minimum requirement for soundness of a study, but does not guarantee it {Bollen:2015wf}.   
