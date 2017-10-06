@@ -22,7 +22,7 @@ abstract: >
   A currently popular way to deal with false positives in omics is to calculate the Bayesian false-discovery rate (FDR) using, for the prior, the information present in the multitude of parallel measurements of a single omics experiment. 
   To this picture we add a simple method to calculate a retrospective power that is compatible with the FDR. 
   This allows to give a rich account of the quality and potential replicability of the results of almost any omics experiment. 
-  As proof of concept we assessed the quality of the __N__ high-throughput sequencing experiments published in Entrez GEO database.
+  As proof of concept we assessed the quality of the 9202 high-throughput sequencing experiments from Entrez GEO database.
 site: bookdown::bookdown_site
 documentclass: book
 bibliography: [references.bib, packages.bib]
