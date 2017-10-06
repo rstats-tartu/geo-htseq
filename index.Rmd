@@ -34,7 +34,7 @@ source("lib/helpers.R")
 panel_label_case <- "upper"
 ```
 
-## Abstract
+# Abstract
 
 Assessing the quality of experiments, both directly and through replication attempts, is becoming a grave concern in biomedicine. 
 This is especially true in omics experiments, where thousands of independent measurements are done in parallel, with the understanding that only a small minority will probe scientifically meaningful effects – a state of affairs conductive to mistaking false positives for scientific discoveries. 
@@ -43,25 +43,3 @@ To this picture we add a simple method to calculate a retrospective power that i
 This allows to give a rich account of the quality and potential replicability of the results of almost any omics experiment. 
 As proof of concept we assessed the quality of the __N__ high-throughput sequencing experiments published in Entrez GEO database.
 
-## Introduction
-
-```{r introduction, child = 'introduction.Rmd'}
-
-```
-
-
-## Materials and methods
-
-```{r methods, child = 'methods.Rmd'}
-
-```
-
-
-## Results
-
-```{r results, child = 'results.Rmd'}
-
-```
-
-
-## References
