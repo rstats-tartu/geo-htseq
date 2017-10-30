@@ -5,15 +5,6 @@
 read_chunk("src/results.R")
 ```
 
-
-Checklist, I never leave home without
-
-1.	Reproducibility: is data usable for reanalysis? (deposition to a public database) – search naively from pubmed and look into a random sample for database submissions.
-2.	Compliance with GEO database submission requirements – random sample or all GEO submissions?
-3.	How many of the GEO submissions provide p value tables?
-4.	P histograms – how many experiments are poorly designed/analysed?
-5.	Replicability measures: SRP, nr of undiscovered effects, expected replication rate, required sample size for high power?
-
 ```{r rna-seq-dynamics}
 
 ```

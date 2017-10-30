@@ -22,15 +22,17 @@ last_date <- ymd("2017-06-19")
 
 ## src/A01_GEO_query.R
 load("data/ds.RData") # mouse and human GEO HT-seq expr datasets
+## all HT-seq datasets 
 ds_all <- filter(ds, ymd(PDAT) <= last_date)
+## Human or mouse datasets
 ds <- filter(ds_all, str_detect(taxon, "Mus musculus|Homo sapiens"))
-
+## Merge all datasets for plotting
 ds_merge <- bind_rows(ds_all, ds, .id = "id") %>% 
   mutate_at("PDAT", lubridate::ymd)
-
+## Count series with publications
 pdat <- ds_merge %>% 
   select(id, PDAT, PubMedIds) %>% 
-  mutate(pub = nchar(PubMedIds) != 0) %>% 
+  mutate(pub = str_length(PubMedIds) != 0) %>% 
   group_by(id, PDAT) %>% 
   summarise(N = n(),
             pub = sum(pub)) %>% 
@@ -38,9 +40,9 @@ pdat <- ds_merge %>%
 
 pdat <- gather(pdat, key, value, -PDAT, -id) 
 
-pdat <- ungroup(pdat) %>% mutate(id = if_else(id == 1, "All taxa", 
-                                              "Human and mouse"))
-
+pdat <- ungroup(pdat) %>% 
+  mutate(id = if_else(id == 1, "All taxa", "Human and mouse"))
+## Plot submissions
 geop <- pdat %>% 
   ggplot(aes(ymd(PDAT), value, linetype = key)) + 
   geom_line() +
@@ -53,6 +55,7 @@ geop <- pdat %>%
         legend.key = element_blank(),
         legend.title = element_blank())
 
+## Calculate percent series using human or mouse 
 ## formattable::percent()
 perc_mmhs <- percent(round(nrow(ds) / nrow(ds_all), 1), digits = 0)
 ppub <- group_by(pdat, id, key) %>% 
@@ -80,7 +83,7 @@ suppfilenames <- suppfilenames %>%
 failed_suppfiles <- suppfilenames %>% 
   filter(map_lgl(SuppFileNames, ~inherits(.x, "try-error"))) %>% 
   select(PDAT, PubMedIds) %>% 
-  mutate(pub = nchar(PubMedIds)!=0) %>% 
+  mutate(pub = str_length(PubMedIds) != 0) %>% 
   arrange(PDAT) %>% 
   group_by(PDAT) %>% 
   summarise(N = n(),
@@ -95,7 +98,7 @@ fsupp <- ggplot(failed_suppfiles, aes(ymd(PDAT), value, linetype = key)) +
   facet_wrap(~id) +
   xlab("Publication date") +
   ylab("Number of GEO series") +
-  scale_linetype_discrete(labels=c("All series", "Series with\npublications")) +
+  scale_linetype_discrete(labels = c("All series", "Series with\npublications")) +
   theme(legend.position = c(0.5, 0.77),
         legend.background = element_blank(),
         legend.key = element_blank(),
@@ -106,7 +109,7 @@ no_suppfile <- suppfilenames %>%
   select(has_suppfile) %>% 
   table
 
-perc_wsuppfile <- percent(round(1-(no_suppfile[1] / sum(no_suppfile)), 2), 
+perc_wsuppfile <- percent(round(1 - (no_suppfile[1] / sum(no_suppfile)), 2), 
                           digits = 0)
 
 # Queryfig ----------------------------------------------------------------
@@ -126,7 +129,7 @@ most_common_filename <- suppfilenames %>%
   filter(!map_lgl(SuppFileNames, ~inherits(.x, "try-error"))) %>% 
   unnest(SuppFileNames) %>% 
   group_by(SuppFileNames) %>% 
-  summarise(N=n())
+  summarise(N = n())
 
 # Supplemental file names with more than N=10 occurences
 cf <- suppfilenames %>% 
@@ -137,7 +140,7 @@ cf <- suppfilenames %>%
          common_filenames = tolower(common_filenames))
 
 cfn <- group_by(cf, common_filenames) %>% 
-  summarise(N=n()) %>% 
+  summarise(N = n()) %>% 
   arrange(desc(N)) %>% 
   filter(N > 10)
 

@@ -110,15 +110,10 @@ if(import_supptabs){
 
 load("data/st.RData")
 
-# Add sheet names to excel tables
-res <- mutate(st, sheetnames = map(result, ~if(!is.data.frame(.x)) {str_c("_", names(.x))} else {""}),
-       excelfiles = map2(suppfiles, sheetnames, str_c, sep = "")) %>%
-  select(-sheetnames)
-
-sampl <- filter(res, str_detect(excelfiles, "xls(x)?_")) %>%
-  select(Accession, excelfiles, result) %>%
-  sample_n(10) 
-
+## wow....
+st_unnested <- st %>% unnest(result)
+st_unnested <- st_unnested %>% unnest(sheets)
+st_unnested %>% filter(str_length(sheets) > 0)
 
 # Code to be removed don't delete yet! ------------------------------------
 

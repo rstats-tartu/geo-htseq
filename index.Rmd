@@ -41,7 +41,7 @@ library(grid)
 library(gridExtra)
 ```
 
-```{r libs}
+```{r}
 # Load helper functions
 source("lib/helpers.R")
 # Set panel label case
