@@ -13,9 +13,8 @@ library(gridExtra)
 # Load helper functions
 source("lib/helpers.R")
 
-# RNA-seq-dynamics --------------------------------------------------------
 
-## @knitr rna-seq-dynamics
+# ---- rna-seq-dynamics ----
 
 # Last date to consider geo series and suppfilenames
 last_date <- ymd("2017-06-19")
@@ -49,7 +48,7 @@ geop <- pdat %>%
   facet_wrap(~id) +
   ylab("Number of GEO series") +
   xlab("Publication date") +
-  scale_linetype_discrete(labels=c("All series","Series with\npublications")) +
+  scale_linetype_discrete(labels = c("All series","Series with\npublications")) +
   theme(legend.position = c(0.75, 0.77),
         legend.background = element_blank(),
         legend.key = element_blank(),
@@ -68,10 +67,8 @@ ppub <- group_by(pdat, id, key) %>%
   round(digits = 1) %>% 
   percent(digits = 0)
 
-# Missingsuppfiles --------------------------------------------------------
+# ---- missingsuppfiles ----
 # In this section we download and analyse supplementary file names
-
-## @knitr missingsuppfiles
 # src/A02_download_suppfiles.R
 load("data/suppfilenames_2017-06-19.RData")
 

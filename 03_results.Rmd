@@ -1,8 +1,8 @@
 
 ## Results {-}
 
-```{r}
-read_chunk("src/results.R")
+```{r res-read-chunk}
+knitr::read_chunk("src/results.R")
 ```
 
 ```{r rna-seq-dynamics}
