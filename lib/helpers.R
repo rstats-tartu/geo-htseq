@@ -1,5 +1,12 @@
 
 
+# Function to calculate mode ----------------------------------------------
+
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
 # myversion function ------------------------------------------------------
 
 myversion <- function(pkg){

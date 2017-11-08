@@ -4,10 +4,10 @@
 # devtools::install_github("tpall/entrezquery")
 library(entrezquery)
 
-# @knitr query-string
+## ---- query-string ----
 query <- 'expression profiling by high throughput sequencing[DataSet Type]'
 
-# @knitr run-query
+## ----- run-query -----
 ds <- entrez_docsums(query = query, db = "gds", retmax = 15000)
 
 # ds is short of document summaries

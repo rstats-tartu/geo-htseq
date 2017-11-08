@@ -18,43 +18,14 @@ abstract: >
   To this picture we add a simple method to calculate a retrospective power that is compatible with the FDR. 
   This allows to give a rich account of the quality and potential replicability of the results of almost any omics experiment. 
   As proof of concept we assessed the quality of the 9202 high-throughput sequencing experiments from Entrez GEO database.
-bibliography: [references.bib, packages.bib]
+bibliography: 
+    - references.bib
+    - packages.bib
 cls: wlpeerj.cls
-output: 
-  Gmisc::docx_document
+site: bookdown::bookdown_site
+documentclass: article
 ---
 
-```{r setup, include=FALSE}
-library(knitr)
-opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.path = 'figures/', dev = c('pdf'))
-library(tidyverse)
-library(lubridate)
-library(stringr)
-library(magrittr)
-library(formattable)
-library(Biobase)
-library(grid)
-library(gridExtra)
+```{r, include=FALSE}
+knitr::write_bib(c(.packages(), 'httr', 'xml2', 'XML', 'data.table','readxl' ,'GEOquery','tidyverse', 'lubridate', 'stringr','formattable', 'Biobase', 'grid', 'gridExtra','knitr', 'rmarkdown'), 'packages.bib')
 ```
-
-```{r}
-# Load helper functions
-source("lib/helpers.R")
-# Set panel label case
-panel_label_case <- "upper"
-```
-
-```{r child='01_introduction.Rmd'}
-
-```
-
-```{r child='02_methods.Rmd'}
-
-```
-
-```{r child='03_results.Rmd'}
-
-```
-
-
-## References {-}

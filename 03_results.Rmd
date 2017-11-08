@@ -1,9 +1,73 @@
+```{r include=FALSE, cache=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, 
+                      message = FALSE, 
+                      warning = FALSE,
+                      out.width = "70%",
+                      fig.align = 'center',
+                      fig.width = 6,
+                      fig.asp = 0.6,
+                      fig.show = "hold")
+
+options(htmltools.dir.version = FALSE, 
+        formatR.indent = 2, 
+        width = 55, 
+        digits = 4, 
+        warnPartialMatchAttr = FALSE, 
+        warnPartialMatchDollar = FALSE)
+
+library(tidyverse)
+library(lubridate)
+library(stringr)
+library(formattable)
+library(Biobase)
+library(grid)
+library(gridExtra)
+# Load helper functions
+source("lib/helpers.R")
+# Set panel label case
+panel_label_case <- "upper"
+nrowthreshold <- 4000
+```
+```{r include=FALSE, cache=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, 
+                      message = FALSE, 
+                      warning = FALSE, 
+                      fig.path = 'figures/',
+                      out.width = "70%",
+                      fig.align = 'center',
+                      fig.width = 6,
+                      fig.asp = 0.7,
+                      fig.show = "hold")
+
+options(htmltools.dir.version = FALSE, 
+        formatR.indent = 2, 
+        width = 55, 
+        digits = 4, 
+        warnPartialMatchAttr = FALSE, 
+        warnPartialMatchDollar = FALSE)
+
+library(tidyverse)
+library(lubridate)
+library(stringr)
+library(formattable)
+library(Biobase)
+library(grid)
+library(gridExtra)
+# Load helper functions
+source("lib/helpers.R")
+# Set panel label case
+panel_label_case <- "upper"
+nrowthreshold <- 4000
+```
 
 ## Results {-}
 
-```{r res-read-chunk}
+```{r}
 knitr::read_chunk("src/results.R")
 ```
+
 
 ```{r rna-seq-dynamics}
 
@@ -48,7 +112,12 @@ Raw data is required part of GEO submission, when raw data is provided as supple
 Other common files contain annotations 'readme.txt' and processed data: commonly sequence read counts, differential expression results or ChIP-Seq peak counts. 
 Reproducibility of ChIP-Seq results is poor and highly dependent on the software tools that were used [@pmid26764273].
 Normalised sequence read counts are used for plotting and visual evaluation of the analysis results, but cannot be used to reproduce differential expression analysis. 
-However, top tables of differentially expressed genes/features with complete set of raw P values allow direct evaluation of the data and analysis quality underlying tested hypothesis.  
+However, top tables of differentially expressed genes/features with complete set of raw P values allow direct evaluation of the data and analysis quality underlying tested hypothesis.
+
+```{r out-strings}
+
+```
+
 
 ```{r filesofinterest}
 
@@ -56,3 +125,15 @@ However, top tables of differentially expressed genes/features with complete set
 
 To start looking for toptables, we first excluded binary, annotation, raw data, graphics, and other non tabular files from the dataset. 
 This filter reduced the number of GEO series by `r suppf_oi_perc`.
+
+
+```{r loadst}
+
+```
+
+(ref:dims) __Number of samples and features of HT-seq experiments.__ Mean number of samples was `r round(n_samples$samples_mean)` and median `r n_samples$samples_median`. Most frequent sample size was `r n_samples$samples_Mode`. Mean number of features was `r paste(floor(n_samples$features_mean))` and median `r n_samples$features_median`. Number of samples was taken from series matrix files and number of features is number of rows in supplementary files. Dashed line denotes cutoff for complete sets of features/p values.
+
+```{r plotdims, fig.cap='(ref:dims)'}
+
+```
+

@@ -1,20 +1,13 @@
 
 # For development only, not run during article compilation
 
-library(tidyverse)
-library(lubridate)
-library(stringr)
-library(magrittr)
-library(formattable)
-library(Biobase)
-library(grid)
-library(gridExtra)
+## Load libs
+source("src/_common.R")
 
 # Load helper functions
 source("lib/helpers.R")
 
-
-# ---- rna-seq-dynamics ----
+## ---- rna-seq-dynamics ----
 
 # Last date to consider geo series and suppfilenames
 last_date <- ymd("2017-06-19")
@@ -27,7 +20,7 @@ ds_all <- filter(ds, ymd(PDAT) <= last_date)
 ds <- filter(ds_all, str_detect(taxon, "Mus musculus|Homo sapiens"))
 ## Merge all datasets for plotting
 ds_merge <- bind_rows(ds_all, ds, .id = "id") %>% 
-  mutate_at("PDAT", lubridate::ymd)
+  mutate_at("PDAT", ymd)
 ## Count series with publications
 pdat <- ds_merge %>% 
   select(id, PDAT, PubMedIds) %>% 
@@ -74,7 +67,7 @@ load("data/suppfilenames_2017-06-19.RData")
 
 # Let's keep study time frame fixed
 suppfilenames <- suppfilenames %>% 
-  mutate_at("PDAT", lubridate::ymd) %>% 
+  mutate_at("PDAT", ymd) %>% 
   filter(PDAT <= last_date)
 
 failed_suppfiles <- suppfilenames %>% 
@@ -111,7 +104,7 @@ perc_wsuppfile <- percent(round(1 - (no_suppfile[1] / sum(no_suppfile)), 2),
 
 # Queryfig ----------------------------------------------------------------
 
-## @knitr queryfig
+## ---- queryfig -----
 
 pg <- lapply(list(geop, fsupp), ggplotGrob)
 pg <- add_labels(pg, case = panel_label_case)
@@ -119,7 +112,7 @@ pga <- arrangeGrob(grobs = pg, ncol = 2, widths = c(2, 1))
 grid.draw(pga)
 
 # Commonfilenames ---------------------------------------------------------
-## @knitr commonfilenames
+## ---- commonfilenames -----
 
 # Single most common filename: filelist.txt
 most_common_filename <- suppfilenames %>% 
@@ -171,10 +164,8 @@ n_acc <- suppfilenames %>%
   n_distinct()
 supp_raw_perc <- percent(n_raw / n_acc, 0)
 
-# Filter downloaded supplementary file names ------------------------------
-# In this section, we filter supplementary file names for patterns: 
-# we are looking only for tabular data. 
-## @knitr out_strings
+## ---- out-strings ----
+
 out_string1 <- c("filelist","annotation","readme","error","raw.tar","csfasta",
                  "bam","sam","bed","[:punct:]hic","hdf5","bismark","map",
                  "barcode","peaks")
@@ -182,7 +173,8 @@ out_string2 <- c("tar","gtf","(big)?bed(\\.txt|12|graph|pk)?","bw","wig",
                  "hic","gct(x)?","tdf","gff(3)?","pdf","png","zip","sif",
                  "narrowpeak","fa", "r$", "rda(ta)?$")
 
-## @knitr filesofinterest
+## ---- filesofinterest ----
+
 suppfiles_of_interest <- suppfilenames %>% 
   unnest(SuppFileNames) %>%
   filter(!str_detect(tolower(SuppFileNames), 
@@ -202,7 +194,61 @@ suppf_oi_perc <- percent(1 - (filesofinterest / n_acc), 0)
 
 # Import of tabular supplementary files -----------------------------------
 
-## @knitr loadst
+## ---- loadst -----
 load("data/st.RData")
 
+st_unnested <- st %>% unnest(result)
+st_unnested <- st_unnested %>% unnest(sheets)
 
+## Add sheet names to xls files
+st_unnested <- st_unnested %>% 
+  mutate(suppdata_id = case_when(
+    str_length(sheets) > 0 ~ str_c(suppfiles, "-sheet-", sheets),
+    str_length(sheets) == 0 ~ suppfiles
+    ))
+
+## Let's use gsem table
+load("data/gsem.RData")
+
+## Remove errored matixes
+library(Biobase)
+gsem <- gsem %>%
+  filter(!map_lgl(gsematrix, inherits, "try-error")) %>% 
+  mutate(samples = map_int(gsematrix, ~ncol(exprs(.x))),
+         annot = map_chr(gsematrix, annotation)) %>% 
+  select(Accession, annot, gsematrix, samples, everything())
+
+## Match samples to right table/assay 
+dims <- left_join(st_unnested, gsem) %>%
+  group_by(suppdata_id) %>%
+  mutate(idcols = columns - samples) %>%
+  filter(idcols >= 0, idcols == min(idcols)) %>%
+  ungroup %>%
+  select(-matrixfiles, -suppfiles) %>%
+  distinct
+
+n_samples <- dims %>% 
+  summarise_at(vars(samples, features), funs(mean, median, Mode, min, max))
+
+## ---- plotdims -----
+
+## Plot features versus samples
+dims_tabp <- dims %>%
+  ggplot(aes(log10(samples), log10(features))) + 
+  geom_hex() +
+  labs(x = bquote(Number~of~samples~(log[10])),
+       y = bquote(Number~of~features~(log[10]))) +
+  geom_hline(yintercept = log10(nrowthreshold), linetype = 2) +
+  scale_fill_continuous(name = "Count")
+
+dims_featuresp <- dims %>%
+  ggplot(aes(log10(features))) + 
+  geom_histogram(bins = 60) +
+  labs(x = bquote(Number~of~features~(log[10])),
+       y = "Count") +
+  geom_vline(xintercept = log10(nrowthreshold), linetype = 2)
+
+pg <- lapply(list(dims_tabp, dims_featuresp), ggplotGrob)
+pg <- add_labels(pg, case = panel_label_case)
+pga <- arrangeGrob(grobs = pg, ncol = 2, widths = c(3, 2))
+grid.draw(pga)

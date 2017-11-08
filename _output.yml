@@ -1,10 +1,4 @@
-bookdown::gitbook:
+bookdown::html_document2:
   number_sections: FALSE
   split_by: none
-bookdown::pdf_book:
-    toc: FALSE
-    number_sections: FALSE
-    base_format: rticles::peerj_article
-    latex_engine: pdflatex
-    citation_package: natbib
-      
+

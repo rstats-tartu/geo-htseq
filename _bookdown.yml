@@ -1,3 +1,5 @@
+new_session: yes
+before_chapter_script: "src/_common.R"
 language:
   ui:
     chapter_name: ""
