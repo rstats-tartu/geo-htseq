@@ -2,10 +2,12 @@
 .Rhistory
 .RData
 .Ruserdata
-*.html
 data/
 figures/
 libs/
 log.txt
 *.log
+*.html
 _book
+*.rds
+packages.bib

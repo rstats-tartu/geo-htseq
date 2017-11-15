@@ -251,32 +251,3 @@ data_frame(pi0shrink, srpshrink) %>%
        y = "Multiple testing power (SRP)",
        caption = "Blue, SRP calculated over shrunken pi0.\nRed line, true power.\nDashed vertical line, unadjusted pi0.\nDashed horizontal line, raw SRP calculated using unadjusted pi0.")
 
-
-#' ## Bootstrap pi0
-p <- 2 * pnorm(-abs(z))
-hist(p)
-
-boot_pi0 <- function(x){
-  p1 <- sample(p, length(p), replace = TRUE)
-  qvalue::qvalue(p1)$pi0
-}
-
-piboots <- replicate(1000, boot_pi0(p))
-hist(piboots)
-
-d <- sum(qobject$qvalues < 0.05)
-td <- (1 - 0.05) * d
-
-tnn <- (1 - piboots) * 1000
-hist(tnn)
-
-srp <- td / tnn
-hist(srp)
-hist(srp[srp <= 1])
-
-srp_post <- (td + 0.2) / (tnn + 0.2 + 0.2)
-hist(log(srp_post[srp_post<=1]))
-quantile(log(srp_post[srp_post<=1]), c(0.05, 0.95)) %>% exp()
-truepower
-rethinking::HPDI(srp_post, prob = 0.95)
-
