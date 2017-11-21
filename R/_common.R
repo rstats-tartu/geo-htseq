@@ -5,8 +5,9 @@ knitr::opts_chunk$set(echo = FALSE,
                       out.width = "70%",
                       fig.align = 'center',
                       fig.width = 6,
-                      fig.asp = 0.6,
-                      fig.show = "hold")
+                      fig.asp = 0.5,
+                      fig.show = "hold",
+                      dev = 'svg')
 
 options(htmltools.dir.version = FALSE, 
         formatR.indent = 2, 
@@ -22,6 +23,8 @@ library(formattable)
 library(Biobase)
 library(grid)
 library(gridExtra)
+library(limma)
+
 # Load helper functions
 source("lib/helpers.R")
 # Set panel label case
