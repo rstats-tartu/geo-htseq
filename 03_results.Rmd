@@ -2,7 +2,8 @@
 ## Results {-}
 
 ```{r}
-knitr::read_chunk("R/results.R")
+knitr::read_chunk("R/results_query.R")
+knitr::read_chunk("R/results_pvalues.R")
 ```
 
 
@@ -91,16 +92,15 @@ However, tables containing top-ranked genes/features (toptables) from gene expre
 ```
 
 
-(ref:filesofinterest) Number of supplementary files per GEO Accession.
+(ref:filesofinterest) Distribution of supplementary files per GEO Accession. Left, all supplementary files. Right, supplementary files after filtering for tabular formats. Numbers show total number of files, respectively, before and after filtering.
 
 ```{r filesofinterest, fig.cap='(ref:filesofinterest)', out.width='50%'}
 
 ```
 
-GEO datasets contain most commonly one supplementary file per Accession and up to `r tail(suppf_per_acc$Files, 1)` files per Accession.
-
+GEO datasets contain most commonly one to two supplementary files per Accession and up to `r tail(suppfall_per_acc$Files, 1)` files per Accession (Fig. \@ref(fig:filesofinterest)).
 To start looking for toptables, we first excluded binary, annotation, raw data, graphics, and other non tabular files from the dataset. 
-This filter reduced the number of GEO series by `r suppf_oi_perc`.
+This filter reduced the number of files by `r files_oi_perc` (Fig. \@ref(fig:filesofinterest)) and GEO series by `r suppf_oi_perc`.
 
 KAS 43% 97-ST PROTSENDIST SISALDAB EELARVUTATUD P VÄÄRTUSI?
 KAS 57% 97-ST PROTSENDIST SISALDAB PROCESSED DATA-T, MILLE PEALT SAAB ARVUTADA P VÄÄRTUSED?
@@ -109,7 +109,7 @@ KAS 57% 97-ST PROTSENDIST SISALDAB PROCESSED DATA-T, MILLE PEALT SAAB ARVUTADA P
 
 ```
 
-(ref:dims) __Number of samples and features of HT-seq experiments.__ (`r ref_labels("A", panel_label_case)`) Mean number of samples was `r round(n_samples$samples_mean)` and median `r n_samples$samples_median`. Most frequent sample size was `r n_samples$samples_Mode`. Mean number of features was `r paste(floor(n_samples$features_mean))` and median `r n_samples$features_median`. (`r ref_labels("B", panel_label_case)`) Number of features in GEO series where supplementary file with p values was uploaded (dark grey) compared to all GEO series with supplementary files (light grey). (`r ref_labels("C", panel_label_case)`) Number of samples in GEO series where p values were available (dark grey) compared to all series with supplementray files (light grey). Number of samples was taken from series matrix files and number of features is number of rows in supplementary files. Dashed line denotes cutoff for complete sets of features/p values.
+(ref:dims) __Number of samples and features of HT-seq experiments.__ (`r ref_labels("A", panel_label_case)`) Mean number of samples was `r round(n_samples$samples_mean)` and median `r n_samples$samples_median`. Most frequent sample size was `r n_samples$samples_Mode`. Mean number of features was `r paste(floor(n_samples$features_mean))` and median `r n_samples$features_median`. (`r ref_labels("B", panel_label_case)`) Number of features in GEO series where supplementary file with p values was uploaded (dark grey) compared to all GEO series with supplementary files (light grey). (`r ref_labels("C", panel_label_case)`) Number of samples in GEO series where p values were available (dark grey) compared to all series with supplementary files (light grey). Number of samples was taken from series matrix files and number of features is number of rows in supplementary files. Dashed line denotes cutoff for complete sets of features/p values.
 
 ```{r plotdims, fig.cap='(ref:dims)'}
 
