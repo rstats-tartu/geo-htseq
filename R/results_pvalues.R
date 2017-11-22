@@ -48,6 +48,8 @@ dims_tabp <- dims %>%
   geom_hline(yintercept = log10(nrowthreshold), linetype = 2) +
   scale_fill_continuous(name = "Count")
 
+n_imported_sets <- length(unique(dims$Accession))
+
 #' dataset with p values
 p_value_dims <- dims %>% 
   filter(!map_lgl(pvalues, is.null))
