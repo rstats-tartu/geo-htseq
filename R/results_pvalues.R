@@ -52,6 +52,8 @@ dims_tabp <- dims %>%
 p_value_dims <- dims %>% 
   filter(!map_lgl(pvalues, is.null))
 
+n_sets_with_pvalues <- length(unique(p_value_dims$Accession))
+
 dims_featuresp <- dims %>%
   ggplot(aes(log10(features))) + 
   geom_histogram(bins = 60, fill = "gray70") +

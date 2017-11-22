@@ -45,19 +45,17 @@ Firstly we sought to determine the compliance with the formal requirements for G
 This pertains to the reproducibitly of data analysis. GEOarchive has three required components: metadata, processed data, and raw data. 
 Importantly, final processed data, on which published results are directly based, is submitted to GEO as supplementary files, allowing for the direct reproduction of analysis.
 Minimally these processed files are required to contain raw or normalized sequence read counts, or peak files of ChIP-Seq data. 
+While, in the presence of raw data, supplementary data is not strictly neccessary for reproducibility, reproducing analysis from the raw data requires the reproduction of the full analysis, starting from re-aligning sequences to the genome, which can be practically unfeasible. 
 
 For the human and mouse subset, we were able to identify supplementary files for `r perc_wsuppfile` (`r nrow(suppfilenames) - nrow(filter(failed_suppfiles, SuppFileNames == "Server denied"))`) of GEO series.  
-
-KAS SUPPLEMETARY VÕI SUPPLEMENTAL???: mõlemad on võimalikud, kuid ncbi geo kasutab "Supplementary file"
-
 The three percent of data sets lacking public supplementary files nevertheless show similar publication rates as data sets with supplementary files (Fig. \@ref(fig:queryfig)`r ref_labels("B", panel_label_case)`). 
 
-SIIN TULEKS SIIS JOONISEL NÄIDATA VÕRDLUST +/- SUPP FILES. MEIL ON AGA KÕIK VS. + SUPP FILES. **9000 ja 300 on sama graafiku peal halb võrrelda ilma log skaalasse minemata -- mitte muffigi ei saa aru. Tegemist on kompromissiga.**
+SIIN TULEKS SIIS JOONISEL NÄIDATA VÕRDLUST +/- SUPP FILES. MEIL ON AGA KÕIK VS. + SUPP FILES. **Võrdle kahte suhet koos usalduspiiridega -- see on lihtsalt tehtav -ÜLO**
 
 (ref:queryfig) __Datasets submitted to NCBI GEO database featuring expression profiling by high-throughput sequencing__. (`r ref_labels("A", panel_label_case)`) GEO series submission dynamics and associated publications of HT-seq data. Left facet, all submissions, N = `r nrow(ds_all)`. Right facet, submissions of human or mouse data sets, N = `r nrow(ds)`. (`r ref_labels("B", panel_label_case)`). Human or mouse GEO series that have supplementary files not available (N = `r nrow(filter(failed_suppfiles, SuppFileNames == "Server denied"))`).
 
 ```{r queryfig, fig.cap="(ref:queryfig)"}
-#B PANEEELIL TULEKS FACETI LEGEND MAHA VÕTTA (ÜLEVALT). SEE JOONIS ON KUIDAGI EBASÜMMEETRILINE. ÄKKI B PANEEL OMAETTE SUP JOONISESSE PANNA?
+#B PANEEEL TULEKS maha võtta. see on vähetähtis ja segadust tekitav.
 ```
 
 
@@ -74,8 +72,6 @@ Supplemental HT-seq files uplodaded to NCBI GEO contain most commonly raw sequen
 ```
 
 Raw sequence read data is required part of GEO submission, when raw data is provided as supplemental raw.tar file, GEO submits raw data to SRA on behalf of user, this happens in `r supp_raw_perc` of submissions.
-
-KAS RAW DATA EI VÕIMALDA PÕHIMÕTTELISELT ANALÜÜSI KORRATA? KUI JAH, SIIS TULEKS SEDA KUSKIL ERALDI ÖELDA (EHK EELMISES ALAMPEATÜKIS?) **Võimaldab küll analüüsi korrata, seda on aga oluliselt raskem teha ja see on oluliselt ressursimahukam. Pead alustama järjestuste genoomile alignimisest ja näiteks osad meetodid ei pruugi olla seepärast nn lauaarvutil hästi tehtavad.**
 
 Other common files contain annotations 'readme.txt' and processed data: commonly sequence read counts, gene expression analysis results or ChIP-Seq peak counts. 
 
