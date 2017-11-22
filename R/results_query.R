@@ -128,10 +128,11 @@ perc_wsuppfile <- percent(round(1 - (nrow(
 
 ## ---- queryfig -----
 
-pg <- lapply(list(geop, fsupp), ggplotGrob)
-pg <- add_labels(pg, case = panel_label_case)
-pga <- arrangeGrob(grobs = pg, ncol = 2, widths = c(2, 1))
-grid.draw(pga)
+geop
+# pg <- lapply(list(geop, fsupp), ggplotGrob)
+# pg <- add_labels(pg, case = panel_label_case)
+# pga <- arrangeGrob(grobs = pg, ncol = 2, widths = c(2, 1))
+# grid.draw(pga)
 
 # Commonfilenames ---------------------------------------------------------
 ## ---- commonfilenames -----

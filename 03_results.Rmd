@@ -52,10 +52,10 @@ The three percent of data sets lacking public supplementary files nevertheless s
 
 SIIN TULEKS SIIS JOONISEL NÄIDATA VÕRDLUST +/- SUPP FILES. MEIL ON AGA KÕIK VS. + SUPP FILES. **Võrdle kahte suhet koos usalduspiiridega -- see on lihtsalt tehtav -ÜLO**
 
-(ref:queryfig) __Datasets submitted to NCBI GEO database featuring expression profiling by high-throughput sequencing__. (`r ref_labels("A", panel_label_case)`) GEO series submission dynamics and associated publications of HT-seq data. Left facet, all submissions, N = `r nrow(ds_all)`. Right facet, submissions of human or mouse data sets, N = `r nrow(ds)`. (`r ref_labels("B", panel_label_case)`). Human or mouse GEO series that have supplementary files not available (N = `r nrow(filter(failed_suppfiles, SuppFileNames == "Server denied"))`).
+(ref:queryfig) __Datasets submitted to NCBI GEO database featuring expression profiling by high-throughput sequencing__. GEO series submission dynamics and associated publications of HT-seq data. Left facet, all submissions, N = `r nrow(ds_all)`. Right facet, submissions of human or mouse data sets, N = `r nrow(ds)`.
 
 ```{r queryfig, fig.cap="(ref:queryfig)"}
-#B PANEEEL TULEKS maha võtta. see on vähetähtis ja segadust tekitav.
+
 ```
 
 
