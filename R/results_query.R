@@ -4,26 +4,23 @@
 # Load libs
 source("R/_common.R")
 
-# # Load helper functions
-# source("lib/helpers.R")
-
 ## ---- rna-seq-dynamics ----
 
-## R/A01_GEO_query.R
+# R/A01_GEO_query.R
 load("data/ds.RData") # mouse and human GEO HT-seq expr datasets
 
-## all HT-seq datasets 
+# all HT-seq datasets 
 ds_all <- filter(ds, ymd(PDAT) <= last_date)
 first_date <- min(ymd(ds$PDAT))
 
-## Human or mouse datasets
+# Human or mouse datasets
 ds <- filter(ds_all, str_detect(taxon, "Mus musculus|Homo sapiens"))
 
-## Merge all datasets for plotting
+# Merge all datasets for plotting
 ds_merge <- bind_rows(ds_all, ds, .id = "id") %>% 
   mutate_at("PDAT", ymd)
 
-## Count series with publications
+# Count series with publications
 pdat <- ds_merge %>% 
   select(id, PDAT, PubMedIds) %>% 
   mutate(pub = str_length(PubMedIds) != 0) %>% 
@@ -37,7 +34,7 @@ pdat <- gather(pdat, key, value, -PDAT, -id)
 pdat <- ungroup(pdat) %>% 
   mutate(id = if_else(id == 1, "All taxa", "Human and mouse"))
 
-## Plot submissions
+# Plot submissions
 geop <- pdat %>% 
   ggplot(aes(ymd(PDAT), value, linetype = key)) + 
   geom_line() +
@@ -51,8 +48,8 @@ geop <- pdat %>%
         legend.key = element_blank(),
         legend.title = element_blank())
 
-## Calculate percent series using human or mouse 
-## formattable::percent()
+# Calculate percent series using human or mouse 
+# formattable::percent()
 perc_mmhs <- percent(round(nrow(ds) / nrow(ds_all), 1), digits = 0)
 
 # number of publications
@@ -69,10 +66,9 @@ ppub <- ppub_n %>%
   round(digits = 2) %>% 
   percent(digits = 0)
 
-# Queryfig ----------------------------------------------------------------
-
 ## ---- queryfig -----
 geop
+
 # pg <- lapply(list(geop, fsupp), ggplotGrob)
 # pg <- add_labels(pg, case = panel_label_case)
 # pga <- arrangeGrob(grobs = pg, ncol = 2, widths = c(2, 1))
