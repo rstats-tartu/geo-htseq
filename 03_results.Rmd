@@ -95,7 +95,7 @@ However, tables containing top-ranked genes/features (toptables) from gene expre
 ```
 
 GEO datasets contain most commonly one to two supplementary files per Accession and up to `r tail(suppfall_per_acc$Files, 1)` files per Accession (Fig. \@ref(fig:filesofinterest)).
-To start looking for toptables, we first excluded binary, annotation, raw data, graphics, and other non tabular files from the dataset. 
+To reduce number of files to be downloaded from GEO database, we first excluded from the dataset files, based on file extensions and filenames, that most plausibly don't contain final processed data in a tabular format, such as binary, annotation, raw data, graphics, and other non tabular files. 
 This filter reduced the number of files by `r files_oi_perc` (Fig. \@ref(fig:filesofinterest)) and GEO series by `r suppf_oi_perc`.
 
 KAS 43% 97-ST PROTSENDIST SISALDAB EELARVUTATUD P VÄÄRTUSI?
