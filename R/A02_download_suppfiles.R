@@ -1,10 +1,7 @@
 
-library(dplyr)
-library(purrr)
-library(tidyr)
+library(tidyverse)
 library(httr)
 library(lubridate)
-library(stringr)
 source("lib/getDirListing.R")
 
 if(!"ds" %in% ls()){
