@@ -21,7 +21,7 @@ has_suppfile <- suppfilenames$SuppFileNames %>%
 suppfilenames_present <- suppfilenames %>% 
   filter(!map_lgl(SuppFileNames, ~inherits(.x, "try-error")))
 
-# unnested data
+# unnested suppfiles
 suppfilenames_present_unnested <- suppfilenames_present %>% 
   unnest(SuppFileNames)
 
@@ -57,14 +57,13 @@ fsupp <- failed_suppfiles %>%
         legend.key = element_blank(),
         legend.title = element_blank())
 
-## in 24 cases we failed to get dir listing because time out
+# in 24 cases we failed to get dir listing because time out
 # perc_wsuppfile <- percent(round(1 - (has_suppfile[1] / sum(has_suppfile)), 2), 
 #                           digits = 0)
 # temporary hack
 perc_wsuppfile <- percent(round(1 - (nrow(suppfilenames_not_present) / nrow(suppfilenames)), 2), digits = 0)
 
-# Commonfilenames ---------------------------------------------------------
-## ---- commonfilenames -----
+# ---- commonfilenames -----
 
 # Analyse file extensions
 file_ext <- suppfilenames_present %>%
@@ -109,7 +108,7 @@ cfp <- ggplot(cfn, aes(reorder(common_filenames, N), N)) +
   theme(axis.title.y = element_blank(),
         axis.text.y = element_text(color = "black"))
 
-# plot commonfilenames ggplot
+# Plot commonfilenames ggplot
 pg <- lapply(list(file_ext_plot, cfp), ggplotGrob)
 pg <- add_labels(pg, case = panel_label_case)
 pga <- arrangeGrob(grobs = pg, ncol = 2, widths = c(2, 3))
@@ -132,7 +131,7 @@ n_raw <- cf %>%
 # Total nr of accessions
 supp_raw_perc <- percent(n_raw / nrow(suppfilenames), 0)
 
-## ---- out-strings ----
+# ---- out-strings ----
 
 out_string1 <- c("filelist","annotation","readme","error","raw.tar","csfasta",
                  "bam","sam","bed","[:punct:]hic","hdf5","bismark","map",
@@ -141,7 +140,7 @@ out_string2 <- c("tar","gtf","(big)?bed(\\.txt|12|graph|pk)?","bw","wig",
                  "hic","gct(x)?","tdf","gff(3)?","pdf","png","zip","sif",
                  "narrowpeak","fa", "r$", "rda(ta)?$")
 
-## ---- filesofinterest ----
+# ---- filesofinterest ----
 suppfiles_of_interest <- suppfilenames_present_unnested %>%
   filter(!str_detect(tolower(SuppFileNames), str_c(out_string1, collapse = "|")),
          !str_detect(tolower(SuppFileNames), str_c(out_string2, "(\\.gz|\\.bz2)?$", 
@@ -149,7 +148,7 @@ suppfiles_of_interest <- suppfilenames_present_unnested %>%
   select(Accession, SuppFileNames, FTPLink, PDAT) %>% 
   mutate(filext = str_extract(tolower(SuppFileNames), "\\.[:alpha:]+([:punct:][bgz2]+)?$")) 
 
-## Number accessions with files of interest
+# Number accessions with files of interest
 filesofinterest <- suppfiles_of_interest %>% 
   select(Accession) %>% 
   n_distinct()
@@ -167,11 +166,6 @@ suppfall_per_acc <- suppfilenames_present_unnested %>%
   as_data_frame()
 colnames(suppfall_per_acc) <- c("Files", "Count")
 
-n_suppfall_per_acc <- suppfall_per_acc %>% 
-  mutate(Files = as.numeric(Files),
-         total = Files * Count) %>% 
-  summarise(N = sum(total))
-
 # Number of files per accession, files of interest
 suppfoi_per_acc <- suppfiles_of_interest %>% 
   group_by(Accession) %>% 
@@ -181,13 +175,8 @@ suppfoi_per_acc <- suppfiles_of_interest %>%
   as_data_frame()
 colnames(suppfoi_per_acc) <- c("Files", "Count")
 
-n_suppfoi_per_acc <- suppfoi_per_acc %>% 
-  mutate(Files = as.numeric(Files),
-         total = Files * Count) %>% 
-  summarise(N = sum(total))
-
 # Percent files after filter
-files_oi_perc <- percent(1 - (n_suppfoi_per_acc / n_suppfall_per_acc), digits = 0)
+files_oi_perc <- percent(1 - (nrow(suppfiles_of_interest) / nrow(suppfilenames_present_unnested)), digits = 0)
 
 bind_rows(suppfall_per_acc, suppfoi_per_acc, .id = "id") %>% 
   mutate(Files = as.numeric(Files),
@@ -200,15 +189,9 @@ bind_rows(suppfall_per_acc, suppfoi_per_acc, .id = "id") %>%
   geom_bar(stat = "identity") + 
   facet_wrap(~ id) +
   annotate("text", x = "6", y = 4500, 
-           label = c(str_c("N = ", n_suppfall_per_acc), 
-                     str_c("N = ", n_suppfoi_per_acc))) +
+           label = c(glue("N = {nrow(suppfilenames_present_unnested)} "), 
+                     glue("N = {nrow(suppfiles_of_interest)}"))) +
   labs(x = "Files per GEO Accession",
        y = "N of GEO Accessions")
 
-# suppf_per_acc %>% 
-#   mutate_at("Files", as.numeric) %>% 
-#   ggplot(aes(as.factor(Files), Count)) +
-#   geom_bar(stat = "identity") + 
-#   labs(x = "Files per GEO Accession",
-#        y = "N of GEO Accessions")
 
