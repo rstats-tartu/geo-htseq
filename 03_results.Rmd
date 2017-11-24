@@ -4,6 +4,7 @@
 ```{r}
 knitr::read_chunk("R/results_query.R")
 knitr::read_chunk("R/results_pvalues.R")
+knitr::read_chunk("R/results_suppfiles.R")
 ```
 
 
@@ -88,15 +89,16 @@ However, tables containing top-ranked genes/features (toptables) from gene expre
 ```
 
 
-(ref:filesofinterest) Distribution of supplementary files per GEO Accession. Left, all supplementary files. Right, supplementary files after filtering for tabular formats. Numbers show total number of files, respectively, before and after filtering.
+(ref:filesofinterest) Distribution of supplementary files per GEO Accession before and after filtering supplementary files for download. Left, all supplementary files. Right, supplementary files to be downloaded after filtering for tabular formats. Numbers show total number of files, respectively, before and after filtering.
 
 ```{r filesofinterest, fig.cap='(ref:filesofinterest)', out.width='50%'}
 
 ```
 
 GEO datasets contain most commonly one to two supplementary files per Accession and up to `r tail(suppfall_per_acc$Files, 1)` files per Accession (Fig. \@ref(fig:filesofinterest)).
-To reduce number of files to be downloaded from GEO database, we first excluded from the dataset files, based on file extensions and filenames, that most plausibly don't contain final processed data in a tabular format, such as binary, annotation, raw data, graphics, and other non tabular files. 
-This filter reduced the number of files by `r files_oi_perc` (Fig. \@ref(fig:filesofinterest)) and GEO series by `r suppf_oi_perc`.
+To reduce number of files to be downloaded from GEO database, based on file extensions and filenames, we first excluded from the dataset files that most plausibly don't contain final processed data in a tabular format, such as binary files, annotations, raw data, graphics, and other non tabular files.
+This filter reduced the number of files by `r files_oi_perc` (Fig. \@ref(fig:filesofinterest)) and GEO series by `r suppf_oi_perc`. 
+Resulting dataset consisted of `r nrow(suppfiles_of_interest)` files from `r n_distinct(suppfiles_of_interest$Accession)` GEO series to be downloaded.
 
 KAS 43% 97-ST PROTSENDIST SISALDAB EELARVUTATUD P VÄÄRTUSI?
 KAS 57% 97-ST PROTSENDIST SISALDAB PROCESSED DATA-T, MILLE PEALT SAAB ARVUTADA P VÄÄRTUSED?
