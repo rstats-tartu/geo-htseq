@@ -69,23 +69,28 @@ this_year <- function(x){
 #' }
 #' @import dplyr
 #' @import httr
+#' @import readr
+#' @import tidyr
+#' @import lubridate
+#' @import purrr
+#' @import stringr
 #' @export
 get_dirlist <- function(r){
   
-  if(class(r) != "response") {
+  if (class(r) != "response") {
     warning("Not html response!")
     return()
   }
   
-  cont <- content(r, as = "text", encoding = "UTF-8")
-  tb <- readr::read_delim(cont, "\n", col_names = F)
+  cont <- httr::content(r, as = "text", encoding = "UTF-8")
+  tb <- readr::read_delim(cont, "\n", col_names = FALSE)
   tb <- tidyr::separate(tb, "X1", paste0("C", 1:9), "[[:space:]]+")
   tb <- dplyr::mutate(tb, year = purrr::map_chr(C8, this_year),
                       month = which(stringr::str_detect(month.abb, C6)),
                       date = lubridate::dmy(paste(C7, month, year, sep = "-")))
   tb <- dplyr::select(tb, date, C5, C9)
-  colnames(tb) <- c("date", "size", str_extract(r$url, "miniml|suppl"))
-  return(tb)
+  colnames(tb) <- c("date", "size", stringr::str_extract(r$url, "miniml|suppl"))
+  tb
 }
 
 # download supplementary files --------------------------------------------
