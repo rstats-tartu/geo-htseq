@@ -19,6 +19,7 @@ options(htmltools.dir.version = FALSE,
 library(tidyverse)
 library(lubridate)
 library(stringr)
+library(glue)
 library(formattable)
 library(Biobase)
 library(grid)
@@ -27,9 +28,11 @@ library(limma)
 
 # Load helper functions
 source("lib/helpers.R")
+
 # Set panel label case
 panel_label_case <- "upper"
 nrowthreshold <- 4000
+
 # Last date to consider geo series and suppfilenames
 last_date <- ymd("2017-06-19")
 
