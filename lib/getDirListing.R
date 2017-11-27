@@ -86,7 +86,7 @@ get_dirlist <- function(r){
   tb <- readr::read_delim(cont, "\n", col_names = FALSE)
   tb <- tidyr::separate(tb, "X1", paste0("C", 1:9), "[[:space:]]+")
   tb <- dplyr::mutate(tb, year = purrr::map_chr(C8, this_year),
-                      month = which(stringr::str_detect(month.abb, C6)),
+                      month = map_int(C6, ~which(stringr::str_detect(month.abb, .x))),
                       date = lubridate::dmy(paste(C7, month, year, sep = "-")))
   tb <- dplyr::select(tb, date, C5, C9)
   colnames(tb) <- c("date", "size", stringr::str_extract(r$url, "miniml|suppl"))
