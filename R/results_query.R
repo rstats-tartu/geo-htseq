@@ -9,36 +9,34 @@ source("R/_common.R")
 # R/A01_GEO_query.R
 load("data/ds.RData") # mouse and human GEO HT-seq expr datasets
 
-# all HT-seq datasets 
-ds_all <- filter(ds, ymd(PDAT) <= last_date)
-first_date <- min(ymd(ds$PDAT))
+# Date of the first submission
+first_date <- range(ymd(ds$PDAT))[1]
 
-# Human or mouse datasets
-ds <- filter(ds_all, str_detect(taxon, "Mus musculus|Homo sapiens"))
-
-# Merge all datasets for plotting
-ds_merge <- bind_rows(ds_all, ds, .id = "id") %>% 
-  mutate_at("PDAT", ymd)
+# All HT-seq datasets
+# Lump together all non-human and murine taxa
+# Convert PDAT to date format
+ds_redline <- ds %>% 
+  mutate(PDAT = ymd(PDAT),
+         model = case_when(
+           str_detect(taxon, "Mus musculus|Homo sapiens") ~ "Human and mouse",
+           !str_detect(taxon, "Mus musculus|Homo sapiens") ~ "Other taxa"
+         )) %>%
+  filter(PDAT <= last_date)
 
 # Count series with publications
-pdat <- ds_merge %>% 
-  select(id, PDAT, PubMedIds) %>% 
+pdat <- ds_redline %>% 
   mutate(pub = str_length(PubMedIds) != 0) %>% 
-  group_by(id, PDAT) %>% 
-  summarise(N = n(),
+  group_by(model, PDAT) %>% 
+  summarise(geoseries = n(), 
             pub = sum(pub)) %>% 
-  mutate_at(vars(N, pub), cumsum)
-
-pdat <- gather(pdat, key, value, -PDAT, -id) 
-
-pdat <- ungroup(pdat) %>% 
-  mutate(id = if_else(id == 1, "All taxa", "Human and mouse"))
+  mutate_at(vars(geoseries, pub), cumsum) %>% 
+  gather(key, value, -PDAT, -model)
 
 # Plot submissions
 geop <- pdat %>% 
-  ggplot(aes(ymd(PDAT), value, linetype = key)) + 
+  ggplot(aes(PDAT, value, linetype = key)) + 
   geom_line() +
-  facet_wrap(~id) +
+  facet_wrap(~ model) +
   labs(x = "Publication date", 
        y = "Number of GEO series") +
   scale_linetype_discrete(labels = c("All series","Series with\npublications")) +
@@ -50,21 +48,28 @@ geop <- pdat %>%
 
 # Calculate percent series using human or mouse 
 # formattable::percent()
-perc_mmhs <- percent(round(nrow(ds) / nrow(ds_all), 1), digits = 0)
+perc_mmhs <- percent(table(ds_redline$model)[1] / sum(table(ds_redline$model)), digits = 0)
 
-# number of publications
-ppub_n <- group_by(pdat, id, key) %>% 
+# Number of publications
+ppub_n <- group_by(pdat, model, key) %>% 
   summarise_at("value", max)
 
-# percent with publications
+# Percent with publications
 ppub <- ppub_n %>% 
-  group_by(id) %>% 
-  summarise(ppub = value[key=="pub"] / value[key=="N"]) %>% 
+  group_by(model) %>% 
+  summarise(ppub = value[key=="pub"] / value[key=="geoseries"]) %>% 
   ungroup %>% 
-  filter(str_detect(id, "Human")) %>% 
+  # filter(str_detect(model, "Human")) %>% 
   .$ppub %>% 
   round(digits = 2) %>% 
   percent(digits = 0)
+
+ppub_n_ci <-  ppub_n %>% 
+  spread(key, value) %>% 
+  mutate(pois = map2(pub, geoseries, poisson.test),
+         ci = map(pois, "conf.int"),
+         ci = map(ci, percent, 1),
+         ci = map_chr(ci, ~glue("95%CI, {.x[1]} to {.x[2]}")))
 
 ## ---- queryfig -----
 geop
@@ -73,5 +78,3 @@ geop
 # pg <- add_labels(pg, case = panel_label_case)
 # pga <- arrangeGrob(grobs = pg, ncol = 2, widths = c(2, 1))
 # grid.draw(pga)
-
-

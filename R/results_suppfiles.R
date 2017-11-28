@@ -5,21 +5,36 @@ source("R/_common.R")
 # ---- missingsuppfiles ----
 # In this section we download and analyse supplementary file names
 # R/A02_download_suppfiles.R
-load("data/suppfilenames_2017-06-19.RData")
+suppfilenames <- readRDS("data/suppfilenames_2017-11-27.rds")
 
 # Let's keep study time frame fixed
 suppfilenames <- suppfilenames %>% 
   mutate_at("PDAT", ymd) %>% 
   filter(PDAT <= last_date)
 
-# missing suppfilenames
-has_suppfile <- suppfilenames$SuppFileNames %>% 
+# Filed suppfilenames downloads
+has_suppfile <- suppfilenames$r %>% 
   map_lgl(~ !inherits(.x, "try-error")) %>% 
   table()
 
-# datasets with suppfiles
+# Summarise failed suppfilename downloads
+suppfilenames_fails <- suppfilenames %>% 
+  filter(map_lgl(r, inherits, "try-error")) %>% 
+  mutate(error = map_chr(r, "["(1)),
+         error = case_when(
+           str_detect(error, "denied") ~ "Server denied",
+           str_detect(error, "Timeout") ~ "Timeout"
+         )) %>% 
+  .$error %>% 
+  table()
+
+# Extract supplemetary file names
+suppfilenames <- suppfilenames %>% 
+  mutate(SuppFileNames = map(suppfiles, "suppl"))
+
+# Datasets with suppfiles
 suppfilenames_present <- suppfilenames %>% 
-  filter(!map_lgl(SuppFileNames, ~inherits(.x, "try-error")))
+  filter(map_lgl(SuppFileNames, ~length(.x) > 0))
 
 # unnested suppfiles
 suppfilenames_present_unnested <- suppfilenames_present %>% 
@@ -27,20 +42,13 @@ suppfilenames_present_unnested <- suppfilenames_present %>%
 
 # datasets missing public suppfiles
 suppfilenames_not_present <- suppfilenames %>% 
-  filter(map_lgl(SuppFileNames, ~inherits(.x, "try-error")))
+  filter(map_lgl(SuppFileNames, ~length(.x) == 0))
 
 # Timeouts need to be checked!!!
 failed_suppfiles <- suppfilenames_not_present %>% 
-  select(Id, Accession, PDAT, PubMedIds, SuppFileNames) %>%
-  unnest(SuppFileNames) %>% 
-  mutate(pub = str_length(PubMedIds) != 0,
-         SuppFileNames = case_when(
-           str_detect(SuppFileNames, "Server denied") ~ "Server denied",
-           str_detect(SuppFileNames, "timed out") ~ "Timed out"
-         ))
+  mutate(pub = str_length(PubMedIds) != 0)
 
 fsupp <- failed_suppfiles %>% 
-  # filter(SuppFileNames == "Server denied") %>%
   group_by(PDAT) %>% 
   summarise(N = n(),
             pub = sum(pub)) %>% 
@@ -62,6 +70,22 @@ fsupp <- failed_suppfiles %>%
 #                           digits = 0)
 # temporary hack
 perc_wsuppfile <- percent(round(1 - (nrow(suppfilenames_not_present) / nrow(suppfilenames)), 2), digits = 0)
+
+ppub_n_ci_nopublicsupps <- suppfilenames_not_present %>% 
+  mutate(pub = str_length(PubMedIds) != 0) %>% 
+  group_by(PDAT) %>% 
+  summarise(geoseries = n(), 
+            pub = sum(pub)) %>% 
+  mutate_at(vars(geoseries, pub), cumsum) %>% 
+  gather(key, value, -PDAT) %>% 
+  group_by(key) %>% 
+  summarise_at("value", max) %>%
+  spread(key, value) %>% 
+  mutate(pois = map2(pub, geoseries, poisson.test),
+         estimate = map_dbl(pois, "estimate"),
+         ci = map(pois, "conf.int"),
+         ci = map(ci, percent, 1),
+         ci = map_chr(ci, ~glue("95%CI, {.x[1]} to {.x[2]}")))
 
 # ---- commonfilenames -----
 
@@ -88,6 +112,10 @@ file_ext_plot <- ggplot(file_ext, aes(reorder(filext, N), N)) +
 most_common_filename <- suppfilenames_present_unnested %>% 
   group_by(SuppFileNames) %>% 
   summarise(N = n())
+
+# filelist.txt and raw.tar only
+suppfiles_rawtar_only <- suppfilenames_present %>% 
+  filter(map_lgl(SuppFileNames, ~ all(str_detect(.x, "filelist.txt|RAW.tar"))))
 
 # Supplemental file names with more than N=10 occurences
 cf <- suppfilenames_present_unnested %>%
@@ -193,5 +221,3 @@ bind_rows(suppfall_per_acc, suppfoi_per_acc, .id = "id") %>%
                      glue("N = {nrow(suppfiles_of_interest)}"))) +
   labs(x = "Files per GEO Accession",
        y = "N of GEO Accessions")
-
-

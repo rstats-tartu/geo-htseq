@@ -1,3 +1,7 @@
+
+# Load libs
+source("R/_common.R")
+
 # Import of tabular supplementary files -----------------------------------
 
 ## ---- loadst -----
@@ -13,12 +17,14 @@ st_unnested <- st_unnested %>%
     str_length(sheets) == 0 ~ suppfiles
   ))
 
-
 ## Let's use gsem table
 load("data/gsem.RData")
 
 ## Remove errored matrixes
 library(Biobase)
+gsem_error <- gsem %>%
+  filter(map_lgl(gsematrix, inherits, "try-error"))
+
 gsem <- gsem %>%
   filter(!map_lgl(gsematrix, inherits, "try-error")) %>% 
   mutate(samples = map_int(gsematrix, ~ncol(exprs(.x))),

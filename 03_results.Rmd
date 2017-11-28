@@ -14,55 +14,36 @@ knitr::read_chunk("R/results_suppfiles.R")
 
 ### HT-sequencing expression data in GEO database {-}
 
-To assess the quality of RNAseq datasets we queried the NCBI GEO database for "expression profiling by high throughput sequencing" AND "human" OR "mouse". 
+To assess the quality of RNAseq datasets we queried the NCBI GEO database for "expression profiling by high throughput sequencing" AND "human" OR "mouse".
+NCBI GEO database shows exponentially growing number of high-throughput sequencing data set submissions between `r year(first_date)` and 2017 (Fig. \@ref(fig:queryfig)). 
+First HT-seq data set that our query retrieved was submitted to GEO database at `r first_date` and our query was limited for datasets submitted until `r last_date`. 
+This resulted in the retrieval of `r nrow(ds_redline)` datasets.
 
-MIKS JUST GEO?
-
->The SRA is NIH's primary archive of high-throughput sequencing data and is part of the International Nucleotide Sequence Database Collaboration (INSDC) that includes at the NCBI Sequence Read Archive (SRA), the European Bioinformatics Institute (EBI), and the DNA Database of Japan (DDBJ). Data submitted to any of the three organizations are shared among them.
-Submitters would deposit their sequence data via GEO instead of via SRA if:
-They have a processed (or summary) data from which the conclusions in associated manuscripts are based.
-Their study is a type accepted by GEO. Refer to Categories of sequence submissions processed by GEO.
-A complete GEO submission includes:
-  - metadata (metadata spreadsheet)
-  - processed data (processed data files)
-  - raw data (raw data files).
-GEO brokers the raw data files to SRA.
-
-NCBI GEO database shows exponentially growing number of high-throughput sequencing data set submissions between 2012 and 2017 (Fig. \@ref(fig:queryfig)`r ref_labels("A", panel_label_case)`). 
-
-Our query was limited for datasets submitted between `r first_date` to `r last_date`. 
-This resulted in the retrieval of `r nrow(ds_all)` datasets.
-
-Approximately `r perc_mmhs` of GEO data sets (`r nrow(ds)`) contain data from mouse or human origin (Fig. \@ref(fig:queryfig)`r ref_labels("A", panel_label_case)`, right facet).
-The majority (`r ppub`, `r ppub_n$value[4]`) of human and mouse data sets are linked to their primary publication.
+Approximately `r perc_mmhs` of GEO data sets (`r table(ds_redline$model)[1]`) contain data from mouse or human origin (Fig. \@ref(fig:queryfig), left facet).
+The `r ppub[1]` (`r ppub_n_ci$ci[1]`, Poisson exact test) of human and mouse data sets are linked to their primary publication. 
+Proportion of datasets with publications is lower when other taxa are used as model organisms `r ppub[2]` (`r ppub_n_ci$ci[2]`, Poisson exact test)(Fig. \@ref(fig:queryfig), right facet).
 As expected, the gap between published GEO series and published articles is bigger for more recent submissions.
-
 
 ```{r missingsuppfiles}
 
 ```
 
-Firstly we sought to determine the compliance with the formal requirements for GEO data submission (https://www.ncbi.nlm.nih.gov/geo/info/seq.html). 
-This pertains to the reproducibitly of data analysis. GEOarchive has three required components: metadata, processed data, and raw data. 
-Importantly, final processed data, on which published results are directly based, is submitted to GEO as supplementary files, allowing for the direct reproduction of analysis.
-Minimally these processed files are required to contain raw or normalized sequence read counts, or peak files of ChIP-Seq data. 
-While, in the presence of raw data, supplementary data is not strictly neccessary for reproducibility, reproducing analysis from the raw data requires the reproduction of the full analysis, starting from re-aligning sequences to the genome, which can be practically unfeasible. 
+For the human and mouse subset, we were able to identify supplementary files for `r perc_wsuppfile` (`r nrow(suppfilenames_present)`) of GEO series.  
+The three percent of data sets lacking public supplementary files nevertheless show `r percent(ppub_n_ci_nopublicsupps$estimate, 0)` publication rate (`r ppub_n_ci_nopublicsupps$ci`) which is similar to data sets with supplementary files. 
 
-For the human and mouse subset, we were able to identify supplementary files for `r perc_wsuppfile` (`r nrow(suppfilenames) - nrow(filter(failed_suppfiles, SuppFileNames == "Server denied"))`) of GEO series.  
-The three percent of data sets lacking public supplementary files nevertheless show similar publication rates as data sets with supplementary files (Fig. \@ref(fig:queryfig)`r ref_labels("B", panel_label_case)`). 
-
-SIIN TULEKS SIIS JOONISEL NÄIDATA VÕRDLUST +/- SUPP FILES. MEIL ON AGA KÕIK VS. + SUPP FILES. **Võrdle kahte suhet koos usalduspiiridega -- see on lihtsalt tehtav -ÜLO**
-
-(ref:queryfig) __Datasets submitted to NCBI GEO database featuring expression profiling by high-throughput sequencing__. GEO series submission dynamics and associated publications of HT-seq data. Left facet, all submissions, N = `r nrow(ds_all)`. Right facet, submissions of human or mouse data sets, N = `r nrow(ds)`.
+(ref:queryfig) __Datasets submitted to NCBI GEO database featuring expression profiling by high-throughput sequencing__. GEO series submission dynamics and associated publications of HT-seq data. Left facet, submissions featuring human or mouse data, N = `r table(ds_redline$model)[1]`. Right facet, submissions of other taxa, N = `r table(ds_redline$model)[2]`. Dashed line, GEO series with publications.
 
 ```{r queryfig, fig.cap="(ref:queryfig)"}
 
 ```
 
-
-JÄRGNEV LÄHEB ILMSELT MAT & MEETODISSE AGA MEIL ON KA TULEMUSTESSE VAJA LAUSET VÕI PAARI KIRJELDAMAKS JOONIS 3-E.
-
 ### Compliance with GEO database submission requirements and data usability for reanalysis {-}
+
+We sought to determine the compliance with the formal requirements for GEO data submission (https://www.ncbi.nlm.nih.gov/geo/info/seq.html). 
+This pertains to the reproducibitly of data analysis. 
+GEO archive has three required components: metadata, processed data, and raw data. 
+Minimally these processed files are required to contain raw or normalized sequence read counts, or peak files of ChIP-Seq data. 
+While, in the presence of raw data, supplementary data is not strictly neccessary for reproducibility, reproducing analysis from the raw data requires the reproduction of the full analysis, starting from re-aligning sequences to the genome, which can be practically unfeasible.
 
 Supplemental HT-seq files uplodaded to NCBI GEO contain most commonly raw sequence data files with 'raw.tar' file extension and associated automatically generated 'filelist.txt' file (Fig. \@ref(fig:commonfilenames)).
 
@@ -100,12 +81,12 @@ To reduce number of files to be downloaded from GEO database, based on file exte
 This filter reduced the number of files by `r files_oi_perc` (Fig. \@ref(fig:filesofinterest)) and GEO series by `r suppf_oi_perc`. 
 Resulting dataset consisted of `r nrow(suppfiles_of_interest)` files from `r n_distinct(suppfiles_of_interest$Accession)` GEO series to be downloaded.
 
-KAS 43% 97-ST PROTSENDIST SISALDAB EELARVUTATUD P VÄÄRTUSI?
-KAS 57% 97-ST PROTSENDIST SISALDAB PROCESSED DATA-T, MILLE PEALT SAAB ARVUTADA P VÄÄRTUSED?
-
 ```{r loadst}
 
 ```
+
+
+### Processed data
 
 (ref:dims) __Number of samples and features of HT-seq experiments.__ (`r ref_labels("A", panel_label_case)`) Mean number of samples was `r round(n_samples$samples_mean)` and median `r n_samples$samples_median`. Most frequent sample size was `r n_samples$samples_Mode`. Mean number of features was `r paste(floor(n_samples$features_mean))` and median `r n_samples$features_median`. (`r ref_labels("B", panel_label_case)`) Number of features in GEO series where supplementary file with p values was uploaded (dark grey) compared to all GEO series with supplementary files (light grey). (`r ref_labels("C", panel_label_case)`) Number of samples in GEO series where p values were available (dark grey) compared to all series with supplementary files (light grey). Number of samples was taken from series matrix files and number of features is number of rows in supplementary files. Dashed line denotes cutoff for complete sets of features/p values.
 
