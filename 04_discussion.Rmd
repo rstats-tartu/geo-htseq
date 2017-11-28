@@ -2,3 +2,5 @@
 ## Discussion {-}
 
 We need to dicuss some things here.
+
+Reproducibility of ChIP-Seq results is poor and highly dependent on the software tools used [@pmid26764273].

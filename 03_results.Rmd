@@ -57,8 +57,6 @@ Raw sequence read data is required part of GEO submission, when raw data is prov
 
 Other common files contain annotations 'readme.txt' and processed data: commonly sequence read counts, gene expression analysis results or ChIP-Seq peak counts. 
 
-Reproducibility of ChIP-Seq results is poor and highly dependent on the software tools used [@pmid26764273]. MIKS SEE LAUSE SIIN ON? **Meeldetuletuseks, chr-ip.**
-
 Sequence read counts can be either as raw read counts or normalised read counts.
 Gene expression analysis of HT-seq data is commonly performed by fitting models to discrete sequence read count data.
 Normalised sequence read counts are used for plotting and visual evaluation of the analysis results, but cannot be used to directly reproduce gene expression analysis. 
