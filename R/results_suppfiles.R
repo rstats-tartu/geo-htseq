@@ -5,32 +5,30 @@ source("R/_common.R")
 # ---- missingsuppfiles ----
 # In this section we download and analyse supplementary file names
 # R/A02_download_suppfiles.R
-suppfilenames <- readRDS("data/suppfilenames_2017-11-27.rds")
+suppfilenames_imported <- readRDS("data/suppfilenames_2017-11-27.rds")
 
 # Let's keep study time frame fixed
-suppfilenames <- suppfilenames %>% 
-  mutate_at("PDAT", ymd) %>% 
-  filter(PDAT <= last_date)
-
-# Filed suppfilenames downloads
-has_suppfile <- suppfilenames$r %>% 
-  map_lgl(~ !inherits(.x, "try-error")) %>% 
-  table()
-
-# Summarise failed suppfilename downloads
-suppfilenames_fails <- suppfilenames %>% 
-  filter(map_lgl(r, inherits, "try-error")) %>% 
-  mutate(error = map_chr(r, "["(1)),
-         error = case_when(
-           str_detect(error, "denied") ~ "Server denied",
-           str_detect(error, "Timeout") ~ "Timeout"
-         )) %>% 
-  .$error %>% 
-  table()
-
 # Extract supplemetary file names
-suppfilenames <- suppfilenames %>% 
+suppfilenames <- suppfilenames_imported %>% 
+  mutate_at("PDAT", ymd) %>% 
+  filter(PDAT <= last_date) %>% 
   mutate(SuppFileNames = map(suppfiles, "suppl"))
+
+# # Filed suppfilenames downloads
+# has_suppfile <- suppfilenames$r %>% 
+#   map_lgl(~ !inherits(.x, "try-error")) %>% 
+#   table()
+# 
+# # Summarise failed suppfilename downloads
+# suppfilenames_fails <- suppfilenames %>% 
+#   filter(map_lgl(r, inherits, "try-error")) %>% 
+#   mutate(error = map_chr(r, "["(1)),
+#          error = case_when(
+#            str_detect(error, "denied") ~ "Server denied",
+#            str_detect(error, "Timeout") ~ "Timeout"
+#          )) %>% 
+#   .$error %>% 
+#   table()
 
 # Datasets with suppfiles
 suppfilenames_present <- suppfilenames %>% 
@@ -100,6 +98,7 @@ file_ext <- suppfilenames_present %>%
   mutate(perc = (N / sum(N)) * 100) %>% 
   arrange(desc(N))
 
+# Plot file extensions
 file_ext_plot <- ggplot(file_ext, aes(reorder(filext, N), N)) +
   geom_point() +
   scale_y_log10(breaks = c(1, 10, 100, 1000, 10000)) +
@@ -116,8 +115,9 @@ most_common_filename <- suppfilenames_present_unnested %>%
 # filelist.txt and raw.tar only
 suppfiles_rawtar_only <- suppfilenames_present %>% 
   filter(map_lgl(SuppFileNames, ~ all(str_detect(.x, "filelist.txt|RAW.tar"))))
+supp_rawtaronly_perc <- percent(nrow(suppfiles_rawtar_only) / nrow(suppfilenames), 0)
 
-# Supplemental file names with more than N=10 occurences
+# Supplemental file names with more than N = 10 occurences
 cf <- suppfilenames_present_unnested %>%
   mutate(common_filenames = str_replace(SuppFileNames, "GSE[0-9]*_", ""),
          common_filenames = str_replace(common_filenames, "\\.gz$", ""), 
@@ -128,6 +128,7 @@ cfn <- group_by(cf, common_filenames) %>%
   arrange(desc(N)) %>% 
   filter(N > 10)
 
+# Plot common file names
 cfp <- ggplot(cfn, aes(reorder(common_filenames, N), N)) +
   geom_point() +
   scale_y_log10(breaks = c(40, 200, 1000, 5000)) +
