@@ -25,6 +25,7 @@ library(Biobase)
 library(grid)
 library(gridExtra)
 library(limma)
+library(viridis)
 
 # Load helper functions
 source("lib/helpers.R")
