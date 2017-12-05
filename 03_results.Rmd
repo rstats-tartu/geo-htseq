@@ -21,8 +21,8 @@ First HT-seq data set was submitted to GEO database at `r first_date`.
 We limited our query for datasets submitted up to the `r last_date` to reduce the number of recent incomplete submissions.
 
 Approximately `r perc_mmhs` of GEO data sets (`r table(ds_redline$model)[1]`) contain data from mouse or human origin (Fig. \@ref(fig:queryfig), left facet).
-The `r ppub[1]` (`r ppub_n_ci$ci[1]`, Poisson exact test) of human and mouse data sets are linked to their primary publication. 
-The proportion of datasets with publications is lower when other taxa are used as model organisms `r ppub[2]` (`r ppub_n_ci$ci[2]`, Poisson exact test)(Fig. \@ref(fig:queryfig), right facet).
+The `r ppub[1]` (`r ppub_n_ci$ci[1]`, Binomial exact test) of human and mouse data sets are linked to their primary publication. 
+The proportion of datasets with publications is lower when other taxa are used as model organisms `r ppub[2]` (`r ppub_n_ci$ci[2]`, Binomial exact test)(Fig. \@ref(fig:queryfig), right facet).
 As expected, the gap between published GEO series and published articles is bigger for more recent submissions.
 
 ```{r missingsuppfiles}

@@ -79,7 +79,7 @@ ppub_n_ci_nopublicsupps <- suppfilenames_not_present %>%
   group_by(key) %>% 
   summarise_at("value", max) %>%
   spread(key, value) %>% 
-  mutate(pois = map2(pub, geoseries, poisson.test),
+  mutate(pois = map2(pub, geoseries, binom.test),
          estimate = map_dbl(pois, "estimate"),
          ci = map(pois, "conf.int"),
          ci = map(ci, percent, 1),
