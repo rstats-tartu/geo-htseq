@@ -34,9 +34,9 @@ pdat <- ds_redline %>%
 
 # Plot submissions
 geop <- pdat %>% 
-  ggplot(aes(PDAT, value, linetype = key)) + 
-  geom_line() +
-  facet_wrap(~ model) +
+  ggplot(aes(PDAT, value)) + 
+  geom_line(aes(group = key, linetype = key)) +
+  facet_wrap(~model) +
   labs(x = "Publication date", 
        y = "Number of GEO series") +
   scale_linetype_discrete(labels = c("All series","Series with\npublications")) +
@@ -51,7 +51,8 @@ geop <- pdat %>%
 perc_mmhs <- percent(table(ds_redline$model)[1] / sum(table(ds_redline$model)), digits = 0)
 
 # Number of publications
-ppub_n <- group_by(pdat, model, key) %>% 
+ppub_n <- pdat %>%
+  group_by(model, key) %>% 
   summarise_at("value", max)
 
 # Percent with publications
@@ -66,7 +67,7 @@ ppub <- ppub_n %>%
 
 ppub_n_ci <-  ppub_n %>% 
   spread(key, value) %>% 
-  mutate(pois = map2(pub, geoseries, poisson.test),
+  mutate(pois = map2(pub, geoseries, binom.test),
          ci = map(pois, "conf.int"),
          ci = map(ci, percent, 1),
          ci = map_chr(ci, ~glue("95%CI, {.x[1]} to {.x[2]}")))
