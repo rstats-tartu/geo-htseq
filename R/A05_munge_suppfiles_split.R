@@ -59,7 +59,16 @@ supptabs <- supptabs %>%
          !str_detect(tolower(suppfiles), str_c(out_string2, "(\\.gz|\\.bz2)?$", 
                                                    collapse = "|")))
 
-# Files that may crash R session
+# Merge gsem ExpressionSets to supptabs
+supptabs <- select(gsem, Accession, gsematrix) %>% 
+  nest(gsematrix, .key = "matrixfiles") %>% 
+  left_join(supptabs, .)
+
+# Use only files 
+supptabs <- supptabs %>% 
+  filter(Accession %in% filter(ds, PDAT <= last_date)$Accession)
+
+# Files that crash R session
 bad <- c("GSE93374_Merged_all_020816_DGE.txt.gz", 
          "GSE88931_RNA-seq_MergedReadCounts.tsv.gz",
          "GSE55385_transcripts_GSE.tsv.gz",
@@ -73,11 +82,6 @@ bad <- c("GSE93374_Merged_all_020816_DGE.txt.gz",
 # Remove 'bad' files
 supptabs <- supptabs %>% filter(!(suppfiles %in% bad))
 
-# Merge gsem ExpressionSets to supptabs
-supptabs <- select(gsem, Accession, gsematrix) %>% 
-  nest(gsematrix, .key = "matrixfiles") %>% 
-  left_join(supptabs, .)
-
 source("lib/munge_geo.R")
 source("lib/checkFullRank.R")
 source("lib/text_funs.R")
@@ -86,7 +90,8 @@ library(Biobase)
 import_supptabs <- FALSE
 if(import_supptabs){
   start <- Sys.time()
-  st <- mutate(supptabs, result = map2(matrixfiles, suppfiles, ~ try(munge_geo(.x, .y, dir = local_suppfile_folder))))
+  st <- supptabs %>% 
+    mutate(result = map2(matrixfiles, suppfiles, ~ try(munge_geo(.x, .y, dir = local_suppfile_folder))))
   end <- Sys.time()
   start-end
   
