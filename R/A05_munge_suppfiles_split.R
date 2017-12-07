@@ -1,13 +1,7 @@
 
 # Load libs ---------------------------------------------------------------
 
-library(dplyr)
-library(tidyr)
-library(purrr)
-library(stringr)
-library(ggplot2)
-source("lib/helpers.R")
-nrowthreshold <- 4000
+source("R/_common.R")
 
 # GEO query results and document summaries --------------------------------
 # source("src/A01_GEO_query.R")
@@ -24,16 +18,18 @@ if(update_geoseriesmatrix_files){
 }
 
 # Identify and filter out Accessions with missing gsematrices
-gsem_missing_or_faulty <- filter(gsem, map_lgl(gsematrix, ~class(.x) != "ExpressionSet")) 
-gsem <- filter(gsem, map_lgl(gsematrix, ~class(.x) == "ExpressionSet"))
+gsem_missing_or_faulty <- gsem %>% 
+  filter(map_lgl(gsematrix, ~class(.x) != "ExpressionSet"))
+gsem <- gsem %>% 
+  filter(map_lgl(gsematrix, ~class(.x) == "ExpressionSet"))
 
 ## Read in local supplemental tables ---------------------------------------
 
-## File name extensions in downloaded supplementary files
+# File name extensions in downloaded supplementary files
 local_suppfile_folder <- "/Volumes/Media/srp_example/data/counts" # "data/counts"
 supptabs <- geofile_df(local_suppfile_folder, "suppfiles")
 
-## Unzip gz xls(x)? files, keep originals
+# Unzip gz xls(x)? files, keep originals
 need_to_unzip_xls_files <- FALSE
 if(need_to_unzip_xls_files){
   xls_gz <- filter(supptabs, str_detect(suppfiles, "xls(x)?.gz$"))$suppfiles
@@ -41,25 +37,9 @@ if(need_to_unzip_xls_files){
   system(sprintf("gzip -dk %s", paste(xls_gz, collapse = " ")))
 }
 
-## List files again to exclude compressed files
+# List files again to exclude compressed xls files
 supptabs <- geofile_df(local_suppfile_folder, "suppfiles") %>% 
   filter(!str_detect(suppfiles, "xls(x)?.gz$"))
-
-## Analyse file extensions
-file_ext <- supptabs %>% 
-  mutate(filext = get_filext(suppfiles)) %>% 
-  group_by(filext) %>% 
-  summarise(N = n()) %>%
-  ungroup() %>% 
-  mutate(perc = (N/sum(N))*100) %>% 
-  arrange(desc(N))
-
-file_ext_plot <- ggplot(file_ext, aes(filext, perc)) +
-  geom_point() +
-  scale_x_discrete(limits = file_ext$filext) +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
-  ylab("Percent of files") +
-  xlab("Supplementary file extention")
 
 # Duplicated files
 supptabs_duplicated <- supptabs %>% 
@@ -67,10 +47,17 @@ supptabs_duplicated <- supptabs %>%
   filter(duplicated(files))
 
 # Remove non tabular filetypes from downloaded files
-non_tabular_formats <- c(".r",".rdata",".xml",".bed12",".json",".rda",".sam",
-                         ".fasta",".html",".tar",".hdf5",".psl")
+out_string1 <- c("filelist","annotation","readme","error","raw.tar","csfasta",
+                 "bam","sam","bed","[:punct:]hic","hdf5","bismark","map",
+                 "barcode","peaks")
+out_string2 <- c("tar","gtf","(big)?bed(\\.txt|12|graph|pk)?","bw","wig",
+                 "hic","gct(x)?","tdf","gff(3)?","pdf","png","zip","sif",
+                 "narrowpeak","fa", "r$", "rda(ta)?$")
 
-supptabs <- filter(supptabs, !(get_filext(suppfiles) %in% non_tabular_formats))
+supptabs <- supptabs %>% 
+  filter(!str_detect(tolower(suppfiles), str_c(out_string1, collapse = "|")),
+         !str_detect(tolower(suppfiles), str_c(out_string2, "(\\.gz|\\.bz2)?$", 
+                                                   collapse = "|")))
 
 # Files that may crash R session
 bad <- c("GSE93374_Merged_all_020816_DGE.txt.gz", 
