@@ -91,3 +91,41 @@ get_filext <- function(x) {
 }
 
 
+# make unique names -------------------------------------------------------
+
+make_unique_colnames <- function(x, sep = "_"){
+  
+  if (!is.data.frame(x)) {
+    warning("Not data.frame. Returning NULL.\n")
+    return(x)
+  }
+  
+  coln <- colnames(x)
+  dups <- any(duplicated(coln))
+  
+  if (!dups) {
+    return(x)
+  }
+  
+  colnames(x) <- make.unique(coln, sep = sep)
+  x
+}
+
+
+# unnest listcolumns function ---------------------------------------------
+
+#' @param data a tibble
+#' @import dplyr
+#' @importFrom dplyr quo
+#' @importFrom purrr map_int
+unnest_listcol <- function(data, ...) {
+  quo <- quo(...)
+  listcol <- dplyr::select(data, !!!quo)
+  data <- dplyr::select(data, -!!!quo)
+  reps <- unlist(dplyr::mutate_all(listcol, map_int, length))
+  data <- data[rep(seq_len(nrow(data)), reps), ]
+  var_unlisted <- unlist(listcol[[1]], recursive = FALSE)
+  var_unlisted <- dplyr::data_frame(var_unlisted)
+  colnames(var_unlisted) <- dplyr::quo_name(quo)
+  dplyr::bind_cols(data, var_unlisted)
+}

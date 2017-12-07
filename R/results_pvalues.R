@@ -8,7 +8,8 @@ source("R/_common.R")
 load("data/st.RData")
 
 st_unnested <- st %>% unnest(result)
-st_unnested <- st_unnested %>% unnest(sheets)
+# n_distinct(st_unnested$Accession)
+# st_unnested <- st_unnested %>% unnest(sheets)
 
 ## Add sheet names to xls files
 st_unnested <- st_unnested %>% 
@@ -37,8 +38,7 @@ dims <- left_join(st_unnested, gsem) %>%
   mutate(idcols = columns - samples) %>%
   filter(idcols >= 0, idcols == min(idcols)) %>%
   ungroup %>%
-  select(-matrixfiles, -suppfiles) %>%
-  distinct
+  select(-matrixfiles)
 
 n_samples <- dims %>% 
   summarise_at(vars(samples, features), funs(mean, median, Mode, min, max))
@@ -53,6 +53,16 @@ dims_tabp <- dims %>%
        y = bquote(N~features~(log[10]))) +
   geom_hline(yintercept = log10(nrowthreshold), linetype = 2) +
   scale_fill_continuous(name = "Count")
+
+#' Number of rows with 0 features
+# dims %>% 
+#   select(Accession, features, samples) %>% 
+#   mutate_at(c("features","samples"), log10) %>% 
+#   filter(is.finite(features))
+
+# dims %>% 
+#   select(Accession) %>% 
+#   n_distinct()
 
 n_imported_sets <- length(unique(dims$Accession))
 
@@ -87,11 +97,20 @@ grid.draw(pga)
 # plot geo series with p values size distribution over all series
 
 p_values <- dims %>% 
-  filter(!map_lgl(pvalues, is.null), features >= nrowthreshold) %>% 
-  mutate(pvals = map(pvalues, "pvalue"),
-         bins = map(pvals, ntile, 60),
-         pi0 = map_dbl(pvals, propTrueNull))
+  filter(!map_lgl(pvalues, is.null), !map_lgl(pvalues, inherits, "try-error")) %>% 
+  mutate(pvalues = map(pvalues, make_unique_colnames),
+         pvalues = map(pvalues, select, matches("pvalue")),
+         pvalues = map(pvalues, as.list)) %>% 
+  select(Accession, suppfiles, suppdata_id, annot, features, columns, pvalues)
 
+p_values <- p_values %>% 
+  unnest_listcol(pvalues)
+# 
+#   mutate(bins = map(pvalues, ntile, 60),
+#          pi0 = map_dbl(pvalues, propTrueNull))
+
+## ---- pvaluesend -----
+  
 p_values_unn <- p_values %>%
   filter(!map_lgl(pvals, is.null)) %>% 
   select(Accession, suppdata_id, annot, pvals, bins, pi0) %>% 
@@ -107,7 +126,6 @@ p_values_unn <- p_values %>%
   mutate(freq = count / features)
 
 library(Rtsne)
-library(viridis)
 p_values_unn <- p_values_unn %>% 
   select(Accession, suppdata_id, annot, bins, freq, pi0) %>%
   filter(complete.cases(.)) %>% 
