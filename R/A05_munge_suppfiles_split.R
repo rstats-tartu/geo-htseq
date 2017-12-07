@@ -71,7 +71,7 @@ bad <- c("GSE93374_Merged_all_020816_DGE.txt.gz",
          "GSE67516_RNA_seq_rep1_diffExp_analysis.xls")
 
 # Remove 'bad' files
-supptabs <- filter(supptabs, !(suppfiles %in% bad))
+supptabs <- supptabs %>% filter(!(suppfiles %in% bad))
 
 # Merge gsem ExpressionSets to supptabs
 supptabs <- select(gsem, Accession, gsematrix) %>% 
@@ -94,45 +94,6 @@ if(import_supptabs){
   save(st, file = "data/st.RData")
   # load("data/st.RData")
 }
-
-load("data/st.RData")
-
-## wow....
-st_unnested <- st %>% unnest(result)
-st_unnested <- st_unnested %>% unnest(sheets)
-st_unnested %>% filter(str_length(sheets) > 0)
-
-# Code to be removed don't delete yet! ------------------------------------
-
-dims <- res %>%
-  filter(map_lgl(result, is.data.frame)) %>%
-  select(-matrixfiles) %>%
-  unnest
-# 
-
-## let's use cleaned-up gsem table
-gsem <- mutate(gsem, samples = map_int(gsematrix, ~nrow(pData(.x))))
-
-## Match samples to right table/assay 
-dims <- left_join(dims, gsem) %>%
-  group_by(excelfiles) %>%
-  mutate(idcols = columns - samples) %>%
-  filter(idcols>=0, idcols == min(idcols)) %>%
-  ungroup %>%
-  select(-matrixfiles) %>%
-  distinct
-
-## Summarise number of features and number of samples
-dims %>%
-  select(-excelfiles, -idcols) %>%
-  filter(features > nrowthreshold) %>%
-  summarise_at(vars(features, samples), funs("mean","median"))
-
-## Plot features versus samples
-dims %>%
-  ggplot(aes(log10(samples), log10(features))) + 
-  geom_hex() +
-  geom_hline(yintercept = log10(nrowthreshold), linetype = 2)
 
 # # P values ----------------------------------------------------------------
 # tabs <- filter(res, !map_lgl(result, is.data.frame))
