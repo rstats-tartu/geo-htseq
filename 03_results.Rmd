@@ -85,6 +85,16 @@ Resulting dataset consisted of `r nrow(suppfiles_of_interest)` files from `r n_d
 
 ```
 
+```{r pvalues}
+
+```
+
+(ref:block) Retention of GEO series and supplementary files in filter for full sets of p values. Number of p value sets is the number of sets with `r glue(">{nrowthreshold}")` features.
+
+```{r block, fig.cap='(ref:block)'}
+source("R/diagram.R")
+```
+
 
 ### Processed data
 
