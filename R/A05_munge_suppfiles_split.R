@@ -100,25 +100,6 @@ if(import_supptabs){
   # load("data/st.RData")
 }
 
-# # P values ----------------------------------------------------------------
-# tabs <- filter(res, !map_lgl(result, is.data.frame))
-# tabs <- tabs[rep(1:nrow(tabs), mutate(tabs, n = map_int(result, length))$n), 
-#              c("Accession", "countfiles", "PDAT", "excelfiles")] %>%
-#   bind_cols(data_frame(result = unlist(tabs$result, recursive = FALSE))) %>% 
-#   filter(!map_lgl(result, is.null))
-# 
-# pvalues <- filter(tabs, map_lgl(result, is.tibble))
-# pvalues %>% 
-#   filter(map_lgl(countfiles, str_detect, pattern = "xls"))
-# 
-# pvalues %>% 
-#   mutate(features = map_int(result, nrow)) %>% 
-#   ggplot(aes(features)) +
-#   geom_histogram(bins=30) +
-#   scale_x_log10() +
-#   geom_vline(xintercept = 8000, linetype = 3) +
-#   xlab("Number of P values")
-# 
 # # Fit models -----------------------------------------------------
 # # Filter ExpressionSets
 # esets <- tabs %>% filter(map_chr(result, ~class(.x)[1])=="ExpressionSet")
