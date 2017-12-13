@@ -311,3 +311,40 @@ munge_geo_pvalue <- function(suppfile, dir = ".", n_head = 100) {
   ## Collect data into data_frame
   dplyr::data_frame(sheets, heads, pvalues, features, columns)
 }
+
+
+# munge_geo2 --------------------------------------------------------------
+
+munge_geo2 <- function(countfile, dir = ".") {
+  
+  # Assemble path to supplementary file
+  path <- file.path(dir, countfile)
+  
+  # Import supplemental file
+  supptab <- read_geotabs(path)
+  
+  if (inherits(supptab, "try-error")) {
+    stop("Table import error!")
+  }
+  
+  if (is.data.frame(supptab) | is.matrix(supptab)) {
+    supptab <- list(supptab) 
+  }
+  
+  # Check for pvalues
+  pvalues <- map(supptab, ~try(get_pvalues_basemean(.x)))
+  heads <- map(supptab, head)
+  features <- map_int(supptab, nrow)
+  columns <- map_int(supptab, ncol)
+  supptab_names <- names(supptab)
+  
+  if (length(supptab_names) != 0) {
+    sheets <- as.list(supptab_names)
+  } else {
+    
+    sheets <- list("")
+  }
+  
+  data_frame(sheets, heads, pvalues, features, columns)
+  
+}
