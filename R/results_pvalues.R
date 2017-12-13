@@ -8,10 +8,9 @@ source("R/_common.R")
 load("data/st.RData")
 
 st_unnested <- st %>% unnest(result)
-# n_distinct(st_unnested$Accession)
-# st_unnested <- st_unnested %>% unnest(sheets)
+st_unnested <- st_unnested %>% unnest(sheets)
 
-## Add sheet names to xls files
+# Add sheet names to xls files
 st_unnested <- st_unnested %>% 
   mutate(suppdata_id = case_when(
     str_length(sheets) > 0 ~ str_c(suppfiles, "-sheet-", sheets),
@@ -87,9 +86,9 @@ dims_samplesp <- dims %>%
   labs(x = bquote(N~samples~(log[10])),
        y = "Count")
 
-pg <- lapply(list(dims_tabp, dims_featuresp, dims_samplesp), ggplotGrob)
+pg <- lapply(list(dims_featuresp, dims_samplesp, dims_tabp), ggplotGrob)
 pg <- add_labels(pg, case = panel_label_case)
-pga <- arrangeGrob(grobs = pg, ncol = length(pg), widths = c(3, 2, 2))
+pga <- arrangeGrob(grobs = pg, ncol = length(pg), widths = c(2, 2, 3))
 grid.draw(pga)
 
 ## ---- pvalues -----
