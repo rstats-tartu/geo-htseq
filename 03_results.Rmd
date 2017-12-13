@@ -50,12 +50,19 @@ Supplementary HT-seq files uplodaded to NCBI GEO contain most commonly raw seque
 
 (ref:commonfilenames) __Filename extensions and common stubs of supplementary file names from HT-seq datasets submitted to NCBI GEO database__. (`r ref_labels("A", panel_label_case)`) File extensions of supplementary file names. (`r ref_labels("B", panel_label_case)`) Common stubs of supplementary file names. Stubs were obtained by removing GEO id from supplementary file names and converting string to lower case. Stubs with N > 10 occurences are shown.
 
-```{r commonfilenames, fig.cap="(ref:commonfilenames)", fig.asp=0.7}
+```{r commonfilenames, fig.cap='(ref:commonfilenames)', fig.asp=0.7}
 
 ```
 
 Raw sequence read data is required part of GEO submission, when raw data is provided as supplemental RAW.tar file, GEO submits raw data to SRA on behalf of user. 
-RAW.tar files are included in `r supp_raw_perc` (`r n_raw`) of GEO series, whereas only RAW.tar and filelist.txt is present in `r supp_rawtaronly_perc` (`r nrow(suppfiles_rawtar_only)`) GEO series (Fig. \@ref(fig:commonfilenames)).
+RAW.tar files are included in `r supp_raw_perc` (`r n_raw`) of GEO series, whereas only RAW.tar and filelist.txt is present in `r supp_rawtaronly_perc` (`r nrow(suppfiles_rawtar_only)`) GEO series (Fig. \@ref(fig:commonfilenames) and \@ref(fig:publicationrawtar)).
+
+(ref:publicationrawtar) __Submission and publication of GEO series with RAW.tar and filelist.txt supplementary files only.__
+
+```{r publicationrawtar, fig.cap='(ref:publicationrawtar)'}
+fsupp_rawtar_only
+```
+
 
 Other common files contain annotations 'readme.txt' and processed data: commonly sequence read counts, gene expression analysis results or ChIP-Seq peak counts. 
 
@@ -72,7 +79,7 @@ However, tables containing top-ranked genes/features (toptables) from gene expre
 
 (ref:filesofinterest) Distribution of supplementary files per GEO Accession before and after filtering supplementary files for download. Left, all supplementary files. Right, supplementary files to be downloaded after filtering for tabular formats. Numbers show total number of files, respectively, before and after filtering.
 
-```{r filesofinterest, fig.cap='(ref:filesofinterest)', out.width='50%'}
+```{r filesofinterest, fig.cap='(ref:filesofinterest)'}
 
 ```
 
@@ -89,7 +96,7 @@ Resulting dataset consisted of `r nrow(suppfiles_of_interest)` files from `r n_d
 
 ```
 
-(ref:block) Retention of GEO series and supplementary files in filter for full sets of p values. Arrows from left to right, filter for human or mouse GEO sets, GEO sets with supplementary files, supplementary files with flat table formats that were downloaded, tables with p values. Number of p value sets is the number of sets with `r glue(">{nrowthreshold}")` features.
+(ref:block) Retention of HT-seq GEO series and supplementary files in filter for full sets of p values. Arrows from left to right, (1) filter for human or mouse GEO sets, (2) GEO sets with supplementary files, (3) filter out RAW.tar and filelist.txt files from supplementary file names, (4) supplementary files with flat table formats that were downloaded, (5) tables with p values. Number of p value sets is the number of sets with `r glue(">{nrowthreshold}")` features.
 
 ```{r block, fig.cap='(ref:block)'}
 source("R/diagram.R")

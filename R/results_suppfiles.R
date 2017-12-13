@@ -101,6 +101,22 @@ suppfiles_rawtar_only <- suppfilenames_present %>%
   filter(map_lgl(SuppFileNames, ~ all(str_detect(.x, "filelist.txt|RAW.tar"))))
 supp_rawtaronly_perc <- percent(nrow(suppfiles_rawtar_only) / nrow(suppfilenames), 0)
 
+# for diagram: files after removing sets with RAW.tar and filelist.txt only
+suppfiles_notonly_rawtar_unnested <- suppfilenames_present %>% 
+  select(Id, Accession, SuppFileNames) %>% 
+  unnest(SuppFileNames) %>% 
+  filter(!map_lgl(SuppFileNames, ~ str_detect(.x, "filelist.txt|RAW.tar")))
+
+# Publications of series with RAW.tar and filelist supplementary files
+fsupp_rawtar_only <- fsupp %+% (suppfilenames_present %>% 
+  filter(map_lgl(SuppFileNames, ~ all(str_detect(.x, "filelist.txt|RAW.tar")))) %>% 
+  mutate(pub = str_length(PubMedIds) != 0) %>% 
+  group_by(PDAT) %>% 
+  summarise(N = n(),
+            pub = sum(pub)) %>% 
+  mutate_at(vars(N, pub), cumsum) %>% 
+  gather(key, value, -PDAT))
+
 # Supplemental file names with more than N = 10 occurences
 cf <- suppfilenames_present_unnested %>%
   mutate(common_filenames = str_replace(SuppFileNames, "GSE[0-9]*_", ""),
