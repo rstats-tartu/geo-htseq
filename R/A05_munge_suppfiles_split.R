@@ -91,7 +91,7 @@ import_supptabs <- FALSE
 if(import_supptabs){
   start <- Sys.time()
   st <- supptabs %>% 
-    mutate(result = map2(matrixfiles, suppfiles, ~ try(munge_geo(.x, .y, dir = local_suppfile_folder))))
+    mutate(result = map(suppfiles, ~ try(munge_geo2(.x, dir = local_suppfile_folder))))
   end <- Sys.time()
   start-end
   
