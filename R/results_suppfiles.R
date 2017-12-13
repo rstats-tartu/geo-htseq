@@ -14,22 +14,6 @@ suppfilenames <- suppfilenames_imported %>%
   filter(PDAT <= last_date) %>% 
   mutate(SuppFileNames = map(suppfiles, "suppl"))
 
-# # Filed suppfilenames downloads
-# has_suppfile <- suppfilenames$r %>% 
-#   map_lgl(~ !inherits(.x, "try-error")) %>% 
-#   table()
-# 
-# # Summarise failed suppfilename downloads
-# suppfilenames_fails <- suppfilenames %>% 
-#   filter(map_lgl(r, inherits, "try-error")) %>% 
-#   mutate(error = map_chr(r, "["(1)),
-#          error = case_when(
-#            str_detect(error, "denied") ~ "Server denied",
-#            str_detect(error, "Timeout") ~ "Timeout"
-#          )) %>% 
-#   .$error %>% 
-#   table()
-
 # Datasets with suppfiles
 suppfilenames_present <- suppfilenames %>% 
   filter(map_lgl(SuppFileNames, ~length(.x) > 0))
