@@ -3,7 +3,7 @@ library(tidyverse)
 library(httr)
 library(lubridate)
 
-if(!"ds" %in% ls()){
+if (!"ds" %in% ls()) {
   ds <- readRDS("data/document_summaries.rds")
 }
 
