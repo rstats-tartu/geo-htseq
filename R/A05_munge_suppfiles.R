@@ -5,13 +5,13 @@ source("R/_common.R")
 
 # GEO query results and document summaries --------------------------------
 # source("src/A01_GEO_query.R")
-if(!"ds" %in% ls()){
+if (!"ds" %in% ls()) {
   ds <- readRDS("data/document_summaries.rds")
 }
 
 # Load series matrix data frames ----------------------------
 update_geoseriesmatrix_files <- FALSE
-if(update_geoseriesmatrix_files){
+if (update_geoseriesmatrix_files) {
   source("src/A04_munge_series_matrixfiles.R")
 } else {
   load("data/gsem.RData")
@@ -31,7 +31,7 @@ supptabs <- geofile_df(local_suppfile_folder, "suppfiles")
 
 # Unzip gz xls(x)? files, keep originals
 need_to_unzip_xls_files <- FALSE
-if(need_to_unzip_xls_files){
+if (need_to_unzip_xls_files) {
   xls_gz <- filter(supptabs, str_detect(suppfiles, "xls(x)?.gz$"))$suppfiles
   xls_gz <- file.path(local_suppfile_folder, xls_gz)
   system(sprintf("gzip -dk %s", paste(xls_gz, collapse = " ")))
