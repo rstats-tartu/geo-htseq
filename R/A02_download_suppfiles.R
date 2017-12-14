@@ -5,7 +5,7 @@ library(lubridate)
 source("lib/getDirListing.R")
 
 if(!"ds" %in% ls()){
-  load("data/ds.RData")
+  ds <- readRDS("data/document_summaries.rds")
 }
 
 ds_filtered <- filter(ds, 
@@ -20,7 +20,5 @@ end <- Sys.time()
 end-start
 cat(sprintf("Downloading filenames took %s hours\n", end-start), file = "suppfilename.log", append = T)
 
-save(suppfilenames, file = "data/suppfilenames_2017-08-25.RData")
-suppfilenames  <- filter(suppfilenames, !map_lgl(r, inherits, "try-error")) %>% 
-  mutate(suppfiles = map(r, get_dirlist))
+saveRDS(suppfilenames, file = "data/suppfilenames_2017-11-27.rds")
 

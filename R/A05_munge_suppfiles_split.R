@@ -6,7 +6,7 @@ source("R/_common.R")
 # GEO query results and document summaries --------------------------------
 # source("src/A01_GEO_query.R")
 if(!"ds" %in% ls()){
-  load("data/ds.RData")
+  ds <- readRDS("data/document_summaries.rds")
 }
 
 # Load series matrix data frames ----------------------------
