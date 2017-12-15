@@ -4,10 +4,10 @@ library(lubridate)
 library(GEOquery)
 
 newquery <- FALSE
-if(newquery) {
-  source("src/A01_GEO_query.R")
+if (newquery) {
+  source("R/A01_GEO_query.R")
 } else {
-  load("data/ds.RData")
+  ds <- read_rds("output/document_summaries.rds")
 }
 
 # GEOquery ----------------------------------------------------------------

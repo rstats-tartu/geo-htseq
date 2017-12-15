@@ -5,7 +5,7 @@ source("R/_common.R")
 # Import of tabular supplementary files -----------------------------------
 
 ## ---- loadst -----
-st <- readRDS("data/suppdata.rds")
+st <- readRDS("output/suppdata.rds")
 
 st_unnested <- st %>% unnest(result)
 st_unnested <- st_unnested %>% unnest(sheets)
@@ -18,7 +18,7 @@ st_unnested <- st_unnested %>%
   ))
 
 ## Let's use gsem table
-gsem <- readRDS("data/gsem.rds")
+gsem <- readRDS("output/gsem.rds")
 
 ## Remove errored matrixes
 library(Biobase)

@@ -8,8 +8,8 @@ library(entrezquery)
 query <- 'expression profiling by high throughput sequencing[DataSet Type]'
 
 ## ----- run-query -----
-ds <- entrez_docsums(query = query, db = "gds", retmax = 16200)
+ds <- entrez_docsums(query = query, db = "gds", retmax = 17000)
 
 # ds is short of document summaries
-saveRDS(ds, file = "data/document_summaries.rds")
+saveRDS(ds, file = "output/document_summaries.rds")
 

@@ -6,15 +6,15 @@ source("R/_common.R")
 # GEO query results and document summaries --------------------------------
 # source("src/A01_GEO_query.R")
 if (!"ds" %in% ls()) {
-  ds <- readRDS("data/document_summaries.rds")
+  ds <- read_rds("output/document_summaries.rds")
 }
 
 # Load series matrix data frames ----------------------------
 update_geoseriesmatrix_files <- FALSE
 if (update_geoseriesmatrix_files) {
-  source("src/A04_munge_series_matrixfiles.R")
+  source("R/A04_munge_series_matrixfiles.R")
 } else {
-  gsem <- readRDS("data/gsem.rds")
+  gsem <- read_rds("output/gsem.rds")
 }
 
 # Identify and filter out Accessions with missing gsematrices
@@ -96,8 +96,7 @@ if(import_supptabs){
   start-end
   
   # Time difference of -1.556035 hours
-  saveRDS(st, file = "data/suppdata.rds")
-  # load("data/st.RData")
+  saveRDS(st, file = "output/suppdata.rds")
 }
 
 # # Fit models -----------------------------------------------------

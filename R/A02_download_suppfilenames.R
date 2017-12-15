@@ -4,7 +4,7 @@ library(httr)
 library(lubridate)
 
 if (!"ds" %in% ls()) {
-  ds <- readRDS("data/document_summaries.rds")
+  ds <- readRDS("output/document_summaries.rds")
 }
 
 ds_filtered <- ds %>% 
@@ -19,5 +19,5 @@ end <- Sys.time()
 end-start
 cat(sprintf("Downloading filenames took %s hours\n", end-start), file = "suppfilename.log", append = T)
 
-saveRDS(suppfilenames, file = "data/suppfilenames_2017-11-27.rds")
+saveRDS(suppfilenames, file = "output/suppfilenames.rds")
 

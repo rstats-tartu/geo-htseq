@@ -29,4 +29,4 @@ my_getGEO <- function(x, path = "data/matrix/") {
 
 gsem <- matrixfiles %>% 
   mutate(series_matrix = map(series_matrix_file, my_getGEO, path = local_matrixfile_folder))
-saveRDS(gsem, file = "data/gsem.rds")
+write_rds(gsem, file = "output/gsem.rds")

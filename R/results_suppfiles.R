@@ -5,7 +5,7 @@ source("R/_common.R")
 # ---- missingsuppfiles ----
 # In this section we download and analyse supplementary file names
 # R/A02_download_suppfiles.R
-suppfilenames_imported <- readRDS("data/suppfilenames_2017-11-27.rds")
+suppfilenames_imported <- readRDS("output/suppfilenames.rds")
 
 # Let's keep study time frame fixed
 # Extract supplemetary file names
