@@ -57,7 +57,7 @@ Supplementary HT-seq files uplodaded to NCBI GEO contain most commonly raw seque
 Raw sequence read data is required part of GEO submission, when raw data is provided as supplemental RAW.tar file, GEO submits raw data to SRA on behalf of user. 
 RAW.tar files are included in `r supp_raw_perc` (`r n_raw`) of GEO series, whereas only RAW.tar and filelist.txt is present in `r supp_rawtaronly_perc` (`r nrow(suppfiles_rawtar_only)`) GEO series (Fig. \@ref(fig:commonfilenames) and \@ref(fig:publicationrawtar)).
 
-(ref:publicationrawtar) __Submission and publication of GEO series with RAW.tar and filelist.txt supplementary files only.__
+(ref:publicationrawtar) __Submission and publication of GEO series with only RAW.tar and filelist.txt supplementary files.__
 
 ```{r publicationrawtar, fig.cap='(ref:publicationrawtar)'}
 fsupp_rawtar_only
