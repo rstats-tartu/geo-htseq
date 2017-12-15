@@ -3,11 +3,8 @@
 .RData
 .Ruserdata
 data/
+output/
 figures/
-libs/
-log.txt
-*.log
-*.html
-_book
-*.rds
-packages.bib
+docs/
+_book/
+_main.*
