@@ -1,30 +1,32 @@
 
-library(dplyr)
-library(purrr)
-library(stringr)
+library(tidyverse)
 library(GEOquery)
 
 # Munge matrixfiles -------------------------------------------------------
 local_suppfile_folder <- "/Volumes/Media/srp_example/data/counts" # "data/counts"
 local_matrixfile_folder <- "/Volumes/Media/srp_example/data/matrix" # "data/matrix"
 
-matrixfiles <- list.files(local_matrixfile_folder)
-matrixfiles <- data_frame(matrixfiles) %>% 
-  mutate(Accession = str_extract(toupper(matrixfiles), "GSE[[:digit:]]*"))
+matrixfiles <- dir(local_matrixfile_folder) %>% 
+  data_frame(series_matrix_file = .) %>% 
+  mutate(Accession = str_extract(toupper(series_matrix_file), "GSE[[:digit:]]*")) %>% 
+  select(Accession, everything())
 
-suppfiles <- list.files(local_suppfile_folder)
-suppfiles <- data_frame(suppfiles) %>% 
-  mutate(Accession = str_extract(toupper(suppfiles), "GSE[[:digit:]]*"))
-
-my_getGEO <- function(x, path = "data/matrix/") {
-  message(x)
-  try(getGEO(filename = file.path(path, x), getGPL = FALSE))
-}
+suppfiles <- dir(local_suppfile_folder) %>% 
+  data_frame(files = .) %>% 
+  mutate(Accession = str_extract(toupper(files), "GSE[[:digit:]]*")) %>% 
+  select(Accession, everything())
 
 # Unique series matrix files
 matrixfiles <- left_join(suppfiles, matrixfiles) %>% 
-  select(-suppfiles) %>%
+  select(-files) %>%
   distinct()
 
-gsem <- mutate(matrixfiles, gsematrix = map(matrixfiles, my_getGEO, path = local_matrixfile_folder))
-save(gsem, file = "data/gsem.RData")
+my_getGEO <- function(x, path = "data/matrix/") {
+  message(x)
+  path <- file.path(path, x)
+  try(getGEO(filename = path, getGPL = FALSE))
+}
+
+gsem <- matrixfiles %>% 
+  mutate(series_matrix = map(series_matrix_file, my_getGEO, path = local_matrixfile_folder))
+saveRDS(gsem, file = "data/gsem.rds")

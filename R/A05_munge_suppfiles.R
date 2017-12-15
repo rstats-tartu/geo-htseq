@@ -14,14 +14,14 @@ update_geoseriesmatrix_files <- FALSE
 if (update_geoseriesmatrix_files) {
   source("src/A04_munge_series_matrixfiles.R")
 } else {
-  load("data/gsem.RData")
+  gsem <- readRDS("data/gsem.rds")
 }
 
 # Identify and filter out Accessions with missing gsematrices
 gsem_missing_or_faulty <- gsem %>% 
-  filter(map_lgl(gsematrix, ~class(.x) != "ExpressionSet"))
+  filter(map_lgl(series_matrix, ~class(.x) != "ExpressionSet"))
 gsem <- gsem %>% 
-  filter(map_lgl(gsematrix, ~class(.x) == "ExpressionSet"))
+  filter(map_lgl(series_matrix, ~class(.x) == "ExpressionSet"))
 
 ## Read in local supplemental tables ---------------------------------------
 
@@ -60,8 +60,8 @@ supptabs <- supptabs %>%
                                                    collapse = "|")))
 
 # Merge gsem ExpressionSets to supptabs
-supptabs <- select(gsem, Accession, gsematrix) %>% 
-  nest(gsematrix, .key = "matrixfiles") %>% 
+supptabs <- select(gsem, Accession, series_matrix) %>% 
+  nest(series_matrix, .key = "matrixfiles") %>% 
   left_join(supptabs, .)
 
 # Use only files 
@@ -96,7 +96,7 @@ if(import_supptabs){
   start-end
   
   # Time difference of -1.556035 hours
-  save(st, file = "data/st.RData")
+  saveRDS(st, file = "data/suppdata.rds")
   # load("data/st.RData")
 }
 

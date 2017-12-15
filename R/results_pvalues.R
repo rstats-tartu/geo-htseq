@@ -5,7 +5,7 @@ source("R/_common.R")
 # Import of tabular supplementary files -----------------------------------
 
 ## ---- loadst -----
-load("data/st.RData")
+st <- readRDS("data/suppdata.rds")
 
 st_unnested <- st %>% unnest(result)
 st_unnested <- st_unnested %>% unnest(sheets)
@@ -18,18 +18,18 @@ st_unnested <- st_unnested %>%
   ))
 
 ## Let's use gsem table
-load("data/gsem.RData")
+gsem <- readRDS("data/gsem.rds")
 
 ## Remove errored matrixes
 library(Biobase)
 gsem_error <- gsem %>%
-  filter(map_lgl(gsematrix, inherits, "try-error"))
+  filter(map_lgl(series_matrix, inherits, "try-error"))
 
 gsem <- gsem %>%
-  filter(!map_lgl(gsematrix, inherits, "try-error")) %>% 
-  mutate(samples = map_int(gsematrix, ~ncol(exprs(.x))),
-         annot = map_chr(gsematrix, annotation)) %>% 
-  select(Accession, annot, gsematrix, samples, everything())
+  filter(!map_lgl(series_matrix, inherits, "try-error")) %>% 
+  mutate(samples = map_int(series_matrix, ~ncol(exprs(.x))),
+         annot = map_chr(series_matrix, annotation)) %>% 
+  select(Accession, annot, series_matrix, samples, everything())
 
 ## Match samples to right table/assay 
 dims <- left_join(st_unnested, gsem) %>%
@@ -37,7 +37,7 @@ dims <- left_join(st_unnested, gsem) %>%
   mutate(idcols = columns - samples) %>%
   filter(idcols >= 0, idcols == min(idcols)) %>%
   ungroup %>%
-  select(-matrixfiles)
+  select(-series_matrix_file)
 
 n_samples <- dims %>% 
   summarise_at(vars(samples, features), funs(mean, median, Mode, min, max))
