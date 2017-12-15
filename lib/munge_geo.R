@@ -1,4 +1,17 @@
 
+#' @param path path to excel file
+#' @param sheet name of the excel worksheet
+#' 
+rex <- function(path, sheet){
+  
+  tab <- try(readxl::read_excel(path, sheet), silent = TRUE)
+  
+  if (inherits(tab, "try-error")) {
+    return(tibble())
+  }
+  return(tab)
+}
+
 # read excel sheets -------------------------------------------------------
 #' Import all sheets from excel file.
 #' @param path Path to excel file.
@@ -9,36 +22,17 @@ read_excelfs <- function(path) {
   
   sheets <- try(readxl::excel_sheets(path), silent = TRUE)
   
-  rex <- function(path, sheet){
-    
-    tab <- try(readxl::read_excel(path, sheet), silent = TRUE)
-    
-    if(inherits(tab, "try-error")){
-      
-      return(tibble())
-    }
-    
-    return(tab)
+  if (inherits(sheets, "try-error")) {
+    return(tibble()) 
   }
   
-  if(!inherits(sheets, "try-error")){
-    
-    tablist <- lapply(sheets, function(x) rex(path, sheet = x))
-    names(tablist) <- sheets
-    
-  } else {
-    
-    return(tibble())
-  }
+  tabs <- purrr::map(sheets, function(x) rex(path, sheet = x))
+  names(tabs) <- sheets
   
-  if(length(tablist) == 1){
-    
-    tab <- tablist[[1]]
-    
-    return(tab)
+  if (length(tabs) == 1) {
+    tabs <- tabs[[1]]
   }
-  
-  return(tablist)
+  return(tabs)
 }
 
 
@@ -55,35 +49,35 @@ read_geotabs <- function(path){
   message(path)
   system(paste("echo '", path, "' >> log.txt"))
   
-  if(stringr::str_detect(path, "xlsx?")){
+  if (stringr::str_detect(path, "xlsx?")) {
     tab <- read_excelfs(path)
     return(tab)
   }
   
-  if(stringr::str_detect(path, "gct$")){
+  if (stringr::str_detect(path, "gct$")) {
     tab <- CePa::read.gct(path)
     return(tab)
   }
   
-  if(stringr::str_detect(path, "\\.gz$")){
+  if (stringr::str_detect(path, "\\.gz$")) {
     path <- paste0("zcat < ", path)
   }
   
   tab <- try(data.table::fread(path, data.table = F))
   
-  if(inherits(tab, "try-error")){
+  if (inherits(tab, "try-error")) {
     message <- tab[1]
     system(paste("echo '", path, "\n", message,"' >> log.txt"))
     return(tibble())
   }
   
-  if(tibble::has_rownames(tab)){
+  if (tibble::has_rownames(tab)) {
     tab <- tibble::rownames_to_column(tab)
   }
   
   tab <- try(tibble::as_tibble(tab))
   
-  if(inherits(tab, "try-error")){
+  if (inherits(tab, "try-error")) {
     message <- cat("as_tibble: ", tab[1])
     system(paste("echo '", path, "\n", message,"' >> log.txt"))
     return(tibble())
@@ -107,66 +101,64 @@ read_geotabs <- function(path){
 #' @import stringr
 get_pvalues_basemean <- function(x){
   
-  ## Remove NA and duplicated columns
+  # Remove columns with all NA
+  x <- x[colSums(!is.na(x)) > 0]
+  
+  # If matrix convert to data.frame
+  if (is.matrix(x)) {
+    x <- as.data.frame(x)
+  }
+  
+  # Remove NA and duplicated column names
   colns <- colnames(x)
   colns <- colns[!is.na(colns)] 
   colns <- colns[!duplicated(colns)]
   
-  if(length(colns)==0){
+  if (length(colns) == 0) {
     stop("No colnames!")
   }
   
-  ## If matrix convert to data.frame
-  if(is.matrix(x)){
-    x <- as.data.frame(x)
-  }
-  
-  ## Fix colnames 
-  if(stringr::str_detect(tail(colns, 1), "V[0-9]")){
+  # Fix colnames 
+  if (stringr::str_detect(tail(colns, 1), "V[0-9]")) {
     colnames(x) <- c(tail(colns, 1), setdiff(colns, tail(colns, 1)))
   }
   
-  x <-  x[colns]
-  pval_col <- stringr::str_detect(colns, "^p(-)?val") & !stringr::str_detect(colns, "[Aa]dj|FDR|Corrected")
+  x <- x[colns]
   
-  ## If P value column present, check if P values are between 0 and 1 
-  if(any(pval_col)){
-    
-    pvals_ok <- vapply(x[pval_col], function(x) {all(na.omit(x)>=0 & na.omit(x)<=1)}, logical(1))
-    
-    if(!all(pvals_ok)){
-      
-      stop("Detected P values not in 0 to 1 range or otherwise malformed!")
-      
-    }
-    
-  } else {
-    
-    return(NULL) 
-    
+  # Now convert column names to lower case
+  colnames(x) <- stringr::str_to_lower(colnames(x))
+  
+  pval_col <- stringr::str_detect(colns, "^p(-)?val") & !stringr::str_detect(colns, "adj|fdr|corrected")
+  
+  # Return NULL if P values not present
+  if (!any(pval_col)) {
+    return(NULL)
   }
   
-  basemean_col <- str_detect(colns, "base[Mm]ean")
-  # restab <- restab[mapply(any, pval_col, basemean_col)]
+  # Check if P values are between 0 and 1
+  pvals_ok <- vapply(x[pval_col], function(x) {x <- range(x, na.rm = TRUE); all(x >= 0 & x <= 1)}, logical(1))
   
-  ## Summarise multiple basemean columns
-  if(any(basemean_col)) {
-    x <- dplyr::mutate(x, bmean = rowMeans(dplyr::select(x, dplyr::matches("basemean"))))
+  if (!all(pvals_ok)) {
+    stop("Detected P values not in 0 to 1 range or otherwise malformed!")
   }
   
-  ## Select only basemean and pvalue olumns
-  x <- dplyr::select(x, matches("bmean|p(-)?val"))
+  # Summarise multiple basemean columns
+  if (any(stringr::str_detect(colns, "base[Mm]ean"))) {
+    x <- dplyr::mutate(x, bmean = rowMeans(dplyr::select(x, dplyr::matches("base[Mm]ean"))))
+  }
   
-  ## Rename pvalue column
+  # Select only basemean and pvalue olumns
+  x <- dplyr::select(x, matches("bmean|^p(-)?val"))
+  
+  # Rename pvalue column
   colnames(x)[stringr::str_detect(colnames(x), "p(-)?val")] <- "pvalue"
   
-  ## Rename basemean column
-  if(any(stringr::str_detect(colnames(x), "bmean"))){
-    colnames(x)[stringr::str_detect(colnames(x),"bmean")] <- "basemean"
+  # Rename basemean column
+  if (any(stringr::str_detect(colnames(x), "bmean"))) {
+    colnames(x)[stringr::str_detect(colnames(x), "bmean")] <- "basemean"
   } else {
     x$basemean <- NA
   }
-  
   return(x)
 }
 
@@ -192,7 +184,7 @@ munge_geo <- function(eset, suppfile, dir = ".") {
   supptab <- read_geotabs(path)
   
   ## Convert to list if single table
-  if(is.data.frame(supptab)|is.matrix(supptab)){
+  if (is.data.frame(supptab) | is.matrix(supptab)) {
     supptab <- list(supptab) 
   }
   
@@ -202,14 +194,10 @@ munge_geo <- function(eset, suppfile, dir = ".") {
   ## Exclude tables which failed to import
   pvalues <- pvalues[!purrr::map_lgl(pvalues, ~inherits(.x, "try-error"))]
   
-  if(any(!purrr::map_lgl(pvalues, is.null))){
-    
+  if (any(!purrr::map_lgl(pvalues, is.null))) {
     supptab <- supptab[purrr::map_lgl(pvalues, is.null)]
-    
     pvalues <- pvalues[!purrr::map_lgl(pvalues, is.null)]
-    
-    if(length(supptab)==0){
-      
+    if (length(supptab) == 0) {
       return(pvalues)
     }
   }
@@ -227,16 +215,14 @@ munge_geo <- function(eset, suppfile, dir = ".") {
   gplmatch <- purrr::map_lgl(counts, ~testInteger(.x))
   
   ## If not integers and no pvalues, return only dim
-  if(sum(gplmatch)==0){
+  if (sum(gplmatch) == 0) {
     
     dims <- unlist(purrr::map(supptab, dim))
     
     dims <- dplyr::data_frame(features = dims[1], columns = dims[2])
     
-    if(all(purrr::map_lgl(pvalues, is.null))){
-      
+    if (all(purrr::map_lgl(pvalues, is.null))) {
       return(dims)
-      
     }
     
     return(c(pvalues, dims))
@@ -274,32 +260,29 @@ munge_geo <- function(eset, suppfile, dir = ".") {
 #' @return A data_frame with columns: sheet, heads, pvalues, features and columns.
 #' @import purrr
 #' @import dplyr
-munge_geo_pvalue <- function(suppfile, dir = ".", n_head = 100) {
+munge_geo_pvalue <- function(suppfile, n_head = 100) {
   
-  ## Assemble path to supplementary file
-  path <- file.path(dir, suppfile)
+  # Import supplemental file, 
+  supptab <- read_geotabs(suppfile)
   
-  ## Import supplemental file, 
-  supptab <- read_geotabs(path)
+  # Check if import was successful or exit
+  if (inherits(supptab, "try-error")) stop("Table import error!")
   
-  ## Check if import was successful or exit
-  if(inherits(supptab, "try-error")) stop("Table import error!")
-  
-  ## Convert to list if single table
-  if(is.data.frame(supptab) || is.matrix(supptab)){
+  # Convert to list if single table
+  if (is.data.frame(supptab) || is.matrix(supptab)) {
     supptab <- list(supptab) 
   }
   
-  ## Check for pvalues
+  # Check for pvalues
   pvalues <- purrr::map(supptab, ~try(get_pvalues_basemean(.x)))
   heads <- purrr::map(supptab, head, n = n_head)
   features <- purrr::map_int(supptab, nrow)
   columns <- purrr::map_int(supptab, ncol)
   
-  ## Get excel sheet names when available, otherwise return empty string
+  # Get excel sheet names when available, otherwise return empty string
   supptab_names <- names(supptab)
   
-  if(length(supptab_names)!=0){
+  if (length(supptab_names) != 0) {
     
     sheets <- as.list(supptab_names)
     
