@@ -96,7 +96,7 @@ get_filext <- function(x) {
 make_unique_colnames <- function(x, sep = "_"){
   
   if (!is.data.frame(x)) {
-    warning("Not data.frame. Returning NULL.\n")
+    warning("Not data.frame\n")
     return(x)
   }
   

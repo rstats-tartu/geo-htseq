@@ -36,6 +36,13 @@ read_excelfs <- function(path) {
 }
 
 
+# Find duplicated columns -------------------------------------------------
+
+find_duplicated_columns <- function(x){
+  hashs <- vapply(x, function(x) digest::digest(x), character(1))
+  duplicated(hashs)
+}
+
 # read_geotabs ------------------------------------------------------------
 #' Import Entrez GEO supplemetary tables
 #' @param path Path to supplementary file.
@@ -63,12 +70,20 @@ read_geotabs <- function(path){
     path <- paste0("zcat < ", path)
   }
   
-  tab <- try(data.table::fread(path, data.table = F))
+  tab <- try(data.table::fread(path, data.table = FALSE))
   
   if (inherits(tab, "try-error")) {
     message <- tab[1]
     system(paste("echo '", path, "\n", message,"' >> log.txt"))
     return(tibble())
+  }
+  
+  # Check for duplicated colnames
+  coln <- colnames(tab)
+  dups <- any(duplicated(coln))
+  
+  if (dups) {
+    colnames(tab) <- make.unique(coln, sep = "_")
   }
   
   if (tibble::has_rownames(tab)) {
@@ -232,7 +247,7 @@ munge_geo <- function(eset, suppfile, dir = ".") {
   exprs <- BiocGenerics::counts[gplmatch][[1]]
   
   ## Add feature names
-  rownames(exprs) <- make.names(rownames(exprs), unique = T)
+  rownames(exprs) <- make.names(rownames(exprs), unique = TRUE)
   
   ## Create eset
   title <- Biobase::pData(esets[gplmatch][[1]])[, 1, drop = FALSE]
