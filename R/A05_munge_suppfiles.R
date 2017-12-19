@@ -87,16 +87,17 @@ source("lib/checkFullRank.R")
 source("lib/text_funs.R")
 library(Biobase)
 
-import_supptabs <- FALSE
+import_supptabs <- TRUE
 if(import_supptabs){
   start <- Sys.time()
   st <- supptabs %>% 
-    mutate(result = map(suppfiles, ~ try(munge_geo_pvalue(.x, dir = local_suppfile_folder))))
+    mutate(result = map(suppfiles, ~ try(munge_geo_pvalue(file.path(local_suppfile_folder, .x)))))
   end <- Sys.time()
-  start-end
+  time_diff <- start-end
   
-  # Time difference of -1.556035 hours
+  system(paste("echo ' Run took", abs(time_diff), units(time_diff), "' >> log.txt"))
   saveRDS(st, file = "output/suppdata.rds")
+  
 }
 
 # # Fit models -----------------------------------------------------
