@@ -50,12 +50,15 @@ p_value_dims <- dims %>%
 
 ## Plot features versus samples
 dims_tabp <- ggplot() + 
-  geom_hex(aes(log10(samples), log10(features), fill = ..count../sum(..count..)), data = p_value_dims) +
-  geom_hex(aes(log10(samples), log10(features), fill = ..count../sum(..count..)), data = dims, alpha = 0.5) +
+  geom_hex(aes(log10(samples), log10(features), fill = ..count.. / sum(..count..)), data = p_value_dims) +
+  geom_hex(aes(log10(samples), log10(features), fill = ..count.. / sum(..count..)), data = dims, alpha = 0.5) +
   labs(x = bquote(N~samples~(log[10])),
        y = bquote(N~features~(log[10]))) +
   geom_hline(yintercept = log10(nrowthreshold), linetype = 2) +
   scale_fill_continuous(name = "Fraction", type = "viridis")
+
+legend <- g_legend(dims_tabp)
+dims_tabp <- dims_tabp + theme(legend.position = "none")
 
 n_imported_sets <- length(unique(dims$Accession))
 
@@ -74,9 +77,16 @@ dims_samplesp <- dims %>%
   labs(x = bquote(N~samples~(log[10])),
        y = "Count")
 
+# Compose plot
 pg <- lapply(list(dims_featuresp, dims_samplesp, dims_tabp), ggplotGrob)
 pg <- add_labels(pg, case = panel_label_case)
-pga <- arrangeGrob(grobs = pg, ncol = length(pg), widths = c(2, 2, 3))
+pga <- arrangeGrob(grobs = pg, ncol = length(pg), widths = c(3, 3, 5))
+lwidth <- sum(legend$widths)
+pga <- arrangeGrob(pga, legend, 
+                   ncol = 2, 
+                   widths = unit.c(unit(1, "npc") - lwidth, lwidth))
+
+# draw plot
 grid.draw(pga)
 
 ## ---- pvalues -----
@@ -101,57 +111,27 @@ p_values <- p_values %>%
 
 # Histogram of pi0 distribution
 pi0hist <- p_values %>% 
-  ggplot(aes(pi0, ..count../sum(..count..))) +
+  ggplot(aes(pi0, ..count.. / sum(..count..))) +
   geom_histogram(bins = 30) +
   labs(x = bquote(Proportion~of~true~nulls~(pi*0)),
        y = "Fraction of P value sets")
 
+# draw plot
 pi0hist
 
 ## ---- pi0histends -----
 
-p_values_unn <- p_values_unn %>% 
+p_values_unn <- p_values %>% 
+  unnest_listcol(bins) %>% 
   group_by(Accession, suppdata_id, annot, bins, pi0) %>% 
   summarise(count = n())
 
 p_values_unn <- p_values %>% 
   select(Accession, suppdata_id, annot, features, pi0) %>% 
-  right_join(p_values_unn) %>% 
+  left_join(p_values_unn) %>% 
   mutate(freq = count / features)
 
-library(Rtsne)
-p_values_unn <- p_values_unn %>% 
-  select(Accession, suppdata_id, annot, bins, freq, pi0) %>%
-  filter(complete.cases(.)) %>% 
-  nest(bins, freq) %>% 
-  mutate(data = map(data, ~ spread(.x, bins, freq)))
 
-p_matrix <- p_values_unn$data %>% bind_rows() %>% as.matrix()
-# p_matrix <- p_matrix[!duplicated(p_matrix),]
-tsne_out <- Rtsne(p_matrix, check_duplicates = FALSE, perplexity = 50, dims = 3)
-as_data_frame(tsne_out$Y) %>% 
-  bind_cols(annot = p_values_unn$annot, pi0 = p_values_unn$pi0) %>%
-  mutate(pi0bin = case_when(
-    pi0 == 1 ~ "no effects",
-    pi0 > 0.8 & pi0 < 1 ~ "pi0 ok",
-    pi0 < 0.8 ~ "too many\neffects"
-  )) %>% 
-  ggplot(aes(V1, V2, col = pi0bin)) +
-  geom_point() +
-  scale_color_viridis(discrete = TRUE)
-
-library(tsne)
-tsne_res <- tsne(p_matrix, perplexity = 50, epoch = 50)
-as_data_frame(tsne_res) %>%
-  bind_cols(annot = p_values_unn$annot, pi0 = p_values_unn$pi0) %>%
-  mutate(pi0bin = case_when(
-    pi0 == 1 ~ "no effects",
-    pi0 > 0.8 & pi0 < 1 ~ "pi0 ok",
-    pi0 < 0.8 ~ "too many\neffects"
-  )) %>% 
-  ggplot(aes(V1, V2, col = pi0bin)) +
-  geom_point() +
-  scale_color_viridis(discrete = TRUE)
 
 # Calculate ecdf and cluster histograms -----------------------------
 ecdf_pv <- dims %>% 
