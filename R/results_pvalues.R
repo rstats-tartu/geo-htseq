@@ -42,38 +42,26 @@ dims <- left_join(st_unnested, gsem) %>%
 n_samples <- dims %>% 
   summarise_at(vars(samples, features), funs(mean, median, Mode, min, max))
 
+#' dataset with p values
+p_value_dims <- dims %>% 
+  filter(!map_lgl(pvalues, is.null), !map_lgl(pvalues, inherits, "try-error"))
+
 ## ---- plotdims -----
 
 ## Plot features versus samples
-dims_tabp <- dims %>%
-  ggplot(aes(log10(samples), log10(features))) + 
-  geom_hex() +
+dims_tabp <- ggplot() + 
+  geom_hex(aes(log10(samples), log10(features), fill = ..count../sum(..count..)), data = p_value_dims) +
+  geom_hex(aes(log10(samples), log10(features), fill = ..count../sum(..count..)), data = dims, alpha = 0.5) +
   labs(x = bquote(N~samples~(log[10])),
        y = bquote(N~features~(log[10]))) +
   geom_hline(yintercept = log10(nrowthreshold), linetype = 2) +
-  scale_fill_continuous(name = "Count")
-
-#' Number of rows with 0 features
-# dims %>% 
-#   select(Accession, features, samples) %>% 
-#   mutate_at(c("features","samples"), log10) %>% 
-#   filter(is.finite(features))
-
-# dims %>% 
-#   select(Accession) %>% 
-#   n_distinct()
+  scale_fill_continuous(name = "Fraction", type = "viridis")
 
 n_imported_sets <- length(unique(dims$Accession))
 
-#' dataset with p values
-p_value_dims <- dims %>% 
-  filter(!map_lgl(pvalues, is.null))
-
-n_sets_with_pvalues <- length(unique(p_value_dims$Accession))
-
 dims_featuresp <- dims %>%
   ggplot(aes(log10(features))) + 
-  geom_histogram(bins = 60, fill = "gray70") +
+  geom_histogram(bins = 60, alpha = 0.5) +
   geom_histogram(bins = 60, aes(log10(features)), data = p_value_dims) +
   labs(x = bquote(N~features~(log[10])),
        y = "Count") +
@@ -81,7 +69,7 @@ dims_featuresp <- dims %>%
 
 dims_samplesp <- dims %>%
   ggplot(aes(log10(samples))) + 
-  geom_histogram(bins = 60, fill = "gray70") +
+  geom_histogram(bins = 60, alpha = 0.5) +
   geom_histogram(bins = 60, aes(log10(samples)), data = p_value_dims) +
   labs(x = bquote(N~samples~(log[10])),
        y = "Count")
@@ -95,8 +83,7 @@ grid.draw(pga)
 ## 
 # plot geo series with p values size distribution over all series
 
-p_values <- dims %>% 
-  filter(!map_lgl(pvalues, is.null), !map_lgl(pvalues, inherits, "try-error")) %>% 
+p_values <- p_value_dims %>% 
   mutate(pvalues = map(pvalues, make_unique_colnames),
          pvalues = map(pvalues, select, matches("pvalue")),
          pvalues = map(pvalues, as.list)) %>% 
@@ -104,16 +91,24 @@ p_values <- dims %>%
 
 p_values <- p_values %>% 
   unnest_listcol(pvalues)
-# 
-#   mutate(bins = map(pvalues, ntile, 60),
-#          pi0 = map_dbl(pvalues, propTrueNull))
 
-## ---- pvaluesend -----
-  
-p_values_unn <- p_values %>%
-  filter(!map_lgl(pvals, is.null)) %>% 
-  select(Accession, suppdata_id, annot, pvals, bins, pi0) %>% 
-  unnest()
+## ---- pi0hist -----
+
+#' Calculate bins and pi0 
+p_values <- p_values %>%
+  mutate(bins = map(pvalues, ntile, 60),
+         pi0 = map_dbl(pvalues, propTrueNull))
+
+# Histogram of pi0 distribution
+pi0hist <- p_values %>% 
+  ggplot(aes(pi0, ..count../sum(..count..))) +
+  geom_histogram(bins = 30) +
+  labs(x = bquote(Proportion~of~true~nulls~(pi*0)),
+       y = "Fraction of P value sets")
+
+pi0hist
+
+## ---- pi0histends -----
 
 p_values_unn <- p_values_unn %>% 
   group_by(Accession, suppdata_id, annot, bins, pi0) %>% 

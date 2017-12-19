@@ -1,3 +1,44 @@
+```{r include=FALSE, cache=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, 
+                      message = FALSE, 
+                      warning = FALSE,
+                      out.width = "70%",
+                      fig.align = 'center',
+                      fig.width = 6,
+                      fig.asp = 0.5,
+                      fig.show = "hold",
+                      dev = 'svg')
+
+options(htmltools.dir.version = FALSE, 
+        formatR.indent = 2, 
+        width = 55, 
+        digits = 4, 
+        warnPartialMatchAttr = FALSE, 
+        warnPartialMatchDollar = FALSE)
+
+library(tidyverse)
+library(lubridate)
+library(stringr)
+library(glue)
+library(formattable)
+library(Biobase)
+library(grid)
+library(gridExtra)
+library(limma)
+library(viridis)
+
+# Load helper functions
+source("lib/helpers.R")
+
+# Set panel label case
+panel_label_case <- "upper"
+nrowthreshold <- 4000
+
+# Last date to consider geo series and suppfilenames
+last_date <- ymd("2017-06-19")
+
+```
 
 ## Results {-}
 
@@ -109,6 +150,12 @@ knitr::include_graphics("figures/diagram.svg")
 (ref:dims) __Number of samples and features of HT-seq experiments.__ (`r ref_labels("A", panel_label_case)`) Number of features in GEO series where supplementary file with p values was uploaded (dark grey) compared to all GEO series with supplementary files (light grey). (`r ref_labels("B", panel_label_case)`) Number of samples in GEO series where p values were available (dark grey) compared to all series with supplementary files (light grey). (`r ref_labels("C", panel_label_case)`) Mean number of samples was `r round(n_samples$samples_mean)` and median `r n_samples$samples_median`. Most frequent sample size was `r n_samples$samples_Mode`. Mean number of features was `r paste(floor(n_samples$features_mean))` and median `r paste(n_samples$features_median)`. Number of samples was taken from series matrix files and number of features is number of rows in supplementary files. Dashed line denotes cutoff for complete sets of features/p values.
 
 ```{r plotdims, fig.cap='(ref:dims)'}
+
+```
+
+(ref:pi0hist) __Proportion of true null hypotheses in P value sets.__
+
+```{r pi0hist, fig.cap='(ref:pi0hist)'}
 
 ```
 
