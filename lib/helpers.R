@@ -129,3 +129,13 @@ unnest_listcol <- function(data, ...) {
   colnames(var_unlisted) <- dplyr::quo_name(quo)
   dplyr::bind_cols(data, var_unlisted)
 }
+
+
+# extract legend ----------------------------------------------------------
+
+g_legend <- function(p) { 
+  tmp <- ggplot_gtable(ggplot_build(p)) 
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box") 
+  tmp$grobs[[leg]]
+}
+

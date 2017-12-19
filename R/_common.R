@@ -2,7 +2,7 @@
 knitr::opts_chunk$set(echo = FALSE, 
                       message = FALSE, 
                       warning = FALSE,
-                      out.width = "70%",
+                      out.width = "80%",
                       fig.align = 'center',
                       fig.width = 6,
                       fig.asp = 0.5,
