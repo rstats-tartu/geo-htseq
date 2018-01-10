@@ -88,7 +88,7 @@ source("lib/text_funs.R")
 library(Biobase)
 
 import_supptabs <- TRUE
-if(import_supptabs){
+if(import_supptabs) {
   start <- Sys.time()
   st <- supptabs %>% 
     mutate(result = map(suppfiles, ~ try(munge_geo_pvalue(file.path(local_suppfile_folder, .x)))))

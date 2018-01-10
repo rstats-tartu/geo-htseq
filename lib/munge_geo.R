@@ -143,7 +143,7 @@ get_pvalues_basemean <- function(x){
   # Now convert column names to lower case
   colnames(x) <- stringr::str_to_lower(colnames(x))
   
-  pval_col <- stringr::str_detect(colns, "^p(-)?val") & !stringr::str_detect(colns, "adj|fdr|corrected")
+  pval_col <- stringr::str_detect(colns, "^p-?val(ue)?s?$") & !stringr::str_detect(colns, "adj|fdr|corrected")
   
   # Return NULL if P values not present
   if (!any(pval_col)) {
