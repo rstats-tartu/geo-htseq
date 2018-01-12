@@ -113,13 +113,13 @@ knitr::include_graphics("figures/diagram.svg")
 
 ```
 
-(ref:pi0hist) __Proportion of true null hypotheses in P value sets.__
+(ref:pi0hist) __Proportion of true null hypotheses in P value sets.__ (`r ref_labels("A", panel_label_case)`) Distribution of estimated $\pi0$ values in reported GEO HT-seq P value sets. (`r ref_labels("B", panel_label_case)`) Distribution of $\pi0$ versus number of features. P value sets with `r glue(">{nrowthreshold}")` features are shown.
 
 ```{r pi0hist, fig.cap='(ref:pi0hist)'}
 
 ```
 
-(ref:publications) __Journals publishing HT-seq data.__ (`r ref_labels("A", panel_label_case)`) Non-human or -mouse datasets. (`r ref_labels("B", panel_label_case)`) Human or mouse datasets. (`r ref_labels("C", panel_label_case)`) Human or mouse datasets with p values in supplementary files.
+(ref:publications) __Journals publishing HT-seq data.__ (`r ref_labels("A", panel_label_case)`) Top 20 journals publishing non-human or -mouse datasets. (`r ref_labels("B", panel_label_case)`) Top 20 journals publishing human or mouse datasets. (`r ref_labels("C", panel_label_case)`) Journals that have published at least two articles reporting p values in GEO supplementary files.
 
 ```{r publications, fig.cap='(ref:publications)'}
 

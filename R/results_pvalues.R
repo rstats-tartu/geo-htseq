@@ -42,7 +42,7 @@ dims <- left_join(st_unnested, gsem) %>%
 n_samples <- dims %>% 
   summarise_at(vars(samples, features), funs(mean, median, Mode, min, max))
 
-#' dataset with p values
+#' Datasets with p values
 p_value_dims <- dims %>% 
   filter(!map_lgl(pvalues, is.null), !map_lgl(pvalues, inherits, "try-error"))
 
@@ -102,6 +102,14 @@ p_values <- p_value_dims %>%
 p_values <- p_values %>% 
   unnest_listcol(pvalues)
 
+#' Filter out one dataset with pvalue threshold info (logical)
+#' and datasets where number of features is less than nrowthreshold
+p_values <- p_values %>% 
+  filter(map_lgl(pvalues, ~ is.numeric(.x)), 
+         features > nrowthreshold)
+#' Dataset with pvaluethreshold
+# p_values %>% filter(Accession == "GSE83134")
+
 ## ---- pi0hist -----
 
 #' Calculate bins and pi0 
@@ -116,45 +124,74 @@ pi0hist <- p_values %>%
   labs(x = bquote(Proportion~of~true~nulls~(pi*0)),
        y = "Fraction of P value sets")
 
+pi0_features <- p_values %>% 
+  ggplot(aes(pi0, log10(features))) +
+  geom_point() +
+  geom_smooth() +
+  labs(x = bquote(Proportion~of~true~nulls~(pi*0)),
+       y = bquote(N~features~(log[10])))
+
+# Compose plot
+pg <- lapply(list(pi0hist, pi0_features), ggplotGrob)
+pg <- add_labels(pg, case = panel_label_case)
+pga <- arrangeGrob(grobs = pg, ncol = length(pg), widths = c(1, 1))
+
 # draw plot
-pi0hist
+grid.draw(pga)
 
 ## ---- pi0histends -----
 
-p_values_unn <- p_values %>% 
-  unnest_listcol(bins) %>% 
-  group_by(Accession, suppdata_id, annot, bins, pi0) %>% 
-  summarise(count = n())
-
-p_values_unn <- p_values %>% 
-  select(Accession, suppdata_id, annot, features, pi0) %>% 
-  left_join(p_values_unn) %>% 
-  mutate(freq = count / features)
-
-
-
 # Calculate ecdf and cluster histograms -----------------------------
-ecdf_pv <- dims %>% 
-  filter(!map_lgl(pvalues, is.null), features >= nrowthreshold) %>% 
-  mutate(pvals = map(pvalues, "pvalue"),
-         bins = map(pvals, ntile, 44),
-         pi0 = map_dbl(pvals, propTrueNull)) %>% 
-  filter(!map_lgl(pvals, is.null)) %>%
-  mutate(eCDF = map(pvals, ecdf))
+p_values <- p_values %>%
+  filter(map_lgl(pvalues, is.numeric)) %>% 
+  mutate(eCDF = map(pvalues, ecdf))
 
-ecdf_pv <- ecdf_pv %>% 
-  mutate(probs = map(eCDF, function(Fn) Fn(seq(0, 1, 1/44))))
-probs_mtrx <- ecdf_pv$probs %>% 
+p_values <- p_values %>% 
+  mutate(probs = map(eCDF, function(Fn) Fn(seq(0, 1, 1/40))))
+probs_mtrx <- p_values$probs %>% 
   unlist %>% 
-  matrix(nrow = nrow(ecdf_pv), byrow = T)
-tsne_out <- Rtsne(probs_mtrx, check_duplicates = FALSE, 
-                  perplexity = 50, dims = 2, theta = 0)
-as_data_frame(tsne_out$Y) %>% 
-  bind_cols(annot = p_values_unn$annot, 
-            pi0 = p_values_unn$pi0, 
-            Accession = p_values_unn$Accession) %>%
-  ggplot(aes(V1, V2, col = pi0)) +
-  geom_point(aes(text = Accession)) +
-  scale_color_viridis()
-library(plotly)
-ggplotly(tooltip = c("Accession", "pi0"))
+  matrix(nrow = nrow(p_values), byrow = T)
+
+# Ok, let's use default eucl + ward.d 
+library(ape)
+barcolors <- c("#070d0d", "#feb308", "#9b5fc0", "#6ecb3c", "#1d5dec", "#fe4b03")
+hc <- probs_mtrx %>% dist(method = "euclidean") %>% hclust() 
+treecut <- hc %>% cutree(k = 6)
+hc_phylo <- hc %>% as.phylo()
+
+library(ggtree)
+ggt <- hc_phylo %>%
+  ggtree(linetype = 2, 
+         color = "steelblue") + 
+  geom_tippoint(color = barcolors[treecut], size = 1)
+
+gghist <- function(x) {
+  ggplot(x, aes(pvalues, group = tip)) +
+    geom_freqpoly(bins = 40, colour = barcolors[unique(x$clus)], size = .1) +
+    ggimage::theme_transparent()
+}
+
+clus_fp <- data_frame(clus = treecut, 
+                      tip = hc_phylo$tip.label, 
+                      pvalues = p_values$pvalues) %>% 
+  unnest() %>% 
+  filter(complete.cases(.)) %>% 
+  group_by(clus) %>% 
+  do(p = gghist(.))
+
+# Create sparklines, inspect histograms --------------------------------------------------
+
+library(sparklines)
+bar_sparkline <- function(x, ...){
+  commonopts <- list(barWidth = 2, barSpacing = 0, chartRangeMin = 0)
+  hist(x, breaks = seq(0, 1, 1/44), plot = FALSE) %>% 
+    .$counts %>% 
+    sparklines::sparkline(chart_type = "bar", config = c(commonopts, ...))
+}
+
+
+# Merge clusters to p value dataframe -------
+p_values <- p_values %>%
+  bind_cols(data_frame(histclus = map_chr(treecut, ~barcolors[.x]))) %>% 
+  mutate(spark = map2(pvalues, histclus, ~bar_sparkline(.x, barColor = .y)))
+
