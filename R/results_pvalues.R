@@ -97,7 +97,7 @@ p_values <- p_value_dims %>%
   mutate(pvalues = map(pvalues, make_unique_colnames),
          pvalues = map(pvalues, select, matches("pvalue")),
          pvalues = map(pvalues, as.list)) %>% 
-  select(Accession, suppfiles, suppdata_id, annot, features, columns, pvalues)
+  select(Accession, suppfiles, suppdata_id, annot, features, columns, samples, pvalues)
 
 p_values <- p_values %>% 
   unnest_listcol(pvalues)
@@ -124,10 +124,21 @@ pi0hist <- p_values %>%
   labs(x = bquote(Proportion~of~true~nulls~(pi*0)),
        y = "Fraction of P value sets")
 
-pi0_features <- p_values %>% 
+sort(unique(p_values$samples))
+
+pi0_features <- p_values %>%
+  mutate(samples = case_when(
+    samples < 4 ~ "2 to 3",
+    samples > 3 & samples < 7 ~ "4 to 6",
+    samples > 6 & samples < 11 ~ "7 to 10",
+    samples > 10 ~ "10+",
+  )) %>% 
   ggplot(aes(pi0, log10(features))) +
-  geom_point() +
-  geom_smooth() +
+  geom_point(aes(color = samples)) +
+  geom_smooth(method = 'loess', se = FALSE) +
+  scale_color_viridis(discrete = TRUE,
+                      name = "N samples", 
+                      limits = c("2 to 3", "4 to 6", "7 to 10", "10+")) +
   labs(x = bquote(Proportion~of~true~nulls~(pi*0)),
        y = bquote(N~features~(log[10])))
 
