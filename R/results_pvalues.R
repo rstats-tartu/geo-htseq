@@ -142,10 +142,17 @@ pi0_features <- p_values %>%
   labs(x = bquote(Proportion~of~true~nulls~(pi*0)),
        y = bquote(N~features~(log[10])))
 
+legend <- g_legend(pi0_features)
+pi0_features <- pi0_features + theme(legend.position = "none")
+
 # Compose plot
 pg <- lapply(list(pi0hist, pi0_features), ggplotGrob)
 pg <- add_labels(pg, case = panel_label_case)
 pga <- arrangeGrob(grobs = pg, ncol = length(pg), widths = c(1, 1))
+lwidth <- sum(legend$widths)
+pga <- arrangeGrob(pga, legend, 
+                   ncol = 2, 
+                   widths = unit.c(unit(1, "npc") - lwidth, lwidth))
 
 # draw plot
 grid.draw(pga)
