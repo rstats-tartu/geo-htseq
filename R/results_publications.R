@@ -22,47 +22,54 @@ pvals_pub <- p_values %>%
 
 pubs <- ds_redline %>% 
   select(Accession, PubMedIds, model) %>% 
-  inner_join(pubs)
+  inner_join(pubs) %>% 
+  mutate(ISSN = case_when(str_length(ISSN) == 0 ~ ESSN,
+                          str_length(ISSN) != 0 ~ ISSN))
 
-pubs_sum <- pubs %>% 
-  select(PubMedIds, model, Source, FullJournalName) %>% 
+jiffy <- read_csv("data/JIF_incites.csv", skip = 1)
+jiffy <- jiffy %>% select(-starts_with("X"))
+colnames(jiffy)[c(2, 3, 6)] <- c("FullJournalName", "Source", "IF")
+jiffy <- jiffy %>% 
+  select(c(2:4, 6)) %>% 
+  mutate_at(c("FullJournalName", "Source"), str_to_lower)
+
+pub_fun <- . %>% 
+  select(PubMedIds, model, Source, ISSN) %>% 
   distinct() %>% 
-  group_by(model, Source) %>% 
-  summarise(N = n())
-
-pubp_hs <- pubs_sum %>% 
-  filter(str_detect(model, "Human")) %>% 
-  top_n(25) %>%
-  ggplot(aes(reorder(Source, desc(N)), N)) +
-  geom_point() +
-  labs(y = "Number of publications") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 6),
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank())
-
-pubp_other <- pubs_sum %>% 
-  filter(!str_detect(model, "Human")) %>% 
-  top_n(25) %>% 
-  ggplot(aes(reorder(Source, desc(N)), N)) +
-  geom_point() +
-  labs(y = "Number of publications") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 6),
-        axis.title.x = element_blank())
-
-pubp_pval <- pubs %>% 
-  filter(Accession %in% p_values$Accession) %>% 
-  select(PubMedIds, model, Source, FullJournalName) %>% 
-  distinct() %>% 
-  group_by(model, Source) %>% 
+  group_by(model, Source, ISSN) %>% 
   summarise(N = n()) %>% 
-  top_n(25) %>% 
-  ggplot(aes(reorder(Source, desc(N)), N)) +
+  ungroup()
+
+pubs_sum <- pubs %>% pub_fun()
+
+pubsum_hs <- pubs_sum %>% 
+  filter(str_detect(model, "Human")) %>%
+  top_n(20)
+
+pubsum_other <- pubs_sum %>% 
+  filter(!str_detect(model, "Human")) %>% 
+  top_n(20)
+
+pubsum_pval <- pubs %>% 
+  filter(Accession %in% p_values$Accession) %>% 
+  pub_fun() %>% 
+  filter(N >= 2)
+
+pubplot <- function(data) {
+  ggplot(data, aes(reorder(Source, desc(N)), N)) +
   geom_point() +
-  labs(y = "Number of publications") +
-  scale_y_continuous(breaks = seq(0, 10, 1), limits = c(0, 10)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 6),
-        axis.title.x = element_blank(),
-        axis.title.y = element_blank())
+  labs(y = "N publications") + 
+  scale_color_viridis() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5, size = 5.5),
+        axis.title.x = element_blank()) + 
+  expand_limits(y = 0)
+}
+
+pubp_other <- pubsum_other %>% pubplot()
+
+pubp_hs <- pubsum_hs %>% pubplot() + theme(axis.title.y = element_blank())
+
+pubp_pval <- pubsum_pval %>% pubplot() + theme(axis.title.y = element_blank())
 
 pg <- lapply(list(pubp_other, pubp_hs, pubp_pval), ggplotGrob)
 pg <- add_labels(pg, case = panel_label_case)
