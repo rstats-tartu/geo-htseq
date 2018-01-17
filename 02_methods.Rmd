@@ -34,6 +34,7 @@ HT-seq experiment metadata was extracted from series matrix files.
 Series matrix files were downloaded using GEOquery package `r myversion("GEOquery")` [@R-GEOquery].
 
 ### Data analysis
+Exact binomial test was used to test differences in proportions.
 Proportion of true nulls was calculated using propTrueNull function from limma package `r myversion("limma")` [@R-limma].
 
 
