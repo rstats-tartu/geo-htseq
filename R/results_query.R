@@ -70,7 +70,7 @@ ppub_n_ci <- ppub_n %>%
   mutate(test = map2(pub, geoseries, binom.test),
          ci = map(test, "conf.int"),
          ci = map(ci, percent, 1),
-         ci = map_chr(ci, ~glue("95%CI, {.x[1]} to {.x[2]}")))
+         ci = map_chr(ci, ~ glue("95%CI, {.x[1]} to {.x[2]}")))
 
 ## ---- queryfig -----
 geop

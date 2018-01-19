@@ -65,7 +65,7 @@ ppub_n_ci_nopublicsupps <- suppfilenames_not_present %>%
   spread(key, value) %>% 
   mutate(test = map2(pub, geoseries, binom.test),
          estimate = map_dbl(test, "estimate"),
-         ci = map(pois, "conf.int"),
+         ci = map(test, "conf.int"),
          ci = map(ci, percent, 1),
          ci = map_chr(ci, ~glue("95%CI, {.x[1]} to {.x[2]}")))
 

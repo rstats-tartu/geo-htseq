@@ -100,6 +100,7 @@ p_values <- p_value_dims %>%
   select(Accession, suppfiles, suppdata_id, annot, features, columns, samples, pvalues)
 
 p_values <- p_values %>% 
+  distinct() %>%
   unnest_listcol(pvalues)
 
 #' Filter out one dataset with pvalue threshold info (logical)
@@ -123,8 +124,6 @@ pi0hist <- p_values %>%
   geom_histogram(bins = 30) +
   labs(x = bquote(Proportion~of~true~nulls~(pi*0)),
        y = "Fraction of P value sets")
-
-sort(unique(p_values$samples))
 
 pi0_features <- p_values %>%
   mutate(samples = case_when(
@@ -197,19 +196,30 @@ clus_fp <- data_frame(clus = treecut,
   group_by(clus) %>% 
   do(p = gghist(.))
 
-# Create sparklines, inspect histograms --------------------------------------------------
+# Merge clusters to p value dataframe and create sparklines -------
+treecut <- data_frame(histclus = map_chr(treecut, ~ barcolors[.x]))
+p_values <- p_values %>% bind_cols(treecut)
 
-library(sparklines)
-bar_sparkline <- function(x, ...){
-  commonopts <- list(barWidth = 2, barSpacing = 0, chartRangeMin = 0)
-  hist(x, breaks = seq(0, 1, 1/44), plot = FALSE) %>% 
-    .$counts %>% 
-    sparklines::sparkline(chart_type = "bar", config = c(commonopts, ...))
-}
+library(kableExtra)
+library(sparkline)
 
+pv_hist_caption <- "P value histograms and proportion of true nulls"
 
-# Merge clusters to p value dataframe -------
-p_values <- p_values %>%
-  bind_cols(data_frame(histclus = map_chr(treecut, ~barcolors[.x]))) %>% 
-  mutate(spark = map2(pvalues, histclus, ~bar_sparkline(.x, barColor = .y)))
-
+p_values %>%
+  select(Accession, suppdata_id, pvalues, pi0, histclus) %>%
+  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/44), plot = FALSE)$counts),
+         pi0 = digits(pi0, 2)) %>%
+  unnest(values) %>%
+  group_by(Accession, suppdata_id, pi0, histclus) %>%
+  summarise(Histogram = spk_chr(values,
+                                chartRangeMin = 0,
+                                barColor = histclus,
+                                type = "bar")) %>%
+  arrange(Accession) %>%
+  select(Accession, suppdata_id, Histogram, pi0) %>%
+  rename('P value histogram' = Histogram,
+         'True nulls proportion' = pi0,
+         'Supplementary file name' = suppdata_id) %>%
+  knitr::kable("html", escape = FALSE, caption = pv_hist_caption) %>%
+  kable_styling(full_width = FALSE)
+  

@@ -29,3 +29,4 @@ documentclass: article
 ```{r, include=FALSE}
 knitr::write_bib(c(.packages(), 'httr', 'xml2', 'XML', 'data.table','readxl' ,'GEOquery','tidyverse', 'lubridate', 'stringr','formattable', 'Biobase', 'grid', 'gridExtra','knitr', 'rmarkdown'), 'packages.bib')
 ```
+
