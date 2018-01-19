@@ -168,6 +168,7 @@ p_values <- p_values %>%
 probs_mtrx <- p_values$probs %>% 
   unlist %>% 
   matrix(nrow = nrow(p_values), byrow = T)
+rownames(probs_mtrx) <- p_values$Accession
 
 # Ok, let's use default eucl + ward.d 
 # barcolors <- c("#070d0d", "#feb308", "#9b5fc0", "#6ecb3c", "#1d5dec", "#fe4b03")
@@ -178,8 +179,10 @@ hc_phylo <- hc %>% ape::as.phylo()
 
 ggt <- hc_phylo %>%
   ggtree::ggtree(linetype = 2, 
-                 color = "steelblue") + 
-  ggtree::geom_tippoint(color = barcolors[treecut], size = 1)
+                 color = "steelblue",
+                 layout = "circular") + 
+  ggtree::geom_tippoint(color = barcolors[treecut], size = 1) +
+  ggtree::geom_tiplab(aes(angle = angle), size = 1.1, hjust = -0.2)
 
 ggt
 
