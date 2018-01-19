@@ -170,17 +170,16 @@ probs_mtrx <- p_values$probs %>%
   matrix(nrow = nrow(p_values), byrow = T)
 
 # Ok, let's use default eucl + ward.d 
-library(ape)
-barcolors <- c("#070d0d", "#feb308", "#9b5fc0", "#6ecb3c", "#1d5dec", "#fe4b03")
+# barcolors <- c("#070d0d", "#feb308", "#9b5fc0", "#6ecb3c", "#1d5dec", "#fe4b03")
+barcolors <- viridis::viridis(6)
 hc <- probs_mtrx %>% dist(method = "euclidean") %>% hclust() 
 treecut <- hc %>% cutree(k = 6)
-hc_phylo <- hc %>% as.phylo()
+hc_phylo <- hc %>% ape::as.phylo()
 
-library(ggtree)
 ggt <- hc_phylo %>%
-  ggtree(linetype = 2, 
-         color = "steelblue") + 
-  geom_tippoint(color = barcolors[treecut], size = 1)
+  ggtree::ggtree(linetype = 2, 
+                 color = "steelblue") + 
+  ggtree::geom_tippoint(color = barcolors[treecut], size = 1)
 
 gghist <- function(x) {
   ggplot(x, aes(pvalues, group = tip)) +
@@ -199,9 +198,6 @@ clus_fp <- data_frame(clus = treecut,
 # Merge clusters to p value dataframe and create sparklines -------
 treecut <- data_frame(histclus = map_chr(treecut, ~ barcolors[.x]))
 p_values <- p_values %>% bind_cols(treecut)
-
-library(kableExtra)
-library(sparkline)
 
 pv_hist_caption <- "P value histograms and proportion of true nulls"
 
@@ -222,4 +218,3 @@ p_values %>%
          'Supplementary file name' = suppdata_id) %>%
   knitr::kable("html", escape = FALSE, caption = pv_hist_caption) %>%
   kable_styling(full_width = FALSE)
-  

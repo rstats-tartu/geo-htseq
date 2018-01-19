@@ -129,4 +129,13 @@ knitr::include_graphics("figures/diagram.svg")
 
 ```
 
+```{r, include=FALSE}
+# Way to add sparkline dependencies
+mtcars %>%
+  group_by(cyl) %>%
+  summarise(hp = spk_chr(hp, type = "box")) %>%
+  formattable() %>%
+  as.htmlwidget() %>%
+  spk_add_deps()
+```
 
