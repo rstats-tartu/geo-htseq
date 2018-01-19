@@ -125,7 +125,14 @@ knitr::include_graphics("figures/diagram.svg")
 
 ```
 
-```{r pi0histends}
+
+(ref:pi0histends) __Phylogenetic tree of P value histograms.__ Tree was obtained by clustering of the empirical cumulative distribution function outputs of P value histograms. Colors show groups obtained by cutting the tree at the height giving six clusters.
+
+```{r pi0histends, fig.cap='(ref:pi0histends)'}
+
+```
+
+```{r sparklines}
 
 ```
 
@@ -138,4 +145,3 @@ mtcars %>%
   as.htmlwidget() %>%
   spk_add_deps()
 ```
-

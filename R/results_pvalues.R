@@ -181,27 +181,31 @@ ggt <- hc_phylo %>%
                  color = "steelblue") + 
   ggtree::geom_tippoint(color = barcolors[treecut], size = 1)
 
-gghist <- function(x) {
-  ggplot(x, aes(pvalues, group = tip)) +
-    geom_freqpoly(bins = 40, colour = barcolors[unique(x$clus)], size = .1) +
-    ggimage::theme_transparent()
-}
+ggt
 
-clus_fp <- data_frame(clus = treecut, 
-                      tip = hc_phylo$tip.label, 
-                      pvalues = p_values$pvalues) %>% 
-  unnest() %>% 
-  filter(complete.cases(.)) %>% 
-  group_by(clus) %>% 
-  do(p = gghist(.))
+# gghist <- function(x) {
+#   ggplot(x, aes(pvalues, group = tip)) +
+#     geom_freqpoly(bins = 40, colour = barcolors[unique(x$clus)], size = .1) +
+#     ggimage::theme_transparent()
+# }
+# 
+# clus_fp <- data_frame(clus = treecut, 
+#                       tip = hc_phylo$tip.label, 
+#                       pvalues = p_values$pvalues) %>% 
+#   unnest() %>% 
+#   filter(complete.cases(.)) %>% 
+#   group_by(clus) %>% 
+#   do(p = gghist(.))
+
+## ---- sparklines -----
 
 # Merge clusters to p value dataframe and create sparklines -------
 treecut <- data_frame(histclus = map_chr(treecut, ~ barcolors[.x]))
 p_values <- p_values %>% bind_cols(treecut)
 
-pv_hist_caption <- "P value histograms and proportion of true nulls"
+pv_hist_caption <- "P value histograms and proportion of true nulls. Histograms are colored according to clustering of their empirical cumulative distribution function outputs. Supplementary file names for tables from xls(x) files might be appended with sheet name."
 
-p_values %>%
+spark_table <- p_values %>%
   select(Accession, suppdata_id, pvalues, pi0, histclus) %>%
   mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/44), plot = FALSE)$counts),
          pi0 = digits(pi0, 2)) %>%
@@ -215,6 +219,15 @@ p_values %>%
   select(Accession, suppdata_id, Histogram, pi0) %>%
   rename('P value histogram' = Histogram,
          'True nulls proportion' = pi0,
-         'Supplementary file name' = suppdata_id) %>%
+         'Supplementary file name' = suppdata_id)
+
+# Save empty table for manual classification. 
+if (!any(str_detect(list.files("output"), "pvalue_histogram_classes.csv"))) {
+  spark_table %>% 
+    select(-`P value histogram`) %>% 
+    write_excel_csv("output/pvalue_histogram_classes.csv")
+}
+
+spark_table %>%
   knitr::kable("html", escape = FALSE, caption = pv_hist_caption) %>%
   kable_styling(full_width = FALSE)
