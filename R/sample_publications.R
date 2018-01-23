@@ -15,3 +15,5 @@ tocheckids <- tocheck %>%
   unnest() %>% 
   select(ISSN, Source, DOI, Volume, Issue, Pages) %>% 
   distinct()
+
+readr::write_excel_csv(tocheckids, "output/check_pubs_for_pvalues.csv")
