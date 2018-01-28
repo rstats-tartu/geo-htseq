@@ -75,3 +75,11 @@ pg <- lapply(list(pubp_other, pubp_hs, pubp_pval), ggplotGrob)
 pg <- add_labels(pg, case = panel_label_case)
 pga <- arrangeGrob(grobs = pg, ncol = 3)
 grid.draw(pga)
+
+## ---- citations ----
+scopus <- read_rds("data/scopus_citedbycount.rds")
+scopus %>% 
+  filter(!is.na(citations)) %>% 
+  ggplot(aes(log10(1 + citations))) +
+  geom_histogram(bins = 100)
+plotly::ggplotly()
