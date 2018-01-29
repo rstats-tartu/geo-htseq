@@ -77,9 +77,53 @@ pga <- arrangeGrob(grobs = pg, ncol = 3)
 grid.draw(pga)
 
 ## ---- citations ----
+
+#' Import citation data
 scopus <- read_rds("data/scopus_citedbycount.rds")
-scopus %>% 
-  filter(!is.na(citations)) %>% 
-  ggplot(aes(log10(1 + citations))) +
-  geom_histogram(bins = 100)
-plotly::ggplotly()
+
+# 
+# scopus %>% 
+#   filter(!is.na(citations)) %>% 
+#   ggplot(aes(log10(1 + citations))) +
+#   geom_histogram(bins = 100)
+
+# Merge publication data with citations and pvalues
+pubs_citations <- pubs %>% 
+  filter(str_detect(model, "Human")) %>% 
+  left_join(scopus) %>% 
+  select(Accession, PubMedIds, DOI, citations) %>% 
+  left_join(pvals_pub)
+
+#' Correlation between pi0 and number of citations
+p_cit <- pubs_citations %>% 
+  select(-Accession) %>% 
+  distinct() %>% 
+  filter(pi0 > 0.25) %>% 
+  ggplot(aes(pi0, log10(1 + citations))) +
+  geom_point() +
+  geom_smooth(se = FALSE, method = "lm") +
+  labs(x = bquote(Proportion~of~true~nulls~(pi*0)))
+
+mod_citations <- pubs_citations %>% 
+  select(-Accession) %>% 
+  distinct() %>% 
+  filter(pi0 > 0.25) %>% 
+  lm(log10(1 + citations) ~ pi0, data = .) %>% 
+  broom::tidy()
+
+# pubs_citations_nested <- pubs_citations %>% 
+#   group_by(PubMedIds, DOI, citations) %>% 
+#   nest()
+p_cit_pval <- pubs_citations %>% 
+  select(-Accession) %>% 
+  distinct() %>% 
+  ggplot(aes(log10(1 + citations), fill = is.na(pi0))) +
+  geom_histogram(bins = 60, position = "dodge") +
+  scale_fill_grey(name = "P values\navailable", labels = c("Yes", "No")) +
+  labs(y = "N of articles")
+
+pg <- lapply(list(p_cit_pval, p_cit), ggplotGrob)
+pg <- add_labels(pg, case = panel_label_case)
+pga <- arrangeGrob(grobs = pg, ncol = length(pg))
+grid.draw(pga)
+

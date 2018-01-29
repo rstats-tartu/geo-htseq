@@ -119,9 +119,15 @@ knitr::include_graphics("figures/diagram.svg")
 
 ```
 
-(ref:publications) __Journals publishing HT-seq data.__ (`r ref_labels("A", panel_label_case)`) Top 20 journals publishing non-human or -mouse datasets. (`r ref_labels("B", panel_label_case)`) Top 20 journals publishing human or mouse datasets. (`r ref_labels("C", panel_label_case)`) Journals that have published at least two articles reporting p values in GEO supplementary files.
+(ref:publications) __Journals publishing HT-seq data.__ (`r ref_labels("A", panel_label_case)`) Top 20 journals publishing non-human or -mouse datasets. (`r ref_labels("B", panel_label_case)`) Top 20 journals publishing human or mouse datasets. (`r ref_labels("C", panel_label_case)`) Journals that have published at least two articles reporting P values in GEO supplementary files.
 
 ```{r publications, fig.cap='(ref:publications)'}
+
+```
+
+(ref:citations) __Citation of articles featuring HT-seq data.__ (`r ref_labels("A", panel_label_case)`) Distribution of the number of citations and availability of full sets of raw P values in GEO database. (`r ref_labels("B", panel_label_case)`) Relationship between the proportion of true nulls and number of citations. Data with pi0 near zero (< 0.25) were filtered out because these P values are probably not full sets of raw P values. Blue line, linear model fit. Citation data is from Scopus.
+
+```{r citations, fig.cap='(ref:citations)'}
 
 ```
 
@@ -145,3 +151,4 @@ mtcars %>%
   as.htmlwidget() %>%
   spk_add_deps()
 ```
+
