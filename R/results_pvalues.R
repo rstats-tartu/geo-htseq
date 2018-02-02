@@ -191,63 +191,69 @@ ggt <- hc_phylo %>%
 ggt
 
 
+## ---- sparklines -----
+
+# Merge clusters to p value dataframe and create sparklines -------
+treecut <- data_frame(histclus = map_chr(treecut, ~ barcolors[.x]))
+p_values <- p_values %>% bind_cols(treecut)
+
+spark_table <- p_values %>%
+  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/44), plot = FALSE)$counts),
+         pi0 = digits(pi0, 2)) %>%
+  unnest(values) %>%
+  group_by(Accession, suppdata_id, pi0, histclus) %>%
+  summarise(Histogram = spk_chr(values,
+                                chartRangeMin = 0,
+                                barColor = histclus,
+                                type = "bar"))
+
+# Save empty table for manual classification. 
+if (!any(str_detect(list.files("output"), "pvalue_histogram_classes.csv"))) {
+  spark_table %>% 
+    select(-Histogram) %>% 
+    write_excel_csv("output/pvalue_histogram_classes.csv")
+}
+
 # Curated p value histogram classes ---------------------------------------
 
 # Load manually assigned classes
 his <- read_delim("data/pvalue_hist_UM.csv", 
                   delim = ";", 
                   locale = locale(decimal_mark = ","))
+
 type_legend <- his[, 5]
 colnames(type_legend) <- "description"
 type_legend <- type_legend %>% 
   filter(complete.cases(.)) %>% 
   separate(description, c("type", "legend")) %>% 
   mutate_all(str_trim)
+
 colnames(his) <- c("Accession", "suppdata_id", "pi0", "type")
-his <- his %>% 
+
+his <- his %>%
   select(Accession, suppdata_id, type) %>% 
+  distinct() %>% 
   mutate(code = case_when(
-  str_detect(type, "2") ~ "2",
-  str_detect(type, "6") ~ "3",
-  type == 1 ~ "1",
-  suppdata_id == "GSE90615_DifferentialExpression.xlsx-sheet-1dP-MI_vs_Sfrp2_12dP-MI" ~ "4",
-  type == 0 ~ "0"
-))
+    str_detect(type, "2") ~ "2",
+    str_detect(type, "6") ~ "3",
+    type == 1 ~ "1",
+    type == 0 ~ "0",
+    suppdata_id == "GSE90615_DifferentialExpression.xlsx-sheet-1dP-MI_vs_Sfrp2_12dP-MI" ~ "4",
+    TRUE ~ "4"
+  ))
 
-## ---- sparklines -----
-
-# Merge clusters to p value dataframe and create sparklines -------
-treecut <- data_frame(histclus = map_chr(treecut, ~ barcolors[.x]))
-p_values <- p_values %>% bind_cols(treecut)
-# Add manually curated clusters
-p_values <- p_values %>% left_join(his)
-
-pv_hist_caption <- "P value histograms and proportion of true nulls. Histograms are colored according to clustering of their empirical cumulative distribution function outputs. Supplementary file names for tables from xls(x) files might be appended with sheet name."
-
-spark_table <- p_values %>%
-  select(Accession, suppdata_id, pvalues, pi0, histclus, code) %>%
-  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/44), plot = FALSE)$counts),
-         pi0 = digits(pi0, 2)) %>%
-  unnest(values) %>%
-  group_by(Accession, suppdata_id, pi0, histclus, code) %>%
-  summarise(Histogram = spk_chr(values,
-                                chartRangeMin = 0,
-                                barColor = histclus,
-                                type = "bar")) %>%
-  arrange(Accession) %>%
+# Merge with classes and generate output table
+spark_table <- spark_table %>%
+  left_join(his) %>%
   select(Accession, suppdata_id, Histogram, code, pi0) %>%
   rename('P value histogram' = Histogram,
          'True nulls proportion' = pi0,
          'Supplementary file name' = suppdata_id,
-         'Type' = code)
+         'Type' = code) %>% 
+  arrange(Accession) 
 
-# Save empty table for manual classification. 
-if (!any(str_detect(list.files("output"), "pvalue_histogram_classes.csv"))) {
-  spark_table %>% 
-    select(-`P value histogram`) %>% 
-    write_excel_csv("output/pvalue_histogram_classes.csv")
-}
+pv_hist_caption <- glue::glue("P value histograms and proportion of true nulls. Histograms are colored according to clustering of their empirical cumulative distribution function outputs. Supplementary file names for tables from xls(x) files might be appended with sheet name. This table contains {nrow(spark_table)} unique P value histograms from {length(unique(spark_table$'Supplementary file name'))} supplementary tables related to {length(unique(spark_table$Accession))} GEO Accessions.")
 
-spark_table %>%
+spark_table %>% 
   knitr::kable("html", escape = FALSE, caption = pv_hist_caption) %>%
   kable_styling(full_width = FALSE)
