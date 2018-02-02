@@ -27,7 +27,7 @@ gsem_error <- gsem %>%
 
 gsem <- gsem %>%
   filter(!map_lgl(series_matrix, inherits, "try-error")) %>% 
-  mutate(samples = map_int(series_matrix, ~ncol(exprs(.x))),
+  mutate(samples = map_int(series_matrix, ~ ncol(exprs(.x))),
          annot = map_chr(series_matrix, annotation)) %>% 
   select(Accession, annot, series_matrix, samples, everything())
 
@@ -44,7 +44,8 @@ n_samples <- dims %>%
 
 #' Datasets with p values
 p_value_dims <- dims %>% 
-  filter(!map_lgl(pvalues, is.null), !map_lgl(pvalues, inherits, "try-error"))
+  filter(!map_lgl(pvalues, is.null), 
+         !map_lgl(pvalues, inherits, "try-error"))
 
 ## ---- plotdims -----
 
@@ -100,23 +101,27 @@ p_values <- p_value_dims %>%
   select(Accession, suppfiles, suppdata_id, annot, features, columns, samples, pvalues)
 
 p_values <- p_values %>% 
-  distinct() %>%
   unnest_listcol(pvalues)
 
 #' Filter out one dataset with pvalue threshold info (logical)
 #' and datasets where number of features is less than nrowthreshold
+# calculate pi0, the proportion of true nulls
 p_values <- p_values %>% 
-  filter(map_lgl(pvalues, ~ is.numeric(.x)), 
-         features > nrowthreshold)
+  mutate(pi0 = map_dbl(pvalues, propTrueNull))
+
+# Filter out sets with supposedly bad sets of P values
+p_values <- p_values %>% 
+  filter(map_lgl(pvalues, is.numeric), 
+         features > nrowthreshold,
+         pi0 > pi0threshold)
 #' Dataset with pvaluethreshold
 # p_values %>% filter(Accession == "GSE83134")
 
 ## ---- pi0hist -----
 
-#' Calculate bins and pi0 
+#' Calculate bins 
 p_values <- p_values %>%
-  mutate(bins = map(pvalues, ntile, 60),
-         pi0 = map_dbl(pvalues, propTrueNull))
+  mutate(bins = map(pvalues, ntile, 60))
 
 # Histogram of pi0 distribution
 pi0hist <- p_values %>% 
@@ -160,7 +165,6 @@ grid.draw(pga)
 
 # Calculate ecdf and cluster histograms -----------------------------
 p_values <- p_values %>%
-  filter(map_lgl(pvalues, is.numeric)) %>% 
   mutate(eCDF = map(pvalues, ecdf))
 
 p_values <- p_values %>% 
@@ -172,11 +176,11 @@ rownames(probs_mtrx) <- p_values$Accession
 
 # Ok, let's use default eucl + ward.d 
 # barcolors <- c("#070d0d", "#feb308", "#9b5fc0", "#6ecb3c", "#1d5dec", "#fe4b03")
-barcolors <- viridis::viridis(6)
 hc <- probs_mtrx %>% dist(method = "euclidean") %>% hclust() 
 treecut <- hc %>% cutree(k = 6)
 hc_phylo <- hc %>% ape::as.phylo()
 
+barcolors <- viridis::viridis(6)
 ggt <- hc_phylo %>%
   ggtree::ggtree(linetype = 2, 
                  color = "steelblue",
@@ -186,43 +190,56 @@ ggt <- hc_phylo %>%
 
 ggt
 
-# gghist <- function(x) {
-#   ggplot(x, aes(pvalues, group = tip)) +
-#     geom_freqpoly(bins = 40, colour = barcolors[unique(x$clus)], size = .1) +
-#     ggimage::theme_transparent()
-# }
-# 
-# clus_fp <- data_frame(clus = treecut, 
-#                       tip = hc_phylo$tip.label, 
-#                       pvalues = p_values$pvalues) %>% 
-#   unnest() %>% 
-#   filter(complete.cases(.)) %>% 
-#   group_by(clus) %>% 
-#   do(p = gghist(.))
+
+# Curated p value histogram classes ---------------------------------------
+
+# Load manually assigned classes
+his <- read_delim("data/pvalue_hist_UM.csv", 
+                  delim = ";", 
+                  locale = locale(decimal_mark = ","))
+type_legend <- his[, 5]
+colnames(type_legend) <- "description"
+type_legend <- type_legend %>% 
+  filter(complete.cases(.)) %>% 
+  separate(description, c("type", "legend")) %>% 
+  mutate_all(str_trim)
+colnames(his) <- c("Accession", "suppdata_id", "pi0", "type")
+his <- his %>% 
+  select(Accession, suppdata_id, type) %>% 
+  mutate(code = case_when(
+  str_detect(type, "2") ~ "2",
+  str_detect(type, "6") ~ "3",
+  type == 1 ~ "1",
+  suppdata_id == "GSE90615_DifferentialExpression.xlsx-sheet-1dP-MI_vs_Sfrp2_12dP-MI" ~ "4",
+  type == 0 ~ "0"
+))
 
 ## ---- sparklines -----
 
 # Merge clusters to p value dataframe and create sparklines -------
 treecut <- data_frame(histclus = map_chr(treecut, ~ barcolors[.x]))
 p_values <- p_values %>% bind_cols(treecut)
+# Add manually curated clusters
+p_values <- p_values %>% left_join(his)
 
 pv_hist_caption <- "P value histograms and proportion of true nulls. Histograms are colored according to clustering of their empirical cumulative distribution function outputs. Supplementary file names for tables from xls(x) files might be appended with sheet name."
 
 spark_table <- p_values %>%
-  select(Accession, suppdata_id, pvalues, pi0, histclus) %>%
+  select(Accession, suppdata_id, pvalues, pi0, histclus, code) %>%
   mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/44), plot = FALSE)$counts),
          pi0 = digits(pi0, 2)) %>%
   unnest(values) %>%
-  group_by(Accession, suppdata_id, pi0, histclus) %>%
+  group_by(Accession, suppdata_id, pi0, histclus, code) %>%
   summarise(Histogram = spk_chr(values,
                                 chartRangeMin = 0,
                                 barColor = histclus,
                                 type = "bar")) %>%
   arrange(Accession) %>%
-  select(Accession, suppdata_id, Histogram, pi0) %>%
+  select(Accession, suppdata_id, Histogram, code, pi0) %>%
   rename('P value histogram' = Histogram,
          'True nulls proportion' = pi0,
-         'Supplementary file name' = suppdata_id)
+         'Supplementary file name' = suppdata_id,
+         'Type' = code)
 
 # Save empty table for manual classification. 
 if (!any(str_detect(list.files("output"), "pvalue_histogram_classes.csv"))) {
