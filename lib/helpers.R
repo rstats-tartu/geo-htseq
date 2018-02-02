@@ -119,14 +119,15 @@ make_unique_colnames <- function(x, sep = "_"){
 #' @importFrom dplyr quo
 #' @importFrom purrr map_int
 unnest_listcol <- function(data, ...) {
-  quo <- quo(...)
-  listcol <- dplyr::select(data, !!!quo)
-  data <- dplyr::select(data, -!!!quo)
+  quo <- dplyr::quo(...)
+  var <- dplyr::quo_name(quo)
+  listcol <- dplyr::select(data, var)
+  data <- dplyr::select(data, -dplyr::contains(var))
   reps <- unlist(dplyr::mutate_all(listcol, map_int, length))
   data <- data[rep(seq_len(nrow(data)), reps), ]
-  var_unlisted <- unlist(listcol[[1]], recursive = FALSE)
+  var_unlisted <- rlang::squash(listcol)
   var_unlisted <- dplyr::data_frame(var_unlisted)
-  colnames(var_unlisted) <- dplyr::quo_name(quo)
+  colnames(var_unlisted) <- var
   dplyr::bind_cols(data, var_unlisted)
 }
 
