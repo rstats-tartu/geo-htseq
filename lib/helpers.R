@@ -115,6 +115,7 @@ make_unique_colnames <- function(x, sep = "_"){
 # unnest listcolumns function ---------------------------------------------
 
 #' @param data a tibble
+#' @param ... a list column name, bare unquoted. 
 #' @import dplyr
 #' @importFrom dplyr quo
 #' @importFrom purrr map_int
