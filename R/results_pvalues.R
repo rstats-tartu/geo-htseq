@@ -7,6 +7,9 @@ source("R/_common.R")
 ## ---- loadst -----
 st <- readRDS("output/suppdata.rds")
 
+# imported files
+imported_geos <- select(st, Accession) %>%  n_distinct()
+
 st_unnested <- st %>% unnest(result)
 st_unnested <- st_unnested %>% unnest(sheets)
 
@@ -220,40 +223,64 @@ if (!any(str_detect(list.files("output"), "pvalue_histogram_classes.csv"))) {
 his <- read_delim("data/pvalue_hist_UM.csv", 
                   delim = ";", 
                   locale = locale(decimal_mark = ","))
+colnames(his) <- c("Accession", "suppdata_id", "pi0", "code")
 
-type_legend <- his[, 5]
-colnames(type_legend) <- "description"
-type_legend <- type_legend %>% 
-  filter(complete.cases(.)) %>% 
-  separate(description, c("type", "legend")) %>% 
-  mutate_all(str_trim)
+# create legend table
+# code_legend <- his[, 5]
+# colnames(code_legend) <- "description"
+# code_legend <- code_legend %>% 
+#   na.omit() %>% 
+#   separate(description, c("code", "legend"), sep = "-") %>% 
+#   mutate_all(str_trim) %>% 
+#   mutate_at("code", parse_integer)
 
-colnames(his) <- c("Accession", "suppdata_id", "pi0", "type")
-
+# parse histogram types from codes
 his <- his %>%
-  select(Accession, suppdata_id, type) %>% 
+  select(Accession, suppdata_id, code) %>% 
   distinct() %>% 
-  mutate(code = case_when(
-    str_detect(type, "2") ~ "2",
-    str_detect(type, "6") ~ "3",
-    type == 1 ~ "1",
-    type == 0 ~ "0",
-    suppdata_id == "GSE90615_DifferentialExpression.xlsx-sheet-1dP-MI_vs_Sfrp2_12dP-MI" ~ "4",
-    TRUE ~ "4"
+  mutate(type = case_when(
+    str_detect(code, "2") ~ 2,
+    str_detect(code, "6") ~ 3,
+    code == 1 ~ 1,
+    code == 0 ~ 0,
+    suppdata_id == "GSE90615_DifferentialExpression.xlsx-sheet-1dP-MI_vs_Sfrp2_12dP-MI" ~ 4,
+    TRUE ~ 4
   ))
+
+# Histogram types summary table
+types_legend <- read_csv("data/pvalue_hist_types.csv")
+his <- left_join(his, types_legend)
 
 # Merge with classes and generate output table
 spark_table <- spark_table %>%
+  ungroup() %>% 
   left_join(his) %>%
-  select(Accession, suppdata_id, Histogram, code, pi0) %>%
   rename('P value histogram' = Histogram,
          'True nulls proportion' = pi0,
          'Supplementary file name' = suppdata_id,
-         'Type' = code) %>% 
-  arrange(Accession) 
+         'Type' = typetext) %>% 
+  arrange(Accession) %>% 
+  distinct()
+
+hist_types <- spark_table %>% 
+  group_by(Type, Comment = comment) %>% 
+  summarise(N = n()) %>%
+  ungroup() %>% 
+  mutate(`%` = percent(N / sum(N), digits = 1))
+
+hist_types_caption <- "Summary of histogram types in supplementary files of GEO HT-seq submissions."
+
+hist_types %>% 
+  knitr::kable("html", escape = FALSE, caption = hist_types_caption) %>%
+  kable_styling(full_width = FALSE)
 
 pv_hist_caption <- glue::glue("P value histograms and proportion of true nulls. Histograms are colored according to clustering of their empirical cumulative distribution function outputs. Supplementary file names for tables from xls(x) files might be appended with sheet name. This table contains {nrow(spark_table)} unique P value histograms from {length(unique(spark_table$'Supplementary file name'))} supplementary tables related to {length(unique(spark_table$Accession))} GEO Accessions.")
 
 spark_table %>% 
+  select(Accession, 
+         `Supplementary file name`, 
+         `P value histogram`, 
+         Type, 
+         `True nulls proportion`) %>%
   knitr::kable("html", escape = FALSE, caption = pv_hist_caption) %>%
   kable_styling(full_width = FALSE)
