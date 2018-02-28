@@ -20,7 +20,7 @@ opts_chunk$set(echo = FALSE,
                fig.width = 6,
                fig.asp = 0.5,
                fig.show = "hold",
-               dev = 'svg')
+               dev = "svg")
 
 options(htmltools.dir.version = FALSE, 
         formatR.indent = 2, 
@@ -39,4 +39,7 @@ pi0threshold <- 0.05
 
 # Last date to consider geo series and suppfilenames
 last_date <- ymd("2017-06-19")
+
+# output directory path
+outdir <- "/spaces"
 

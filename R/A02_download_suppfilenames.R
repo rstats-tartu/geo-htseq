@@ -13,7 +13,6 @@ ds_filtered <- ds %>%
 
 start <- Sys.time()
 suppfilenames <- mutate(ds_filtered, url = file.path(FTPLink, "suppl/")) %>% 
-  sample_n(10) %>%
   mutate(r = map(url, ~{message(.x); try(httr::GET(.x))}))
 end <- Sys.time()
 end-start

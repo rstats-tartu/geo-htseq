@@ -99,13 +99,16 @@ geo_supp_dwnl <- function(ftplink, slug = c("suppl", "miniml"), filename, destdi
   
   message(filename)
   
-  fp <- file.path(ftplink, slug, filename)
+  slug <- match.arg(slug)
+  
   dest <- file.path(destdir, filename)
   
   if(file.exists(dest)){
     message("File exists!")
     return()
   }
+  
+  fp <- file.path(ftplink, slug, filename)
   
   out <- try(download.file(fp, dest))
   if(inherits(out, "try-error")){
