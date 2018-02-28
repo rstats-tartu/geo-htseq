@@ -3,9 +3,9 @@
 
 ```{r}
 knitr::read_chunk("R/results_query.R")
-knitr::read_chunk("R/results_pvalues.R")
-knitr::read_chunk("R/results_suppfiles.R")
+knitr::read_chunk("R/results_suppfilenames.R")
 knitr::read_chunk("R/results_publications.R")
+knitr::read_chunk("R/results_pvalues.R")
 ```
 
 
