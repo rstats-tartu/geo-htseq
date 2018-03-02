@@ -1,3 +1,4 @@
+
 # Load libs
 source("R/_common.R")
 library(entrezquery)
@@ -12,12 +13,19 @@ ds_filtered <- ds %>%
   filter(PDAT <= last_date)
 
 # Start download
-get_safely <- possibly(get_dirlist, data_frame)
+get_safely <- safely(get_dirlist)
+
 start <- Sys.time()
 suppfilenames <- ds_filtered %>%
   mutate(dirlist = map(Accession, ~ {message(.x); get_safely(.x)}))
 end <- Sys.time()
-cat(sprintf("Downloading filenames took %s hours\n", end-start), file = "suppfilename.log", append = T)
 
 # Save downloaded dataset
 saveRDS(suppfilenames, file = "output/suppfilenames.rds")
+
+# Send remainder
+msg <- sprintf("Hi!\nDownload took %s hours and ended at %s.\nBest regards,\nYour Computer.", 
+               end - start, Sys.time())
+cmd <- sprintf("echo '%s' | mail -s 'Downloading filenames finished!' tapa741@gmail.com", msg)
+system(cmd)
+
