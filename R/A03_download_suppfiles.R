@@ -1,7 +1,7 @@
-library(dplyr)
-library(purrr)
+
+# Load libs
+source("R/_common.R")
 library(entrezquery)
-set.seed(124)
 
 suppfilenames <- readRDS("output/suppfilenames.rds")
 
