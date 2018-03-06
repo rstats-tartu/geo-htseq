@@ -30,11 +30,21 @@ sfn <- sfn %>%
          !str_detect(tolower(files), str_c(out_string2, "(\\.gz|\\.bz2)?$", 
                                                    collapse = "|"))) 
 
+
+# Count number of soft files and other supplementary files to be downloaded
+number_of_files <- sfn %>% 
+  mutate(type = case_when(
+    str_detect(files, "family.soft.gz$") ~ "soft",
+    TRUE ~ "suppl"
+  )) %>% 
+  group_by(type) %>% 
+  summarise(N = n())
+
 # Safe wrap download function
 safe_download <- safely(~ download_gsefile(.x, dest = "output"))
 
 # Start download
-message("Sownloading files\n")
+message("Downloading files\n")
 start <- Sys.time()
 sfn %>% 
   ungroup() %>% 
