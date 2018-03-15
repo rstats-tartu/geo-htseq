@@ -1,5 +1,6 @@
 
 library(tidyverse)
+library(entrezquery)
 sfn <- read_rds("output/suppfilenames_filtered.rds")
 
 # Safe wrap download function

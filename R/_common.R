@@ -40,4 +40,6 @@ pi0threshold <- 0.05
 # Last date to consider geo series and suppfilenames
 last_date <- ymd("2017-06-19")
 
-local_suppfile_folder <- "output/suppl" # "data/counts"
+# folder where downloaded supplementary and matrix files live
+local_suppfile_folder <- "output/suppl" 
+local_matrixfile_folder <- "output/matrix"

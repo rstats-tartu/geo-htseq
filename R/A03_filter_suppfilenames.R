@@ -15,7 +15,7 @@ sfn <- suppfilenames %>%
   mutate(result = map(dirlist, "result"),
          files = map(result, "file"),
          type = map(result, "type")) %>% 
-  select(Accession, files) %>% 
+  select(Accession, files, type) %>% 
   filter(map_chr(files, class) != "NULL") %>% 
   unnest()
 
@@ -34,10 +34,7 @@ write_rds(sfn, "output/suppfilenames_filtered.rds")
 
 ## save text file with file names
 sfn %>% 
-  mutate(files = case_when(
-    str_detect(files, "soft.gz$") ~ file.path("soft", files),
-    TRUE ~ file.path("suppl", files)
-  )) %>% 
+  mutate(files = file.path(type, files)) %>% 
   pull(files) %>% 
   unique() %>% 
   str_c(collapse = " ") %>% 

@@ -1,6 +1,7 @@
 
 # Load libs and settings --------------------------------------------------
 source("R/_common.R")
+library(GEOquery)
 
 # GEO query results and document summaries --------------------------------
 ds <- read_rds("output/document_summaries.rds")
@@ -37,12 +38,7 @@ supptabs_duplicated <- supptabs %>%
   filter(duplicated(files))
 
 # Remove non tabular filetypes from downloaded files
-out_string1 <- c("filelist","annotation","readme","error","raw.tar","csfasta",
-                 "bam","sam","bed","[:punct:]hic","hdf5","bismark","map",
-                 "barcode","peaks")
-out_string2 <- c("tar","gtf","(big)?bed(\\.txt|12|graph|pk)?","bw","wig",
-                 "hic","gct(x)?","tdf","gff(3)?","pdf","png","zip","sif",
-                 "narrowpeak","fa", "r$", "rda(ta)?$")
+source("R/out_strings.R")
 
 supptabs <- supptabs %>% 
   filter(!str_detect(tolower(suppfiles), str_c(out_string1, collapse = "|")),
@@ -87,5 +83,4 @@ if(import_supptabs) {
   
   system(paste("echo ' Run took", abs(time_diff), units(time_diff), "' >> log.txt"))
   saveRDS(st, file = "output/suppdata.rds")
-  
 }
