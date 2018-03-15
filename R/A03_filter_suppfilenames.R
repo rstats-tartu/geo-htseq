@@ -30,31 +30,15 @@ sfn <- sfn %>%
          !str_detect(tolower(files), str_c(out_string2, "(\\.gz|\\.bz2)?$", 
                                                    collapse = "|"))) 
 
+write_rds(sfn, "output/suppfilenames_filtered.rds")
 
-# Count number of soft files and other supplementary files to be downloaded
-number_of_files <- sfn %>% 
-  mutate(type = case_when(
-    str_detect(files, "family.soft.gz$") ~ "soft",
-    TRUE ~ "suppl"
-  )) %>% 
-  group_by(type) %>% 
-  summarise(N = n())
-
-# Safe wrap download function
-safe_download <- safely(~ download_gsefile(.x, dest = "output"))
-
-# Start download
-message("Downloading files\n")
-start <- Sys.time()
+## save text file with file names
 sfn %>% 
-  ungroup() %>% 
-  mutate(d = map(files, safe_download))
-end <- Sys.time()
-
-# Job finished, send email
-message("Job finished, sending email\n")
-msg <- sprintf("Subject:Downloading files finished!\n\nHi Taavi!\n\nSupplementary files download took %s and ended at %s.\n\nBest regards,\nYour Computer.", 
-               format(difftime(end, start)), Sys.time())
-cmd <- sprintf("echo -e '%s' | sendmail tapa741@gmail.com", msg)
-system(cmd)
-message("End")
+  mutate(files = case_when(
+    str_detect(files, "soft.gz$") ~ file.path("soft", files),
+    TRUE ~ file.path("suppl", files)
+  )) %>% 
+  pull(files) %>% 
+  unique() %>% 
+  str_c(collapse = " ") %>% 
+  write_lines(path = "output/suppfilenames_filtered.txt")
