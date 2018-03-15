@@ -1,21 +1,12 @@
 
-# Load libs ---------------------------------------------------------------
-
+# Load libs and settings --------------------------------------------------
 source("R/_common.R")
 
 # GEO query results and document summaries --------------------------------
-# source("src/A01_GEO_query.R")
-if (!"ds" %in% ls()) {
-  ds <- read_rds("output/document_summaries.rds")
-}
+ds <- read_rds("output/document_summaries.rds")
 
 # Load series matrix data frames ----------------------------
-update_geoseriesmatrix_files <- FALSE
-if (update_geoseriesmatrix_files) {
-  source("R/A04_munge_series_matrixfiles.R")
-} else {
-  gsem <- read_rds("output/gsem.rds")
-}
+gsem <- read_rds("output/gsem.rds")
 
 # Identify and filter out Accessions with missing gsematrices
 gsem_missing_or_faulty <- gsem %>% 
@@ -26,7 +17,6 @@ gsem <- gsem %>%
 ## Read in local supplemental tables ---------------------------------------
 
 # File name extensions in downloaded supplementary files
-local_suppfile_folder <- "/Volumes/Media/srp_example/data/counts" # "data/counts"
 supptabs <- geofile_df(local_suppfile_folder, "suppfiles")
 
 # Unzip gz xls(x)? files, keep originals
