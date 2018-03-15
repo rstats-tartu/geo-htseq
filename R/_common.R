@@ -40,6 +40,4 @@ pi0threshold <- 0.05
 # Last date to consider geo series and suppfilenames
 last_date <- ymd("2017-06-19")
 
-# output directory path
-outdir <- "/spaces"
-
+local_suppfile_folder <- "output/suppl" # "data/counts"
