@@ -19,12 +19,20 @@ matrixfiles <- left_join(suppfiles, matrixfiles) %>%
   select(-files) %>%
   distinct()
 
-my_getGEO <- function(x, path) {
-  message(x)
-  path <- file.path(path, x)
-  try(getGEO(filename = path, getGPL = FALSE))
-}
+safely_getGEO <- safely(
+  function(x, path) {
+    message(x)
+    path <- file.path(path, x)
+    getGEO(filename = path, getGPL = FALSE)
+  }
+)
+
+weird_stuff <- matrixfiles %>% 
+  filter(!str_detect(series_matrix_file, "GSE[0-9]*(-GPL[0-9]*)?_series_matrix.txt.gz"))
 
 gsem <- matrixfiles %>%
-  mutate(gse = map(series_matrix_file, my_getGEO, path = local_matrixfile_folder))
+  filter(str_detect(series_matrix_file, "GSE[0-9]*(-GPL[0-9]*)?_series_matrix.txt.gz")) %>% 
+  head() %>% 
+  mutate(gse = map(series_matrix_file, safely_getGEO, path = local_matrixfile_folder))
+
 write_rds(gsem, path = "output/gsem.rds")
