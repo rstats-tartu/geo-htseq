@@ -32,7 +32,6 @@ weird_stuff <- matrixfiles %>%
 
 gsem <- matrixfiles %>%
   filter(str_detect(series_matrix_file, "GSE[0-9]*(-GPL[0-9]*)?_series_matrix.txt.gz")) %>% 
-  head() %>% 
   mutate(gse = map(series_matrix_file, safely_getGEO, path = local_matrixfile_folder))
 
 write_rds(gsem, path = "output/gsem.rds")
