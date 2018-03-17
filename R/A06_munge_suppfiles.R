@@ -9,6 +9,10 @@ ds <- read_rds("output/document_summaries.rds")
 # Load series matrix data frames ----------------------------
 gsem <- read_rds("output/gsem.rds")
 
+# Extract series matrixes
+gsem <- gsem %>% 
+  mutate(series_matrix = map(gse, "result"))
+
 # Identify and filter out Accessions with missing gsematrices
 gsem_missing_or_faulty <- gsem %>% 
   filter(map_lgl(series_matrix, ~class(.x) != "ExpressionSet"))
@@ -37,22 +41,27 @@ supptabs_duplicated <- supptabs %>%
   mutate(files = str_replace(suppfiles, "\\.(gz|bz2)$","")) %>% 
   filter(duplicated(files))
 
-# Remove non tabular filetypes from downloaded files
-source("R/out_strings.R")
-
-supptabs <- supptabs %>% 
-  filter(!str_detect(tolower(suppfiles), str_c(out_string1, collapse = "|")),
-         !str_detect(tolower(suppfiles), str_c(out_string2, "(\\.gz|\\.bz2)?$", 
-                                                   collapse = "|")))
-
 # Merge gsem ExpressionSets to supptabs
 supptabs <- select(gsem, Accession, series_matrix) %>% 
   nest(series_matrix, .key = "matrixfiles") %>% 
   left_join(supptabs, .)
 
-# Use only files 
+# File size filter
 supptabs <- supptabs %>% 
-  filter(Accession %in% filter(ds, PDAT <= last_date)$Accession)
+  mutate(filesize = file.size(file.path("output/suppl", suppfiles)))
+
+supptabs_size <- supptabs %>% 
+  arrange(desc(filesize)) %>% 
+  mutate(size = case_when(
+    filesize > 1e8 ~ "big",
+    TRUE ~ "ok"
+  )) %>% 
+  group_by(size) %>% 
+  summarise(total = sum(filesize),
+            N = n())
+
+supptabs_big <- supptabs %>% filter(filesize > 1e8)
+supptabs <- supptabs %>% filter(filesize < 1e8)
 
 # Files that crash R session
 bad <- c("GSE93374_Merged_all_020816_DGE.txt.gz", 
@@ -73,14 +82,16 @@ source("lib/checkFullRank.R")
 source("lib/text_funs.R")
 library(Biobase)
 
-import_supptabs <- TRUE
-if(import_supptabs) {
-  start <- Sys.time()
-  st <- supptabs %>% 
-    mutate(result = map(suppfiles, ~ try(munge_geo_pvalue(file.path(local_suppfile_folder, .x)))))
-  end <- Sys.time()
-  time_diff <- start-end
-  
-  system(paste("echo ' Run took", abs(time_diff), units(time_diff), "' >> log.txt"))
-  saveRDS(st, file = "output/suppdata.rds")
-}
+start <- Sys.time()
+st <- supptabs %>% 
+  mutate(result = map(suppfiles, ~ try(munge_geo_pvalue(file.path(local_suppfile_folder, .x)))))
+saveRDS(st, file = "output/suppdata.rds")
+end <- Sys.time()
+
+# Job finished, send email
+message("Job finished, sending email\n")
+msg <- sprintf("Subject:importing and saving supplementary files finished!\n\nHi Taavi!\n\nSupplementary files download took %s and ended at %s.\n\nBest regards,\nYour Computer.", 
+               format(difftime(end, start)), Sys.time())
+cmd <- sprintf("echo -e '%s' | sendmail tapa741@gmail.com", msg)
+system(cmd)
+message("End")
