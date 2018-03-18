@@ -1,9 +1,10 @@
-
+# Download and install gridDiagram from 
+# https://www.stat.auckland.ac.nz/~paul/R/Diagram/gridDiagram_0.2-1.tar.gz
 library(gridDiagram)
 
 # Draw boxes --------------------------------------------------------------
 
-svg("figures/diagram.svg", width = 9, height = 2)
+pdf("figures/diagram.pdf", width = 9, height = 2)
 
 grid.box("GEO series", sum(table(ds_redline$model)), 
          x = 1/7, y = 2/3,
