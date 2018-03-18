@@ -12,7 +12,9 @@ Imports:
     devtools, 
     ggthemes, 
     grid, 
-    gridExtra
+    gridExtra,
+    GEOquery
 Remotes: 
     rstudio/bookdown,
     tpall/entrezquery
+    
