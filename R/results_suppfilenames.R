@@ -7,12 +7,13 @@ source("R/_common.R")
 # R/A02_download_suppfilenames.R
 suppfilenames_imported <- readRDS("output/suppfilenames.rds")
 
-# Let's keep study time frame fixed
 # Extract supplemetary file names
 suppfilenames <- suppfilenames_imported %>% 
-  mutate_at("PDAT", ymd) %>% 
-  filter(PDAT <= last_date) %>% 
-  mutate(SuppFileNames = map(suppfiles, "suppl"))
+  mutate(result = map(dirlist, "result")) %>% 
+  filter(result != "NULL") %>% 
+  mutate(result = map(result, filter, type == "suppl"),
+         SuppFileNames = map(result, "file")) %>% 
+  select(-result, -dirlist)
 
 # Datasets with suppfiles
 suppfilenames_present <- suppfilenames %>% 
@@ -23,8 +24,9 @@ suppfilenames_present_unnested <- suppfilenames_present %>%
   unnest(SuppFileNames)
 
 # datasets missing public suppfiles
-suppfilenames_not_present <- suppfilenames %>% 
-  filter(map_lgl(SuppFileNames, ~length(.x) == 0))
+suppfilenames_not_present <- suppfilenames_imported %>% 
+  mutate(result = map(dirlist, "result")) %>% 
+  filter(result == "NULL")
 
 # Timeouts need to be checked!!!
 failed_suppfiles <- suppfilenames_not_present %>% 

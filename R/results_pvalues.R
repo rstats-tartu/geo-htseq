@@ -23,13 +23,17 @@ st_unnested <- st_unnested %>%
 ## Let's use gsem table
 gsem <- readRDS("output/gsem.rds")
 
+# Pull out series matrixes
+gsem <- gsem %>% 
+  mutate(series_matrix = map(gse, "result"))
+
 ## Remove errored matrixes
 library(Biobase)
 gsem_error <- gsem %>%
-  filter(map_lgl(series_matrix, inherits, "try-error"))
+  filter(is.null(series_matrix))
 
 gsem <- gsem %>%
-  filter(!map_lgl(series_matrix, inherits, "try-error")) %>% 
+  filter(!is.null(series_matrix)) %>% 
   mutate(samples = map_int(series_matrix, ~ ncol(exprs(.x))),
          annot = map_chr(series_matrix, annotation)) %>% 
   select(Accession, annot, series_matrix, samples, everything())
@@ -59,7 +63,7 @@ dims_tabp <- ggplot() +
   labs(x = bquote(N~samples~(log[10])),
        y = bquote(N~features~(log[10]))) +
   geom_hline(yintercept = log10(nrowthreshold), linetype = 2) +
-  scale_fill_continuous(name = "Fraction", type = "viridis")
+  scale_fill_viridis(name = "Fraction")
 
 legend <- g_legend(dims_tabp)
 dims_tabp <- dims_tabp + theme(legend.position = "none")
