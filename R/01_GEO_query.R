@@ -9,7 +9,7 @@ query <- 'expression profiling by high throughput sequencing[DataSet Type]'
 
 ## ----- run-query -----
 # ds is short of document summaries
-ds <- entrez_docsums(query = query, db = "gds", retmax = 16000)
+ds <- entrez_docsums(query = query, db = "gds", retmax = 18000)
 
 ## ----- save downloaded filenames ----- 
 # create output dir if not present
