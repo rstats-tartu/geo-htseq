@@ -16,6 +16,7 @@ gsem <- gsem %>%
 # Identify and filter out Accessions with missing gsematrices
 gsem_missing_or_faulty <- gsem %>% 
   filter(map_lgl(series_matrix, ~class(.x) != "ExpressionSet"))
+
 gsem <- gsem %>% 
   filter(map_lgl(series_matrix, ~class(.x) == "ExpressionSet"))
 
@@ -25,12 +26,9 @@ gsem <- gsem %>%
 supptabs <- geofile_df(local_suppfile_folder, "suppfiles")
 
 # Unzip gz xls(x)? files, keep originals
-need_to_unzip_xls_files <- FALSE
-if (need_to_unzip_xls_files) {
-  xls_gz <- filter(supptabs, str_detect(suppfiles, "xls(x)?.gz$"))$suppfiles
-  xls_gz <- file.path(local_suppfile_folder, xls_gz)
-  system(sprintf("gzip -dk %s", paste(xls_gz, collapse = " ")))
-}
+xls_gz <- filter(supptabs, str_detect(suppfiles, "xls(x)?.gz$"))$suppfiles
+xls_gz <- file.path(local_suppfile_folder, xls_gz)
+system(sprintf("gzip -d %s", paste(xls_gz, collapse = " ")))
 
 # List files again to exclude compressed xls files
 supptabs <- geofile_df(local_suppfile_folder, "suppfiles") %>% 
