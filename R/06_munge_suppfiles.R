@@ -67,13 +67,11 @@ source("lib/text_funs.R")
 if (xls) {
   st <- supptabs %>%
     filter(str_detect(suppfiles, "xls(x)?")) %>% 
-    head() %>% 
     mutate(result = map(suppfiles, ~ try(munge_geo_pvalue(file.path(local_suppfile_folder, .x)))))
   write_rds(st, path = "output/suppdata_xls.rds")
 } else {
   st <- supptabs %>%
     filter(!str_detect(suppfiles, "xls(x)?")) %>% 
-    head() %>% 
     mutate(result = map(suppfiles, ~ try(munge_geo_pvalue(file.path(local_suppfile_folder, .x)))))
   write_rds(st, path = "output/suppdata_allothers.rds")
 }
