@@ -1,3 +1,5 @@
+#!/usr/bin/env Rscript
+xls <- commandArgs(trailingOnly = TRUE)
 
 # Load libs and settings --------------------------------------------------
 source("R/_common.R")
@@ -28,7 +30,6 @@ supptabs <- geofile_df(local_suppfile_folder, "suppfiles")
 # Unzip gz xls(x)? files, keep originals
 xls_gz <- filter(supptabs, str_detect(suppfiles, "xls(x)?.gz$"))$suppfiles
 xls_gz <- file.path(local_suppfile_folder, xls_gz)
-system(sprintf("gzip -d %s", paste(xls_gz, collapse = " ")))
 
 # List files again to exclude compressed xls files
 supptabs <- geofile_df(local_suppfile_folder, "suppfiles") %>% 
@@ -43,23 +44,6 @@ supptabs_duplicated <- supptabs %>%
 supptabs <- select(gsem, Accession, series_matrix) %>% 
   nest(series_matrix, .key = "matrixfiles") %>% 
   left_join(supptabs, .)
-
-# File size filter
-supptabs <- supptabs %>% 
-  mutate(filesize = file.size(file.path("output/suppl", suppfiles)))
-
-supptabs_size <- supptabs %>% 
-  arrange(desc(filesize)) %>% 
-  mutate(size = case_when(
-    filesize > 1e8 ~ "big",
-    TRUE ~ "ok"
-  )) %>% 
-  group_by(size) %>% 
-  summarise(total = sum(filesize),
-            N = n())
-
-supptabs_big <- supptabs %>% filter(filesize > 1e8)
-supptabs <- supptabs %>% filter(filesize < 1e8)
 
 # Files that crash R session
 bad <- c("GSE93374_Merged_all_020816_DGE.txt.gz", 
@@ -78,18 +62,19 @@ supptabs <- supptabs %>% filter(!(suppfiles %in% bad))
 source("lib/munge_geo.R")
 source("lib/checkFullRank.R")
 source("lib/text_funs.R")
-library(Biobase)
 
-start <- Sys.time()
-st <- supptabs %>% 
-  mutate(result = map(suppfiles, ~ try(munge_geo_pvalue(file.path(local_suppfile_folder, .x)))))
-saveRDS(st, file = "output/suppdata.rds")
-end <- Sys.time()
 
-# Job finished, send email
-message("Job finished, sending email\n")
-msg <- sprintf("Subject:importing and saving supplementary files finished!\n\nHi Taavi!\n\nSupplementary files download took %s and ended at %s.\n\nBest regards,\nYour Computer.", 
-               format(difftime(end, start)), Sys.time())
-cmd <- sprintf("echo -e '%s' | sendmail tapa741@gmail.com", msg)
-system(cmd)
-message("End")
+if (xls) {
+  st <- supptabs %>%
+    filter(str_detect(suppfiles, "xls(x)?")) %>% 
+    head() %>% 
+    mutate(result = map(suppfiles, ~ try(munge_geo_pvalue(file.path(local_suppfile_folder, .x)))))
+  write_rds(st, path = "output/suppdata_xls.rds")
+} else {
+  st <- supptabs %>%
+    filter(!str_detect(suppfiles, "xls(x)?")) %>% 
+    head() %>% 
+    mutate(result = map(suppfiles, ~ try(munge_geo_pvalue(file.path(local_suppfile_folder, .x)))))
+  write_rds(st, path = "output/suppdata_allothers.rds")
+}
+
