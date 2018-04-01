@@ -54,7 +54,12 @@ bad <- c("GSE93374_Merged_all_020816_DGE.txt.gz",
          "GSE77213_Nguyen_GEO_TN05_tallies_total.xls",
          "GSE60012_100bpTiles_RRBS_Mouse.txt.gz",
          "GSE60415_heatmap-upload.xls",
-         "GSE67516_RNA_seq_rep1_diffExp_analysis.xls")
+         "GSE67516_RNA_seq_rep1_diffExp_analysis.xls",
+         "GSE53298_processed_data.xlsx",
+         "GSE53350_SAGE_KomatsuFurukawa_Processed.xls",
+         "GSE60483_AQ_exp.tab.gz",
+         "GSE53260_Supplementary_S2.xls",
+         "GSE53260_Supplementary_S1.xls")
 
 # Remove 'bad' files
 supptabs <- supptabs %>% filter(!(suppfiles %in% bad))

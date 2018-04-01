@@ -5,8 +5,8 @@
 #SBATCH --mail-user=tapa741@gmail.com
 #SBATCH --mail-type=END
 #SBATCH --ntasks=1
-#SBATCH --mem=45G
-#SBATCH --time=04:00:00
+#SBATCH --mem=36G
+#SBATCH --time=08:00:00
 #SBATCH --array=1-2
 
 module purge
