@@ -1,4 +1,21 @@
 
+# Test integer function ---------------------------------------------------
+testInteger <- function(x, id = NULL){
+  
+  if(!is.null(id)){
+    message(id)
+  }
+  
+  if(!is.matrix(x)){
+    message("Not matrix!")
+    return(FALSE)
+  }
+  
+  x <- x[sample(nrow(x), 100),]
+  x <- vapply(x, function(z) as.integer(z) == z, logical(1L))
+  all(vapply(x, all, logical(1L)))
+}
+
 #' @param path path to excel file
 #' @param sheet name of the excel worksheet
 #' 
