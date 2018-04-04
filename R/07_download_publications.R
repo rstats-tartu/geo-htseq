@@ -4,7 +4,7 @@ source("R/_common.R")
 library(entrezquery)
 
 # Check if document summary table is already loaded
-ds <- readRDS("output/document_summaries.rds")
+ds <- read_rds("output/document_summaries.rds")
 
 # All HT-seq datasets
 # Lump together all non-human and murine taxa
@@ -28,4 +28,4 @@ ds_pmids <- ds %>%
 publications <- ds_pmids %>% 
   mutate(docsums = map(PubMedIds, ~{message(.x); entrez_docsums(uid = .x, db = "pubmed")}))
 publications <- publications %>% unnest()
-saveRDS(publications, "output/publications.rds")
+write_rds(publications, "output/publications.rds")

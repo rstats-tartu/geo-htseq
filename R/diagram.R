@@ -4,7 +4,7 @@ library(gridDiagram)
 
 # Draw boxes --------------------------------------------------------------
 
-pdf("figures/diagram.pdf", width = 9, height = 2)
+svg("figures/diagram.svg", width = 9, height = 2)
 
 grid.box("GEO series", sum(table(ds_redline$model)), 
          x = 1/7, y = 2/3,

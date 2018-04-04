@@ -11,6 +11,8 @@ library(viridis)
 library(sparkline)
 library(kableExtra)
 library(knitr)
+library(ape)
+library(ggtree)
 
 opts_chunk$set(echo = FALSE, 
                message = FALSE, 

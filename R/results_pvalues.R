@@ -114,12 +114,12 @@ p_values <- p_values %>%
 #' and datasets where number of features is less than nrowthreshold
 # calculate pi0, the proportion of true nulls
 p_values <- p_values %>% 
+  filter(map_lgl(pvalues, is.numeric)) %>% 
   mutate(pi0 = map_dbl(pvalues, propTrueNull))
 
 # Filter out sets with supposedly bad sets of P values
 p_values <- p_values %>% 
-  filter(map_lgl(pvalues, is.numeric), 
-         features > nrowthreshold,
+  filter(features > nrowthreshold,
          pi0 > pi0threshold)
 #' Dataset with pvaluethreshold
 # p_values %>% filter(Accession == "GSE83134")

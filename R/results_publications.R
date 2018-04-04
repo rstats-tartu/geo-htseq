@@ -11,8 +11,7 @@ if (!"p_values" %in% ls()) {
   
 ## ---- publications ----
 
-pubs <- readRDS("output/publications.rds")
-# jif <- read_csv("data/JIF_incites.csv", skip = 1)
+pubs <- read_rds("output/publications.rds")
 
 # Drop duplicate Id column
 pubs <- pubs %>% select(-Id)
@@ -81,12 +80,6 @@ grid.draw(pga)
 #' Import citation data
 scopus <- read_rds("data/scopus_citedbycount.rds")
 
-# 
-# scopus %>% 
-#   filter(!is.na(citations)) %>% 
-#   ggplot(aes(log10(1 + citations))) +
-#   geom_histogram(bins = 100)
-
 # Merge publication data with citations and pvalues
 pubs_citations <- pubs %>% 
   filter(str_detect(model, "Human")) %>% 
@@ -111,9 +104,6 @@ mod_citations <- pubs_citations %>%
   lm(log10(1 + citations) ~ pi0, data = .) %>% 
   broom::tidy()
 
-# pubs_citations_nested <- pubs_citations %>% 
-#   group_by(PubMedIds, DOI, citations) %>% 
-#   nest()
 p_cit_pval <- pubs_citations %>% 
   select(-Accession) %>% 
   distinct() %>% 

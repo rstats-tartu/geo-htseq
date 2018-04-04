@@ -1,15 +1,12 @@
 
 # Load libs
-message("Loading libs\n")
 source("R/_common.R")
 library(entrezquery)
 
 # Load supplementary file names
-message("Loading supplementary file names\n")
-suppfilenames <- readRDS("output/suppfilenames.rds")
+suppfilenames <- read_rds("output/suppfilenames.rds")
 
 # Munge file list
-message("Munging file list\n")
 sfn <- suppfilenames %>% 
   group_by(Accession) %>%
   mutate(result = map(dirlist, "result"),
@@ -20,19 +17,17 @@ sfn <- suppfilenames %>%
   unnest()
 
 # Load out strings
-message("Loading out strings\n")
 source("R/out_strings.R")
 
 # Filter files of interest
-message("Filtering files of interest\n")
 sfn <- sfn %>%
   filter(!str_detect(tolower(files), str_c(out_string1, collapse = "|")),
          !str_detect(tolower(files), str_c(out_string2, "(\\.gz|\\.bz2)?$", 
-                                                   collapse = "|"))) 
+                                                   collapse = "|")))
 
 write_rds(sfn, "output/suppfilenames_filtered.rds")
 
-## save text file with file names
+## Save text file with file names
 sfn %>% 
   mutate(files = file.path(type, files)) %>% 
   pull(files) %>% 
