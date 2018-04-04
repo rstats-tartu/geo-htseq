@@ -32,7 +32,7 @@ options(htmltools.dir.version = FALSE,
         warnPartialMatchDollar = FALSE)
 
 # Load helper functions
-source("lib/helpers.R")
+source("R/helpers.R")
 
 # Set panel label case
 panel_label_case <- "upper"

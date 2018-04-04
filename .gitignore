@@ -4,8 +4,6 @@
 .Ruserdata
 output/
 figures/
-docs/
 _book/
 _main.*
-ylorandomstuff/
 nohup.out

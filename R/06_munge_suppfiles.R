@@ -64,9 +64,9 @@ bad <- c("GSE93374_Merged_all_020816_DGE.txt.gz",
 # Remove 'bad' files
 supptabs <- supptabs %>% filter(!(suppfiles %in% bad))
 
-source("lib/munge_geo.R")
-source("lib/checkFullRank.R")
-source("lib/text_funs.R")
+source("R/munge_geo.R")
+source("R/checkFullRank.R")
+source("R/text_funs.R")
 
 if (xls) {
   st <- supptabs %>%
