@@ -31,7 +31,7 @@ As expected, the gap between published GEO series and published articles is bigg
 ```
 
 For the human and mouse subset, we were able to identify supplementary files for `r perc_wsuppfile` (`r nrow(suppfilenames_present)`) of GEO series.  
-The three percent of data sets lacking public supplementary files nevertheless show `r percent(ppub_n_ci_nopublicsupps$estimate, 0)` publication rate (`r ppub_n_ci_nopublicsupps$ci`) which is similar to data sets with supplementary files. 
+The data sets lacking public supplementary files nevertheless show `r percent(ppub_n_ci_nopublicsupps$estimate, 0)` publication rate (`r ppub_n_ci_nopublicsupps$ci`) which is similar to data sets with supplementary files. 
 
 (ref:queryfig) __Datasets submitted to NCBI GEO database featuring expression profiling by high-throughput sequencing__. GEO series submission dynamics and associated publications of HT-seq data. Left facet, submissions featuring human or mouse data, N = `r table(ds_redline$model)[1]`. Right facet, submissions of other taxa, N = `r table(ds_redline$model)[2]`. Dashed line, GEO series with publications.
 
