@@ -1,7 +1,7 @@
 #!/bin/bash
 
 suppfiles=$(cat output/suppfilenames_filtered.txt)
-suppfiles_rds=$(ls output/suppl | sed 's/$/.rds/g')
+suppfiles_rds=$(ls output/tmp)
 
 _main.html: index.Rmd 01_introduction.Rmd 02_methods.Rmd 03_results.Rmd \
 04_discussion.Rmd 05_references.Rmd output/document_summaries.rds \
@@ -9,14 +9,14 @@ output/gsem.rds output/suppdata.rds output/suppfilenames.rds \
 output/publications.rds output/document_summaries.rds
 	Rscript -e "rmarkdown::render_site(input = 'index.Rmd', output_format = 'bookdown::html_document2')"
 
-output/suppdata.rds: R/_common.R output/document_summaries.rds output/gsem.rds lib/munge_geo.R lib/checkFullRank.R lib/text_funs.R
-	Rscript R/06_munge_suppfiles.R
+output/suppdata.rds: output/tmp/{echo $suppfiles_rds}
+	Rscript R/07_merge_suppdata.R
 
+output/tmp/{echo $suppfiles_rds}: echo $suppfiles output/document_summaries.rds output/gsem.rds R/06_munge_suppfiles_slurm.R
+	sbatch -p main munge_suppfiles.sh 
+	
 output/gsem.rds: R/_common.R
 	Rscript R/05_munge_series_matrixfiles.R
-
-output/suppl_rds/{echo $suppfiles_rds}: echo $suppfiles
-	Rscript R/munge_geo_pvalue_to_rds.R
 
 echo $suppfiles: output/suppfilenames_filtered.rds
 	Rscript R/04_download_suppfiles.R
