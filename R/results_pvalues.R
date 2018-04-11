@@ -214,13 +214,6 @@ spark_table <- p_values %>%
                                 barColor = histclus,
                                 type = "bar"))
 
-# Save empty table for manual classification. 
-if (!any(str_detect(list.files("output"), "pvalue_histogram_classes.csv"))) {
-  spark_table %>% 
-    select(-Histogram) %>% 
-    write_excel_csv("output/pvalue_histogram_classes.csv")
-}
-
 # Curated p value histogram classes ---------------------------------------
 
 # Load manually assigned classes
@@ -228,15 +221,6 @@ his <- read_delim("data/pvalue_hist_UM.csv",
                   delim = ";", 
                   locale = locale(decimal_mark = ","))
 colnames(his) <- c("Accession", "suppdata_id", "pi0", "code")
-
-# create legend table
-# code_legend <- his[, 5]
-# colnames(code_legend) <- "description"
-# code_legend <- code_legend %>% 
-#   na.omit() %>% 
-#   separate(description, c("code", "legend"), sep = "-") %>% 
-#   mutate_all(str_trim) %>% 
-#   mutate_at("code", parse_integer)
 
 # parse histogram types from codes
 his <- his %>%
@@ -265,6 +249,13 @@ spark_table <- spark_table %>%
          'Type' = typetext) %>% 
   arrange(Accession) %>% 
   distinct()
+
+# Save empty table for manual classification. 
+if (!any(str_detect(list.files("output"), "pvalue_histogram_classes.csv"))) {
+  spark_table %>% 
+    select(-`P value histogram`) %>% 
+    write_excel_csv("output/pvalue_histogram_classes.csv")
+}
 
 hist_types <- spark_table %>% 
   group_by(Type, Comment = comment) %>% 
