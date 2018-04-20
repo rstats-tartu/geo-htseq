@@ -222,6 +222,20 @@ his <- read_delim("data/pvalue_hist_UM.csv",
                   locale = locale(decimal_mark = ","))
 colnames(his) <- c("Accession", "suppdata_id", "pi0", "code")
 
+# Second set of p value histograms
+his_added <- read_delim("data/20180411_histogram_classes.csv", 
+                        delim = ";", 
+                        locale = locale(decimal_mark = ","))
+
+his_added <- select(his_added, 
+       Accession, 
+       suppdata_id = `Supplementary file name`,
+       pi0 = `True nulls proportion`,
+       code)
+his_added <- mutate(his_added, pi0 = parse_double(pi0))
+his <- full_join(his, his_added)
+his <- distinct(his)
+
 # parse histogram types from codes
 his <- his %>%
   select(Accession, suppdata_id, code) %>% 
