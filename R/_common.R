@@ -1,18 +1,10 @@
 
-library(tidyverse)
-library(lubridate)
-library(glue)
-library(formattable)
-library(Biobase)
-library(grid)
-library(gridExtra)
-library(limma)
-library(viridis)
-library(sparkline)
-library(kableExtra)
-library(knitr)
-library(ape)
-library(ggtree)
+## install and load dependencies
+source("https://bioconductor.org/biocLite.R")
+if (!require("pacman")) install.packages("pacman", repos = "https://cloud.r-project.org/")
+pacman::p_load(bookdown, tidyverse, lubridate, glue, stringr, formattable, Biobase, grid, 
+               gridExtra, limma, viridis, sparkline, kableExtra, knitr,
+               ape, ggtree, data.table)
 
 opts_chunk$set(echo = FALSE, 
                message = FALSE, 

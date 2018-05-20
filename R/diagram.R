@@ -1,5 +1,10 @@
 # Download and install gridDiagram from 
 # https://www.stat.auckland.ac.nz/~paul/R/Diagram/gridDiagram_0.2-1.tar.gz
+if (!pacman::p_isinstalled("gridDiagram")) {
+  install.packages("https://www.stat.auckland.ac.nz/~paul/R/Diagram/gridDiagram_0.2-1.tar.gz", 
+                   repos = NULL, 
+                   type = "source") 
+}
 library(gridDiagram)
 
 # Draw boxes --------------------------------------------------------------
