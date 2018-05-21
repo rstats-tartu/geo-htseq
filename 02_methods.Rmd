@@ -16,6 +16,7 @@ knitr::read_chunk("R/results_suppfilenames.R")
 ```
 
 ```{r}
+library(stringr)
 out_string2 <- str_replace(out_string2, "(\\$)", "\\1")
 ```
 
