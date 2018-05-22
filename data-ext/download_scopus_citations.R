@@ -30,7 +30,6 @@ pubs <- ds_redline %>%
 # Download citations ------------------------------------------------------
 
 dois <- pubs %>% 
-  filter(str_detect(model, "Human")) %>% 
   select(Accession, PubMedIds, DOI) %>% 
   distinct() %>% 
   nest(Accession)
@@ -50,6 +49,7 @@ scopus_n_citations <- function(doi, con) {
 library(jsonlite)
 dois <- dois %>% 
   mutate(resp = map(DOI, scopus_n_citations, con = scopus))
+
 dois <- dois %>% 
   filter(map_lgl(resp, ~ .x$status_code == 200)) %>% 
   mutate(parsed = map(resp, ~ .x$parse()),
