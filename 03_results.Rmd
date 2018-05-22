@@ -47,7 +47,7 @@ GEO archive has three required components: metadata, processed data, and raw dat
 Minimally these processed files are required to contain raw or normalized sequence read counts, or peak files of ChIP-Seq data. 
 While, in the presence of raw data, supplementary data is not strictly neccessary for reproducibility, reproducing analysis from the raw data requires the reproduction of the full analysis, starting from re-aligning sequences to the genome, which can be practically unfeasible.
 
-Supplementary HT-seq files uplodaded to NCBI GEO contain most commonly raw sequence data files with 'raw.tar' file extension and associated automatically generated 'filelist.txt' file (Fig. \@ref(fig:commonfilenames)).
+Supplementary HT-seq files uplodaded to NCBI GEO contain most commonly raw or processed sequence data files as a 'RAW.tar' archive and associated automatically generated 'filelist.txt' file (Fig. \@ref(fig:commonfilenames)). 'RAW.tar' archive contains one file per sample and samples can be directly mapped to metadata by using sample name.
 
 (ref:commonfilenames) __Filename extensions and common stubs of supplementary file names from HT-seq datasets submitted to NCBI GEO database__. (`r ref_labels("A", panel_label_case)`) File extensions of supplementary file names. (`r ref_labels("B", panel_label_case)`) Common stubs of supplementary file names. Stubs were obtained by removing GEO id from supplementary file names and converting string to lower case. Stubs with N > 10 occurences are shown.
 
