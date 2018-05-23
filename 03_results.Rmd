@@ -63,7 +63,6 @@ RAW.tar files are included in `r supp_raw_perc` (`r n_raw`) of GEO series, where
 fsupp_rawtar_only
 ```
 
-
 Other common files contain annotations 'readme.txt' and processed data: commonly sequence read counts, gene expression analysis results or ChIP-Seq peak counts. 
 
 Sequence read counts can be either as raw read counts or normalised read counts.
@@ -96,7 +95,7 @@ Resulting dataset consisted of `r nrow(suppfiles_of_interest)` files from `r n_d
 
 ```
 
-(ref:block) Retention of HT-seq GEO series and supplementary files in filter for full sets of p values. Arrows from left to right, (1) filter for human or mouse GEO sets, (2) GEO sets with supplementary files, (3) filter out RAW.tar and filelist.txt files from supplementary file names, (4) supplementary files with flat table formats that were downloaded, (5) tables with p values. Number of p value sets is the number of sets with `r glue(">{nrowthreshold}")` features.
+(ref:block) Retention of HT-seq GEO series and supplementary files in filter for full sets of p values. Arrows from left to right, (1) GEO sets with supplementary files, (2) filter out RAW.tar and filelist.txt files from supplementary file names, (3) supplementary files with flat table formats that were downloaded, (4) tables with p values. Number of p value sets is the number of sets with `r glue(">{nrowthreshold}")` features.
 
 ```{r block, fig.cap='(ref:block)'}
 source("R/diagram.R")
