@@ -66,9 +66,9 @@ pubplot <- function(data) {
 
 pubp_other <- pubsum_other %>% pubplot()
 
-pubp_hs <- pubsum_hs %>% pubplot() + theme(axis.title.y = element_blank())
+pubp_hs <- pubplot(pubsum_hs) + theme(axis.title.y = element_blank())
 
-pubp_pval <- pubsum_pval %>% pubplot() + theme(axis.title.y = element_blank())
+pubp_pval <- pubplot(pubsum_pval) + theme(axis.title.y = element_blank())
 
 pg <- lapply(list(pubp_other, pubp_hs, pubp_pval), ggplotGrob)
 pg <- add_labels(pg, case = panel_label_case)
@@ -82,7 +82,6 @@ scopus <- read_rds("data/scopus_citedbycount.rds")
 
 # Merge publication data with citations and pvalues
 pubs_citations <- pubs %>% 
-  filter(str_detect(model, "Human")) %>% 
   left_join(scopus) %>% 
   select(Accession, PubMedIds, DOI, citations) %>% 
   left_join(pvals_pub)
