@@ -33,26 +33,29 @@ jiffy <- jiffy %>%
   mutate_at(c("FullJournalName", "Source"), str_to_lower)
 
 pub_fun <- . %>% 
-  select(PubMedIds, model, Source, ISSN) %>% 
+  select(PubMedIds, Source, ISSN) %>% 
   distinct() %>% 
-  group_by(model, Source, ISSN) %>% 
+  group_by(Source, ISSN) %>% 
   summarise(N = n()) %>% 
   ungroup()
 
-pubs_sum <- pubs %>% pub_fun()
-
-pubsum_hs <- pubs_sum %>% 
+pubsum_hs <- pubs %>% 
   filter(str_detect(model, "Human")) %>%
-  top_n(20)
+  pub_fun() %>% 
+  top_n(20) %>% 
+  arrange(desc(N))
 
-pubsum_other <- pubs_sum %>% 
+pubsum_other <- pubs %>% 
   filter(!str_detect(model, "Human")) %>% 
-  top_n(20)
+  pub_fun() %>% 
+  top_n(20) %>% 
+  arrange(desc(N))
 
 pubsum_pval <- pubs %>% 
   filter(Accession %in% p_values$Accession) %>% 
   pub_fun() %>% 
-  filter(N >= 2)
+  filter(N >= 2) %>% 
+  arrange(desc(N))
 
 pubplot <- function(data) {
   ggplot(data, aes(reorder(Source, desc(N)), N)) +
