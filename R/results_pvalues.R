@@ -10,8 +10,8 @@ st <- readRDS("output/suppdata.rds")
 # imported files
 imported_geos <- select(st, Accession) %>%  n_distinct()
 
-st_unnested <- st %>% unnest(result)
-st_unnested <- st_unnested %>% unnest(sheets)
+st_unnested <- unnest(st, result)
+st_unnested <- unnest(st_unnested, sheets)
 
 # Add sheet names to xls files
 st_unnested <- st_unnested %>% 
@@ -24,13 +24,11 @@ st_unnested <- st_unnested %>%
 gsem <- readRDS("output/gsem.rds")
 
 # Pull out series matrixes
-gsem <- gsem %>% 
-  mutate(series_matrix = map(gse, "result"))
+gsem <- mutate(gsem, series_matrix = map(gse, "result"))
 
 ## Remove errored matrixes
 library(Biobase)
-gsem_error <- gsem %>%
-  filter(is.null(series_matrix))
+gsem_error <- filter(gsem, is.null(series_matrix))
 
 gsem <- gsem %>%
   filter(!is.null(series_matrix)) %>% 
@@ -46,13 +44,13 @@ dims <- left_join(st_unnested, gsem) %>%
   ungroup %>%
   select(-series_matrix_file)
 
-n_samples <- dims %>% 
-  summarise_at(vars(samples, features), funs(mean, median, Mode, min, max))
+n_samples <- summarise_at(dims, 
+                          vars(samples, features), 
+                          funs(mean, median, Mode, min, max))
 
 #' Datasets with p values
-p_value_dims <- dims %>% 
-  filter(!map_lgl(pvalues, is.null), 
-         !map_lgl(pvalues, inherits, "try-error"))
+p_value_dims <- filter(dims, !map_lgl(pvalues, is.null), 
+                       !map_lgl(pvalues, inherits, "try-error"))
 
 ## ---- plotdims -----
 
@@ -101,14 +99,26 @@ grid.draw(pga)
 ## 
 # plot geo series with p values size distribution over all series
 
+# filter out features with low expression
+p_values_bm <- mutate(p_value_dims, 
+                     basemean = map(pvalues, "basemean"),
+                     basemean = map_lgl(basemean, ~ !all(is.na(.x)))) %>% 
+  filter(basemean) %>%
+  mutate(pvalues = map(pvalues, make_unique_colnames),
+         pvalues = map(pvalues, filter, basemean / (sum(basemean) / 1e6) > 100),
+         pvalues = map(pvalues, select, matches("pvalue")),
+         pvalues = map(pvalues, as.list)) %>% 
+  select(Accession, suppfiles, suppdata_id, annot, features, columns, samples, pvalues)
+
 p_values <- p_value_dims %>% 
   mutate(pvalues = map(pvalues, make_unique_colnames),
          pvalues = map(pvalues, select, matches("pvalue")),
          pvalues = map(pvalues, as.list)) %>% 
   select(Accession, suppfiles, suppdata_id, annot, features, columns, samples, pvalues)
 
-p_values <- p_values %>% 
-  unnest_listcol(pvalues)
+p_values <- unnest_listcol(p_values, pvalues)
+
+p_values_bm <- unnest_listcol(p_values_bm, pvalues)
 
 #' Filter out one dataset with pvalue threshold info (logical)
 #' and datasets where number of features is less than nrowthreshold
@@ -117,10 +127,19 @@ p_values <- p_values %>%
   filter(map_lgl(pvalues, is.numeric)) %>% 
   mutate(pi0 = map_dbl(pvalues, propTrueNull))
 
+p_values_bm <- p_values_bm %>% 
+  filter(map_lgl(pvalues, is.numeric)) %>% 
+  mutate(pi0 = map_dbl(pvalues, propTrueNull))
+
 # Filter out sets with supposedly bad sets of P values
 p_values <- p_values %>% 
   filter(features > nrowthreshold,
          pi0 > pi0threshold)
+
+p_values_bm <- p_values_bm %>% 
+  filter(features > nrowthreshold,
+         pi0 > pi0threshold)
+
 #' Dataset with pvaluethreshold
 # p_values %>% filter(Accession == "GSE83134")
 
@@ -130,21 +149,34 @@ p_values <- p_values %>%
 p_values <- p_values %>%
   mutate(bins = map(pvalues, ntile, 60))
 
+p_values_bm <- p_values_bm %>%
+  mutate(bins = map(pvalues, ntile, 60))
+
 # Histogram of pi0 distribution
-pi0hist <- p_values %>% 
-  ggplot(aes(pi0, ..count.. / sum(..count..))) +
-  geom_histogram(bins = 30) +
+pi0hist <- ggplot(data = p_values) +
+  geom_histogram(aes(x = pi0, y = ..count.. / sum(..count..)), bins = 30) +
   labs(x = bquote(Proportion~of~true~nulls~(pi*0)),
        y = "Fraction of P value sets")
 
-pi0_features <- p_values %>%
+pi0hist_bm <- pi0hist %+% p_values_bm
+
+pi0_features_recoded <- p_values %>%
   mutate(samples = case_when(
     samples < 4 ~ "2 to 3",
     samples > 3 & samples < 7 ~ "4 to 6",
     samples > 6 & samples < 11 ~ "7 to 10",
-    samples > 10 ~ "10+",
-  )) %>% 
-  ggplot(aes(pi0, log10(features))) +
+    samples > 10 ~ "10+"
+  ))
+
+pi0_features_recoded_bm <- p_values_bm %>%
+  mutate(samples = case_when(
+    samples < 4 ~ "2 to 3",
+    samples > 3 & samples < 7 ~ "4 to 6",
+    samples > 6 & samples < 11 ~ "7 to 10",
+    samples > 10 ~ "10+"
+  ))
+
+pi0_features <- ggplot(pi0_features_recoded, aes(x = pi0, y = log10(features))) +
   geom_point(aes(color = samples)) +
   geom_smooth(method = 'loess', se = FALSE) +
   scale_color_viridis(discrete = TRUE,
@@ -152,6 +184,9 @@ pi0_features <- p_values %>%
                       limits = c("2 to 3", "4 to 6", "7 to 10", "10+")) +
   labs(x = bquote(Proportion~of~true~nulls~(pi*0)),
        y = bquote(N~features~(log[10])))
+
+pi0_features_bm <- pi0_features %+% pi0_features_recoded_bm
+pi0_features_bm <- pi0_features_bm + theme(legend.position = "none")
 
 legend <- g_legend(pi0_features)
 pi0_features <- pi0_features + theme(legend.position = "none")
@@ -214,13 +249,25 @@ spark_table <- p_values %>%
                                 barColor = histclus,
                                 type = "bar"))
 
+spark_table_bm <- p_values_bm %>%
+  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/44), plot = FALSE)$counts),
+         pi0 = digits(pi0, 2)) %>%
+  unnest(values) %>%
+  group_by(Accession, suppdata_id, pi0) %>%
+  summarise(Histogram = spk_chr(values,
+                                chartRangeMin = 0,
+                                type = "bar"))
+
 # Curated p value histogram classes ---------------------------------------
 
 # Load manually assigned classes
 his <- read_delim("data/pvalue_hist_UM.csv", 
                   delim = ";", 
                   locale = locale(decimal_mark = ","))
-colnames(his) <- c("Accession", "suppdata_id", "pi0", "code")
+colnames(his) <- c("Accession", "suppdata_id", "pi0", "code", "legend")
+
+# remove column 5/legend 
+his <- select(his, -"legend")
 
 # Second set of p value histograms
 his_added <- read_delim("data/20180411_histogram_classes.csv", 
@@ -285,11 +332,29 @@ hist_types %>%
 
 pv_hist_caption <- glue::glue("P value histograms and proportion of true nulls. Histograms are colored according to clustering of their empirical cumulative distribution function outputs. Supplementary file names for tables from xls(x) files might be appended with sheet name. This table contains {nrow(spark_table)} unique P value histograms from {length(unique(spark_table$'Supplementary file name'))} supplementary tables related to {length(unique(spark_table$Accession))} GEO Accessions.")
 
-spark_table %>% 
+spark_table_bm_renamed <- spark_table_bm %>% 
+  rename('P value histogram,\nfiltered' = Histogram,
+       'True nulls proportion,\nfiltered' = pi0,
+       'Supplementary file name' = suppdata_id) %>% 
+  arrange(Accession) %>% 
+  distinct()
+
+left_join(spark_table, spark_table_bm_renamed) %>% 
   select(Accession, 
          `Supplementary file name`, 
          `P value histogram`, 
          Type, 
-         `True nulls proportion`) %>%
+         `True nulls proportion`,
+         `P value histogram,\nfiltered`,
+         `True nulls proportion,\nfiltered`) %>%
   knitr::kable("html", escape = FALSE, caption = pv_hist_caption) %>%
   kable_styling(full_width = FALSE)
+
+# spark_table %>% 
+#   select(Accession, 
+#          `Supplementary file name`, 
+#          `P value histogram`, 
+#          Type, 
+#          `True nulls proportion`) %>%
+#   knitr::kable("html", escape = FALSE, caption = pv_hist_caption) %>%
+#   kable_styling(full_width = FALSE)
