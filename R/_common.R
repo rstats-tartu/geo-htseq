@@ -2,9 +2,10 @@
 ## install and load dependencies
 source("https://bioconductor.org/biocLite.R")
 if (!require("pacman")) install.packages("pacman", repos = "https://cloud.r-project.org/")
+
 pacman::p_load(bookdown, tidyverse, lubridate, glue, stringr, formattable, Biobase, grid, 
-               gridExtra, limma, viridis, sparkline, kableExtra, knitr,
-               ape, ggtree, data.table)
+                 gridExtra, limma, viridis, sparkline, kableExtra, knitr,
+                 ape, ggtree, data.table)
 
 opts_chunk$set(echo = FALSE, 
                message = FALSE, 

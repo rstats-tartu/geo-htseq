@@ -16,12 +16,10 @@ suppfilenames <- suppfilenames_imported %>%
   select(-result, -dirlist)
 
 # Datasets with suppfiles
-suppfilenames_present <- suppfilenames %>% 
-  filter(map_lgl(SuppFileNames, ~length(.x) > 0))
+suppfilenames_present <- filter(suppfilenames, map_lgl(SuppFileNames, ~length(.x) > 0))
 
 # unnested suppfiles
-suppfilenames_present_unnested <- suppfilenames_present %>% 
-  unnest(SuppFileNames)
+suppfilenames_present_unnested <- unnest(suppfilenames_present, SuppFileNames)
 
 # datasets missing public suppfiles
 suppfilenames_not_present <- suppfilenames_imported %>% 

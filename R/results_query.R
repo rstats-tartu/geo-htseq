@@ -7,7 +7,7 @@ source("R/_common.R")
 ## ---- rna-seq-dynamics ----
 
 # R/A01_GEO_query.R
-ds <- readRDS("output/document_summaries.rds") # mouse and human GEO HT-seq expr datasets
+ds <- readRDS("output/document_summaries.rds") # GEO HT-seq expr datasets
 
 # Date of the first submission
 first_date <- range(ymd(ds$PDAT))[1]
@@ -74,4 +74,3 @@ ppub_n_ci <- ppub_n %>%
 
 ## ---- queryfig -----
 geop
-

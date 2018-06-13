@@ -44,6 +44,10 @@ dims <- left_join(st_unnested, gsem) %>%
   ungroup %>%
   select(-series_matrix_file)
 
+group_by(dims, samples) %>% 
+  summarise(N = n()) %>% 
+  write_csv("output/number_of_samples_in_geo.csv")
+
 n_samples <- summarise_at(dims, 
                           vars(samples, features), 
                           funs(mean, median, Mode, min, max))
@@ -339,16 +343,24 @@ spark_table_bm_renamed <- spark_table_bm %>%
   arrange(Accession) %>% 
   distinct()
 
-left_join(spark_table, spark_table_bm_renamed) %>% 
+pvalue_spark <- left_join(spark_table, spark_table_bm_renamed) %>% 
   select(Accession, 
          `Supplementary file name`, 
          `P value histogram`, 
          Type, 
          `True nulls proportion`,
          `P value histogram,\nfiltered`,
-         `True nulls proportion,\nfiltered`) %>%
+         `True nulls proportion,\nfiltered`) 
+
+pvalue_spark %>% 
+  select(-matches("histogram")) %>%
+  write_csv("output/pvalue_spark_table.csv")
+
+(pvalue_spark <- pvalue_spark %>%
   knitr::kable("html", escape = FALSE, caption = pv_hist_caption) %>%
-  kable_styling(full_width = FALSE)
+  kable_styling(full_width = FALSE))
+
+write_rds(pvalue_spark, "output/pvalue_spark_table.rds")
 
 # spark_table %>% 
 #   select(Accession, 
