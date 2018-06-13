@@ -362,11 +362,3 @@ pvalue_spark %>%
 
 write_rds(pvalue_spark, "output/pvalue_spark_table.rds")
 
-# spark_table %>% 
-#   select(Accession, 
-#          `Supplementary file name`, 
-#          `P value histogram`, 
-#          Type, 
-#          `True nulls proportion`) %>%
-#   knitr::kable("html", escape = FALSE, caption = pv_hist_caption) %>%
-#   kable_styling(full_width = FALSE)
