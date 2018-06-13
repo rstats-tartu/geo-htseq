@@ -103,7 +103,7 @@ grid.draw(pga)
 ## 
 # plot geo series with p values size distribution over all series
 
-# filter out features with low expression
+# ad hoc filter to remove uninformative features with less than 100 counts per 1M reads on average
 p_values_bm <- mutate(p_value_dims, 
                      basemean = map(pvalues, "basemean"),
                      basemean = map_lgl(basemean, ~ !all(is.na(.x)))) %>% 
@@ -301,6 +301,19 @@ his <- his %>%
 types_legend <- read_csv("data/pvalue_hist_types.csv")
 his <- left_join(his, types_legend)
 
+# Histograms after basemean filtering
+his_bm <- read_delim("data/pvalue_histogram_codes_after_filtering.csv", delim = ";")
+his_bm <- select(his_bm, Accession, `Supplementary file name`, `True nulls proportion filtered`, code_after_filter)
+his_bm <- distinct(his_bm) %>% 
+  mutate(type = case_when(
+    str_detect(code_after_filter, "2") ~ 2,
+    str_detect(code_after_filter, "6") ~ 3,
+    code_after_filter == 1 ~ 1,
+    code_after_filter == 0 ~ 0,
+    TRUE ~ 4
+  )) %>% 
+  left_join(types_legend)
+
 # Merge with classes and generate output table
 spark_table <- spark_table %>%
   ungroup() %>% 
@@ -325,10 +338,44 @@ hist_types <- spark_table %>%
   ungroup() %>% 
   mutate(`%` = percent(N / sum(N), digits = 1))
 
+# Recalculated frequencies after basemean filtering
+
+type_conversion_rate <- left_join(select(spark_table, Accession, `Supplementary file name`, type), 
+                                  select(his_bm, Accession, `Supplementary file name`, type_after_filter=type)) %>% 
+  filter(!is.na(type_after_filter)) %>% 
+  distinct() %>% 
+  mutate(type_conversion = case_when(
+    type_after_filter == type ~ "same",
+    type_after_filter != type & type_after_filter == 1 ~ "improvement",
+    TRUE ~ "no improvement"
+  )) %>% 
+  group_by(type_conversion) %>% 
+  summarise(N = n()) %>%
+  ungroup() %>% 
+  mutate(`%` = percent(N / sum(N), digits = 1))
+  
+his_bm_converted <- anti_join(select(his_bm, Accession, `Supplementary file name`, type, comment),
+                              select(spark_table, Accession, `Supplementary file name`, type, comment))
+
+hist_types_bm <- select(spark_table, Accession, `Supplementary file name`, type, comment) %>% 
+  filter(!(`Supplementary file name` %in% his_bm_converted$`Supplementary file name`)) %>% 
+  bind_rows(his_bm_converted) %>% 
+  left_join(types_legend) %>% 
+  group_by(Type = typetext, Comment = comment) %>% 
+  summarise(`N after filter` = n()) %>%
+  ungroup() %>% 
+  mutate(`% after filter` = percent(`N after filter` / sum(`N after filter`), digits = 1))
+
+hist_types <- left_join(hist_types, hist_types_bm)
+
 hist_types_caption <- "Summary of histogram types in supplementary files of GEO HT-seq submissions."
 
 hist_types %>% 
   knitr::kable("html", escape = FALSE, caption = hist_types_caption) %>%
+  kable_styling(full_width = FALSE)
+
+type_conversion_rate %>% 
+  knitr::kable("html", escape = FALSE, caption = "Fraction of histograms that could be fixed by filtering out non-informative features.") %>%
   kable_styling(full_width = FALSE)
 
 pv_hist_caption <- glue::glue("P value histograms and proportion of true nulls. Histograms are colored according to clustering of their empirical cumulative distribution function outputs. Supplementary file names for tables from xls(x) files might be appended with sheet name. This table contains {nrow(spark_table)} unique P value histograms from {length(unique(spark_table$'Supplementary file name'))} supplementary tables related to {length(unique(spark_table$Accession))} GEO Accessions.")
