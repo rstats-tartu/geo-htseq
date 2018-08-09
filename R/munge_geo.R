@@ -118,6 +118,13 @@ read_geotabs <- function(path){
   return(tab)
 }
 
+# check for correctness of p values
+#' @param x full set of p values, a numeric vector
+check_pvalues <- function(x) {
+  x <- range(x, na.rm = TRUE) 
+  all(x >= 0 & x <= 1 & max(x) > 0.5)
+  }
+
 # get_pvalues_basemean ----------------------------------------------------
 #' Extract p value and when available basemean columns from geo data frames.
 #' @description Function tries to identify and subscript raw p value and base mean columns from data frame. When multiple basemean columns are detected, function calculates rowmeans.
@@ -160,7 +167,8 @@ get_pvalues_basemean <- function(x){
   # Now convert column names to lower case
   colnames(x) <- stringr::str_to_lower(colnames(x))
   
-  pval_col <- stringr::str_detect(colns, "^p-?val(ue)?s?$") & !stringr::str_detect(colns, "adj|fdr|corrected")
+  pval_regexp <- "^p([:punct:][:space:])?val"
+  pval_col <- stringr::str_detect(colns, pval_regexp) & !stringr::str_detect(colns, "adj|fdr|corr")
   
   # Return NULL if P values not present
   if (!any(pval_col)) {
@@ -168,10 +176,10 @@ get_pvalues_basemean <- function(x){
   }
   
   # Check if P values are between 0 and 1
-  pvals_ok <- vapply(x[pval_col], function(x) {x <- range(x, na.rm = TRUE); all(x >= 0 & x <= 1)}, logical(1))
+  pvals_ok <- vapply(x[pval_col], check_pvalues, logical(1))
   
   if (!all(pvals_ok)) {
-    stop("Detected P values not in 0 to 1 range or otherwise malformed!")
+    stop("Detected P values not in 0 to 1 range or truncated!")
   }
   
   # Summarise multiple basemean columns
@@ -179,11 +187,11 @@ get_pvalues_basemean <- function(x){
     x <- dplyr::mutate(x, bmean = rowMeans(dplyr::select(x, dplyr::matches("base[Mm]ean"))))
   }
   
-  # Select only basemean and pvalue olumns
-  x <- dplyr::select(x, matches("bmean|^p(-)?val"))
+  # Select only basemean and pvalue columns
+  x <- dplyr::select(x, matches(paste0("bmean|", pval_regexp)))
   
   # Rename pvalue column
-  colnames(x)[stringr::str_detect(colnames(x), "p(-)?val")] <- "pvalue"
+  colnames(x)[stringr::str_detect(colnames(x), pval_regexp)] <- "pvalue"
   
   # Rename basemean column
   if (any(stringr::str_detect(colnames(x), "bmean"))) {
