@@ -167,7 +167,7 @@ get_pvalues_basemean <- function(x){
   # Now convert column names to lower case
   colnames(x) <- stringr::str_to_lower(colnames(x))
   
-  pval_regexp <- "^p([:punct:][:space:])?val"
+  pval_regexp <- "p([:punct:][:space:])?val"
   pval_col <- stringr::str_detect(colns, pval_regexp) & !stringr::str_detect(colns, "adj|fdr|corr")
   
   # Return NULL if P values not present
@@ -188,7 +188,7 @@ get_pvalues_basemean <- function(x){
   }
   
   # Select only basemean and pvalue columns
-  x <- dplyr::select(x, matches(paste0("bmean|", pval_regexp)))
+  x <- dplyr::select(x, matches(paste0("bmean|^", pval_regexp)))
   
   # Rename pvalue column
   colnames(x)[stringr::str_detect(colnames(x), pval_regexp)] <- "pvalue"
