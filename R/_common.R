@@ -6,6 +6,7 @@ if (!require("pacman")) install.packages("pacman", repos = "https://cloud.r-proj
 pacman::p_load(bookdown, tidyverse, lubridate, glue, stringr, formattable, Biobase, grid, 
                  gridExtra, limma, viridis, sparkline, kableExtra, knitr,
                  ape, ggtree, data.table)
+pacman::p_load_gh("tpall/entrezquery")
 
 opts_chunk$set(echo = FALSE, 
                message = FALSE, 
