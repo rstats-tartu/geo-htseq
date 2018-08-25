@@ -1,35 +1,30 @@
 
-n <- as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID"))
-array_size <- as.numeric(Sys.getenv("SLURM_ARRAY_TASK_MAX"))
-
-if (is.na(n) & is.na(array_size)) {
-  array_size <- n <- 1
-}
-
 # Load libs, settings and functions
 source("R/_common.R")
 source("R/munge_geo.R")
 source("R/checkFullRank.R")
 source("R/text_funs.R")
-pacman::p_load_gh("seandavi/GEOquery")
+p_load(digest, glue)
+p_load_gh("seandavi/GEOquery")
 
-munge_suppfiles <- function(docsums, gsem, n, array_size, out_path) {
+munge_suppfiles <- function(docsums, suppfilenames_filtered, gsem) {
+  
   # GEO query results and document summaries -----
   ds <- read_rds(docsums)
+  
+  # supplementary files of interest expected to be locally available
+  suppfilenames_filtered <- read_rds(suppfilenames)
   
   # Load series matrix data frames -----
   gsem <- read_rds(gsem)
   
   # Extract series matrixes
-  gsem <- gsem %>% 
-    mutate(series_matrix = map(gse, "result"))
+  gsem <- mutate(gsem, series_matrix = map(gse, "result"))
   
   # Identify and filter out Accessions with missing gsematrices
-  gsem_missing_or_faulty <- gsem %>% 
-    filter(map_lgl(series_matrix, ~class(.x) != "ExpressionSet"))
+  gsem_missing_or_faulty <- filter(gsem, map_lgl(series_matrix, ~class(.x) != "ExpressionSet"))
   
-  gsem <- gsem %>% 
-    filter(map_lgl(series_matrix, ~class(.x) == "ExpressionSet"))
+  gsem <- filter(gsem, map_lgl(series_matrix, ~class(.x) == "ExpressionSet"))
   
   ## Read in local supplemental tables -----
   
@@ -45,12 +40,11 @@ munge_suppfiles <- function(docsums, gsem, n, array_size, out_path) {
     filter(!str_detect(suppfiles, "xls(x)?.gz$"))
   
   # Duplicated files
-  supptabs_duplicated <- supptabs %>% 
-    mutate(files = str_replace(suppfiles, "\\.(gz|bz2)$","")) %>% 
+  supptabs_duplicated <- mutate(supptabs, files = str_replace(suppfiles, "\\.(gz|bz2)$","")) %>% 
     filter(duplicated(files))
   
   # Merge gsem ExpressionSets to supptabs
-  supptabs <- select(gsem, Accession, series_matrix) %>% 
+  supptabs <- dplyr::select(gsem, Accession, series_matrix) %>% 
     nest(series_matrix, .key = "matrixfiles") %>% 
     left_join(supptabs, .)
   
@@ -89,17 +83,14 @@ munge_suppfiles <- function(docsums, gsem, n, array_size, out_path) {
            "GSE89113_T35_vs_T40.T40.UP.0.05.A5SS.MATS.JunctionCountOnly.txt.gz")
   
   # Remove 'bad' files
-  supptabs <- supptabs %>% filter(!(suppfiles %in% bad))
+  supptabs <- filter(supptabs, !(suppfiles %in% bad))
   
-  split_supptabs <- split(supptabs, 1:array_size)
-  
-  split_supptabs[[n]] %>%
-    mutate(result = map(suppfiles, ~ try(munge_geo_pvalue(file.path(local_suppfile_folder, .x))))) %>% 
-    write_rds(path = glue(out_path))
+  mutate(supptabs, splits = rep_len(1:100, nrow(supptabs))) %>% 
+    group_by(splits) %>% 
+    nest() %>% 
+    mutate(data = map2(data, splits, ~write_rds(.x, path = glue::glue("output/tmp/supptabs_{.y}.rds"))))
 }
 
-munge_suppfiles(snakemake@input[["docsums"]], 
-                snakemake@input[["gsem"]], 
-                n = n, 
-                array_size = array_size, 
-                out_path = snakemake@output[[1]])
+munge_suppfiles(docsums = snakemake@input[["docsums"]], 
+                suppfiles_filtered = snakemake@input[["suppfilenames_filtered"]],
+                gsem = snakemake@input[["gsem"]])
