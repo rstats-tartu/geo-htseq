@@ -71,9 +71,9 @@ find_duplicated_columns <- function(x){
 read_geotabs <- function(path){
   
   message(path)
-  system(paste("echo '", path, "' >> log.txt"))
+  # system(paste("echo '", path, "' >> log.txt"))
   
-  if (stringr::str_detect(path, "xlsx?")) {
+  if (stringr::str_detect(path, "xls(x)?(\\.gz)?")) {
     tab <- read_excelfs(path)
     return(tab)
   }
@@ -91,7 +91,7 @@ read_geotabs <- function(path){
   
   if (inherits(tab, "try-error")) {
     message <- tab[1]
-    system(paste("echo '", path, "\n", message,"' >> log.txt"))
+    # system(paste("echo '", path, "\n", message,"' >> log.txt"))
     return(tibble())
   }
   
@@ -111,7 +111,7 @@ read_geotabs <- function(path){
   
   if (inherits(tab, "try-error")) {
     message <- cat("as_tibble: ", tab[1])
-    system(paste("echo '", path, "\n", message,"' >> log.txt"))
+    # system(paste("echo '", path, "\n", message,"' >> log.txt"))
     return(tibble())
   }
   
