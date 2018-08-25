@@ -6,4 +6,4 @@ out_string1 <- c("filelist","annotation","readme","error","raw.tar","csfasta",
                  "barcode","peaks")
 out_string2 <- c("tar","gtf","(big)?bed(\\.txt|12|graph|pk)?","bw","wig",
                  "hic","gct(x)?","tdf","gff(3)?","pdf","png","zip","sif",
-                 "narrowpeak","fa", "r$", "rda(ta)?$")
+                 "narrowpeak","fa(sta|stq)?", "r$", "rda(ta)?$")
