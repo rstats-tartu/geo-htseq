@@ -7,9 +7,10 @@ Assessing the quality of experiments, both directly and through replication atte
 
 ### How do I get set up? ###
 
-* Summary of set up
-* Configuration
-* Dependencies
+* To get started you need to download and install miniconda3 and create conda environment with snakemake
+* bash Miniconda3-latest-Linux-x86_64.sh
+* conda create -n geo -c bioconda snakemake
+* source activate geo
 * Database configuration
 * How to run tests
 * Deployment instructions

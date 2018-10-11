@@ -20,8 +20,10 @@ rule download_suppfilenames:
     "R/02_download_suppfilenames.R"
 
 rule filter_suppfilenames:
-  input: "output/suppfilenames.rds"
-  output: expand("output/suppfilenames_filtered.{ext}", ext = ['rds','txt'])
+  input: 
+    suppfilenames = "output/suppfilenames.rds"
+  output: 
+    suppfilenames_filtered = "output/suppfilenames_filtered.rds"
   conda:
     "envs/r.yaml"
   script:
@@ -29,29 +31,38 @@ rule filter_suppfilenames:
 
 rule download_suppfiles:
   input: "output/suppfilenames_filtered.rds"
-  output: touch("downloading_suppfiles.done")
+  output: touch("output/downloading_suppfiles.done")
   conda:
     "envs/r.yaml"
   script:
     "R/04_download_suppfiles.R"
 
-rule munge_matrixfiles:
+rule series_matrixfiles:
   input: "downloading_suppfiles.done"
   output: "output/gsem.rds"
   conda:
     "envs/r.yaml"
   script:
-    "R/05_munge_series_matrixfiles.R"
+    "R/05_series_matrixfiles.R"
 
-rule munge_suppfiles:
-  input: docsums = "output/document_summaries.rds", gsem = "output/gsem.rds"
-  output: dynamic("output/tmp/suppdata_{n}.rds")
+rule split_suppfiles:
+  input: 
+    docsums = "output/document_summaries.rds", 
+    suppfilenames_filtered = "output/suppfilenames_filtered.rds", 
+    gsem = "output/gsem.rds"
+  output: temp(dynamic("output/tmp/supptabs_{n}.rds"))
   conda:
     "envs/r.yaml"
-  resources:
-    mem_mb = lambda wildcards, attempt: attempt * 8000
   script:
-    "R/06_munge_suppfiles_slurm.R"
+    "R/06_split_suppfiles.R"
+
+rule import_suppfiles:
+  input: "output/tmp/supptabs_{n}.rds"
+  output: temp("output/tmp/suppdata_{n}.rds")
+  conda:
+    "envs/r.yaml"
+  script:
+    "R/06_import_suppfiles.R"
   
 rule merge_suppdata:
   input: dynamic("output/tmp/suppdata_{n}.rds")
