@@ -25,13 +25,6 @@ pubs <- ds_redline %>%
   mutate(ISSN = case_when(str_length(ISSN) == 0 ~ ESSN,
                           str_length(ISSN) != 0 ~ ISSN))
 
-jiffy <- read_csv("data/JIF_incites.csv", skip = 1)
-jiffy <- jiffy %>% select(-starts_with("X"))
-colnames(jiffy)[c(2, 3, 6)] <- c("FullJournalName", "Source", "IF")
-jiffy <- jiffy %>% 
-  select(c(2:4, 6)) %>% 
-  mutate_at(c("FullJournalName", "Source"), str_to_lower)
-
 pub_fun <- . %>% 
   select(PubMedIds, Source, ISSN) %>% 
   distinct() %>% 
@@ -84,8 +77,11 @@ grid.draw(pga)
 scopus <- read_rds("data/scopus_citedbycount.rds")
 
 # Merge publication data with citations and pvalues
-pubs_citations <- pubs %>% 
-  left_join(scopus) %>% 
+publications_citations <- left_join(pubs, scopus) %>% 
+  select_if(function(x) !is.list(x))
+write_csv(publications_citations, "output/publications_citations.csv")
+
+pubs_citations <- publications_citations %>% 
   select(Accession, PubMedIds, DOI, citations) %>% 
   left_join(pvals_pub)
 

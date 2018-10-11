@@ -1,17 +1,18 @@
 
 # Test integer function ---------------------------------------------------
-testInteger <- function(x, id = NULL){
+testInteger <- function(x, id = NULL) {
   
-  if(!is.null(id)){
+  if (!is.null(id)) {
     message(id)
   }
   
-  if(!is.matrix(x)){
+  if (!is.matrix(x)) {
     message("Not matrix!")
     return(FALSE)
   }
   
-  x <- x[sample(nrow(x), 100),]
+  idx <- sample(nrow(x), 100)
+  x <- x[idx, ]
   x <- vapply(x, function(z) as.integer(z) == z, logical(1L))
   all(vapply(x, all, logical(1L)))
 }
@@ -47,15 +48,16 @@ read_excelfs <- function(path) {
   names(tabs) <- sheets
   
   if (length(tabs) == 1) {
-    tabs <- tabs[[1]]
+    tabs <- purrr::flatten_df(tabs)
   }
+  
   return(tabs)
 }
 
 
 # Find duplicated columns -------------------------------------------------
 
-find_duplicated_columns <- function(x){
+find_duplicated_columns <- function(x) {
   hashs <- vapply(x, function(x) digest::digest(x), character(1))
   duplicated(hashs)
 }
@@ -68,10 +70,9 @@ find_duplicated_columns <- function(x){
 #' @import data.table
 #' @import CePa
 #' @import tibble
-read_geotabs <- function(path){
+read_geotabs <- function(path) {
   
   message(path)
-  # system(paste("echo '", path, "' >> log.txt"))
   
   if (stringr::str_detect(path, "xls(x)?(\\.gz)?")) {
     tab <- read_excelfs(path)
@@ -111,7 +112,6 @@ read_geotabs <- function(path){
   
   if (inherits(tab, "try-error")) {
     message <- cat("as_tibble: ", tab[1])
-    # system(paste("echo '", path, "\n", message,"' >> log.txt"))
     return(tibble())
   }
   
@@ -122,7 +122,7 @@ read_geotabs <- function(path){
 #' @param x full set of p values, a numeric vector
 check_pvalues <- function(x) {
   x <- range(x, na.rm = TRUE) 
-  all(x >= 0 & x <= 1 & max(x) > 0.5)
+  all(x >= 0 & x <= 1)
   }
 
 # get_pvalues_basemean ----------------------------------------------------

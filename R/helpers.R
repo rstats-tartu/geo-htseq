@@ -9,12 +9,12 @@ Mode <- function(x) {
 
 # myversion function ------------------------------------------------------
 
-myversion <- function(pkg){
+myversion <- function(pkg) {
   paste0("v", package.version(pkg))
 }
 
 # Function to format numbers ------
-myround <- function(x, digits = 1){
+myround <- function(x, digits = 1) {
   if(digits < 1)
     stop("This is intended for the case digits >= 1.")
   
@@ -33,7 +33,7 @@ myround <- function(x, digits = 1){
 }
 
 # Figure panel labels ----
-add_labels <- function(groblist, case = c("upper", "lower"), ...){
+add_labels <- function(groblist, case = c("upper", "lower"), ...) {
   
   n_panels <- length(groblist)
   
@@ -50,7 +50,7 @@ add_labels <- function(groblist, case = c("upper", "lower"), ...){
 }
 
 # Ref labels --------------------------------------------------------------
-ref_labels <- function(label, case = c("upper", "lower")){
+ref_labels <- function(label, case = c("upper", "lower")) {
   if(case=="upper"){
     return(toupper(label))
   } 
@@ -71,7 +71,7 @@ ref_labels <- function(label, case = c("upper", "lower")){
 #' df <- geofile_df("data", "gsematrixfile")
 #' }
 #' 
-geofile_df <- function(dir, var){
+geofile_df <- function(dir, var) {
   
   ## List files and extract filenames
   files <- list.files(dir)
@@ -93,7 +93,7 @@ get_filext <- function(x) {
 
 # make unique names -------------------------------------------------------
 
-make_unique_colnames <- function(x, sep = "_"){
+make_unique_colnames <- function(x, sep = "_") {
   
   if (!is.data.frame(x)) {
     warning("Not data.frame\n")

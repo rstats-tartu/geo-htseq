@@ -1,5 +1,5 @@
 
-## install and load dependencies
+# Install and load libraries
 source("https://bioconductor.org/biocLite.R")
 if (!require("pacman")) install.packages("pacman", repos = "https://cloud.r-project.org/")
 
@@ -8,6 +8,7 @@ pacman::p_load(bookdown, tidyverse, lubridate, glue, stringr, formattable, Bioba
                  ape, ggtree, data.table)
 pacman::p_load_gh("tpall/entrezquery")
 
+# Plot options
 opts_chunk$set(echo = FALSE, 
                message = FALSE, 
                warning = FALSE,
@@ -25,17 +26,19 @@ options(htmltools.dir.version = FALSE,
         warnPartialMatchAttr = FALSE, 
         warnPartialMatchDollar = FALSE)
 
+# Set panel label case
+panel_label_case <- "upper"
+
 # Load helper functions
 source("R/helpers.R")
 
-# Set panel label case
-panel_label_case <- "upper"
-nrowthreshold <- 4000
-pi0threshold <- 0.05
+
 
 # Last date to consider geo series and suppfilenames
 last_date <- ymd("2017-06-19")
+nrowthreshold <- 4000
+pi0threshold <- 0.05
 
-# folder where downloaded supplementary and matrix files live
+# Folder where downloaded supplementary and matrix files live
 local_suppfile_folder <- "output/suppl" 
 local_matrixfile_folder <- "output/matrix"
