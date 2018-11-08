@@ -36,6 +36,6 @@ filter_suppfilenames <- function(suppfilenames, outpath) {
   write_rds(suppfilenames_filtered, outpath)
 }
 
-filter_suppfilenames(snakemake@input[["suppfilenames"]], 
-                     snakemake@output[["suppfilenames_filtered"]])
+filter_suppfilenames(snakemake@input[[1]], 
+                     snakemake@output[[1]])
 
