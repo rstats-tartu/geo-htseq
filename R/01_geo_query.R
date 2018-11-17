@@ -13,7 +13,7 @@ geo_query <- function(out_path) {
   
   ## ----- run-query -----
   # ds is short of document summaries
-  ds <- entrez_docsums(query = query, db = "gds", retmax = 21000)
+  ds <- entrez_docsums(query = query, db = "gds", retmax = 23000)
   
   ## ----- save downloaded filenames ----- 
   # create output dir if not present
