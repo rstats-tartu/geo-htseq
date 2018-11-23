@@ -59,7 +59,7 @@ rule split_suppfiles:
     suppfilenames_filtered = rules.filter_suppfilenames.output, 
     gsem = rules.series_matrixfiles.output
   output: 
-    temp(expand("output/tmp/supptabs_{n}.rds", n = n_files))
+    temp(expand("output/tmp/suppdata_{n}.rds", n = n_files))
   conda:
     "envs/r.yaml"
   script:

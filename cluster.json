@@ -2,7 +2,7 @@
     "__default__" :
     {
         "name" : "{rule}",
-        "time" : "01:00:00",
+        "time" : "02:00:00",
         "mem" : 4000,
         "partition" : "testing",
         "output" : "output/log/{rule}_slurm_%j.log"
