@@ -4,8 +4,11 @@ channels:
   - conda-forge
   - defaults
   - r
+  - fullflu
 dependencies:
   - r-base
   - r-tidyverse
   - r-bookdown
   - r-xml
+  - r-pacman
+  - r-readr
