@@ -67,7 +67,7 @@ rule split_suppfiles:
 
 rule import_suppfiles:
   input: 
-    temp("output/tmp/supptabs_{n}.rds")
+    rules.split_suppfiles.output
   output: 
     temp("output/tmp/suppdata_{n}.rds")
   conda:
