@@ -2,7 +2,7 @@
 # Run GEO query for HT sequencing data --------------------------------------------------------
 ## Library can be installed from github
 # devtools::install_github("tpall/entrezquery")
-devtools::install_github("tpall/entrezquery")
+devtools::install_github("tpall/entrezquery", dependencies = TRUE)
 library(entrezquery)
 library(readr)
 
