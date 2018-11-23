@@ -12,3 +12,4 @@ dependencies:
   - r-xml
   - r-pacman
   - r-readr
+  - r-devtools
