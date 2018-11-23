@@ -75,9 +75,21 @@ read_geotabs <- function(path) {
   message(path)
   
   if (stringr::str_detect(path, "xls(x)?(\\.gz)?")) {
+    #If packed xls(x) file then work with unpacked file
+    if (stringr::str_detect(path, "\\.gz$")) {
+      #Unpack if unpacked file does not exist
+      if(!file.exists(gsub("[.]gz$", "", path))) {
+        gunzip(path, destname = gsub("[.]gz$", "", path),remove = FALSE)
+      }
+      tab <- read_excelfs(gsub("[.]gz$", "", path))
+	  #remove unpacked file after processing
+      file.remove(gsub("[.]gz$", "", path))
+      return(tab)
+    }
     tab <- read_excelfs(path)
     return(tab)
   }
+
   
   if (stringr::str_detect(path, "gct$")) {
     tab <- CePa::read.gct(path)
@@ -167,7 +179,7 @@ get_pvalues_basemean <- function(x){
   # Now convert column names to lower case
   colnames(x) <- stringr::str_to_lower(colnames(x))
   
-  pval_regexp <- "p([:punct:][:space:])?val"
+  pval_regexp <- "p[:punct:]*[:space:]*[:punct:]*[:space:]*val"
   pval_col <- stringr::str_detect(colns, pval_regexp) & !stringr::str_detect(colns, "adj|fdr|corr")
   
   # Return NULL if P values not present

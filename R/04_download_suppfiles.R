@@ -1,5 +1,4 @@
 
-if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tidyverse)
 pacman::p_load_gh("tpall/entrezquery")
 

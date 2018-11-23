@@ -4,7 +4,7 @@ source("R/_common.R")
 source("R/munge_geo.R")
 # source("R/checkFullRank.R")
 # source("R/text_funs.R")
-install.packages("pacman")
+
 pacman::p_load(digest, glue)
 pacman::p_load_gh("seandavi/GEOquery")
 
