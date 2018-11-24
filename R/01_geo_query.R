@@ -4,7 +4,7 @@
 # devtools::install_github("tpall/entrezquery")
 options(unzip = Sys.which("unzip"))
 # if(!require(pacman)) install.packages("pacman", repos = "http://cloud.r-project.org")
-devtools::install_github("tpall/entrezquery")
+devtools::install_github("tpall/entrezquery", upgrade = FALSE)
 library(entrezquery)
 library(readr)
 
