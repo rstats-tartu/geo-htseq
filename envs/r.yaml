@@ -10,6 +10,3 @@ dependencies:
   - r-tidyverse
   - r-bookdown
   - r-xml
-  - r-pacman
-  - r-readr
-  - r-devtools
