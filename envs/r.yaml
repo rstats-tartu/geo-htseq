@@ -10,3 +10,4 @@ dependencies:
   - r-bookdown
   - r-xml
   - unzip
+  - r-devtools
