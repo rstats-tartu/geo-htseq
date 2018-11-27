@@ -1,13 +1,12 @@
-
+name: geoquery
 channels:
   - bioconda
   - conda-forge
   - defaults
-  - r
 dependencies:
-  - r-base
-  - r-tidyverse
+  - r-base=3.4.1
+  - r-tidyverse=1.2.1
   - r-bookdown
-  - r-xml
+  - r-xml=3.98_1.16
   - unzip
   - r-devtools

@@ -78,5 +78,5 @@ munge_suppfiles <- function(docsums, suppfilenames_filtered, gsem) {
 }
 
 munge_suppfiles(docsums = snakemake@input[["docsums"]], 
-                suppfiles_filtered = snakemake@input[["suppfilenames_filtered"]],
+                suppfilenames_filtered = snakemake@input[["suppfilenames_filtered"]],
                 gsem = snakemake@input[["gsem"]])

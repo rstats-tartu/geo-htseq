@@ -1,10 +1,7 @@
 
 # Run GEO query for HT sequencing data --------------------------------------------------------
-## Library can be installed from github
-# devtools::install_github("tpall/entrezquery")
-options(unzip = Sys.which("unzip"))
-# if(!require(pacman)) install.packages("pacman", repos = "http://cloud.r-project.org")
-devtools::install_github("tpall/entrezquery", upgrade = FALSE)
+## entrezquery can be installed from github
+if(!require(entrezquery)) devtools::install_github("tpall/entrezquery")
 library(entrezquery)
 library(readr)
 

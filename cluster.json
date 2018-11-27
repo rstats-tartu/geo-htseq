@@ -10,5 +10,10 @@
     "import_suppfiles" :
     {
         "mem" : 32000
+    },
+    "download_suppfilenames" :
+    {   
+        "time" : 960,
+        "partition": "main"
     }
 }
