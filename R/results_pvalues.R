@@ -31,7 +31,7 @@ library(Biobase)
 gsem_error <- filter(gsem, is.null(series_matrix))
 
 gsem <- gsem %>%
-  filter(!is.null(series_matrix)) %>% 
+  filter(!map_lgl(series_matrix, is.null)) %>% 
   mutate(samples = map_int(series_matrix, ~ ncol(exprs(.x))),
          annot = map_chr(series_matrix, annotation)) %>% 
   select(Accession, annot, series_matrix, samples, everything())

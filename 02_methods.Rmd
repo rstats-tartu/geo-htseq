@@ -2,7 +2,7 @@
 ## Materials and methods {-}
 
 ```{r}
-knitr::read_chunk("R/01_GEO_query.R")
+knitr::read_chunk("R/01_geo_query.R")
 knitr::read_chunk("R/results_suppfilenames.R")
 ```
 
@@ -22,7 +22,7 @@ out_string2 <- str_replace(out_string2, "(\\$)", "\\1")
 
 
 ### Data query and import {-}
-Data was queried from NCBI GEO database by using eSearch E-Util with search string `r paste0('"_', query,'_"')` using GET function from httr R package [@R-httr].
+Data was queried from NCBI GEO database by using eSearch E-Util with search string `r paste0('"_', query,'_"')` using entrezquery R package.
 GEO UIDs were extracted from query results with xml2 package `r myversion("xml2")` [@R-xml2].
 UIDs were used to retrieve GEO document summaries using eSummary E-Util.
 Metadata was extracted from document summaries using xmlSApply function from XML package `r myversion("XML")` [@R-XML] and FTPLinks were used to identify supplemental files.
@@ -32,12 +32,11 @@ Flat tables were imported into R using fread function from package data.table `r
 MS Excel xls(x) files were imported using read_excel function from package readxl `r myversion("readxl")` [@R-readxl].
 Compressed xls(x) files were uncompressed before import using gzip.
 HT-seq experiment metadata was extracted from series matrix files. 
-Series matrix files were downloaded using GEOquery package `r myversion("GEOquery")` [@R-GEOquery].
+Supplementary files and series matrix files were downloaded using entrezquery package.
 
 ### Data analysis
 Exact binomial test was used to test differences in proportions.
 Proportion of true nulls was calculated using propTrueNull function from limma package `r myversion("limma")` [@R-limma].
-
 
 ### Code availability {-}
 Source code is available in github repo `org/reponame`.

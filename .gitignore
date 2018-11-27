@@ -6,4 +6,7 @@ output/
 figures/
 _book/
 _main.*
-nohup.out
+.snakemake
+R/.snakemake*
+render*
+bookdown*
