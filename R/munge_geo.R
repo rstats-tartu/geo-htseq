@@ -186,6 +186,23 @@ get_pvalues_basemean <- function(x){
   if (!any(pval_col)) {
     return(NULL)
   }
+    
+  #Check that P value data is not as characters, if it is convert
+  #It can be as characters if there is:
+  #1) NA in xsl(x) files
+  #2) there is a comma used as a decimal marker
+  print(x[pval_col])
+  print(length(x[pval_col]))
+  for (j in 1:length(x[pval_col])) {
+    for (k in 1:ncol(x[pval_col][j])) {
+      if (typeof(x[pval_col][j][,k][[1]]) == "character") {
+        print("AAAAAAAAAAAAAAA")
+        print(filename)
+        print("CONVERSION")
+        x[pval_col][j][,k][[1]] <- as.numeric(gsub(",",".", x[pval_col][j][,k][[1]]))
+      }
+    }
+  }
   
   # Check if P values are between 0 and 1
   pvals_ok <- vapply(x[pval_col], check_pvalues, logical(1))
