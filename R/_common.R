@@ -3,9 +3,7 @@
 source("https://bioconductor.org/biocLite.R")
 if (!require("pacman")) install.packages("pacman", repos = "https://cloud.r-project.org/")
 
-pacman::p_load(bookdown, tidyverse, lubridate, glue, stringr, formattable, Biobase, grid, 
-                 gridExtra, limma, viridis, sparkline, kableExtra, knitr,
-                 ape, ggtree, data.table)
+pacman::p_load(ggplot2, purrr, tibble, dplyr, tidyr, stringr, readr, lubridate, glue, stringr, Biobase, limma, ape, ggtree, data.table, bookdown, viridis, kableExtra, knitr, formattable, sparkline, grid, gridExtra)
 pacman::p_load_gh("tpall/entrezquery")
 
 # Plot options
@@ -31,8 +29,6 @@ panel_label_case <- "upper"
 
 # Load helper functions
 source("R/helpers.R")
-
-
 
 # Last date to consider geo series and suppfilenames
 last_date <- ymd("2017-12-31")
