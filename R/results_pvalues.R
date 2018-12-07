@@ -11,9 +11,11 @@ st <- readRDS("output/suppdata.rds")
 imported_geos <- select(st, Accession) %>%  n_distinct()
 
 st_unnested <- unnest(st, result)
+
+# Unnest xls file sheet names
 st_unnested <- unnest(st_unnested, sheets)
 
-# Add sheet names to xls files
+# Append sheet names to xls file names for unique table id
 st_unnested <- st_unnested %>% 
   mutate(suppdata_id = case_when(
     str_length(sheets) > 0 ~ str_c(suppfiles, "-sheet-", sheets),
@@ -28,7 +30,7 @@ gsem <- mutate(gsem, series_matrix = map(gse, "result"))
 
 ## Remove errored matrixes
 library(Biobase)
-gsem_error <- filter(gsem, is.null(series_matrix))
+gsem_error <- filter(gsem, map_lgl(series_matrix, is.null))
 
 gsem <- gsem %>%
   filter(!map_lgl(series_matrix, is.null)) %>% 
