@@ -89,5 +89,5 @@ rule report:
   output: "index.html"
   conda:
     "envs/r.yaml"
-  shell:
-    "_build.sh"
+  run:
+    shell("./_build.sh")
