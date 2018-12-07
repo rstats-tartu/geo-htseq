@@ -5,12 +5,14 @@ pacman::p_load_gh("seandavi/GEOquery")
 munge_matrixfiles <- function(out_path) {
   # Munge matrixfiles -------------------------------------------------------
   # local_matrixfile_folder and local_suppfile_folder come from _common.R
-  matrixfiles <- dir(local_matrixfile_folder) %>% 
+  matrixfiles <- local_matrixfile_folder %>% 
+    dir(pattern = "GSE[[:digit:]]*", full.names = TRUE) %>% 
     data_frame(series_matrix_file = .) %>% 
     mutate(Accession = str_extract(toupper(series_matrix_file), "GSE[[:digit:]]*")) %>% 
     select(Accession, everything())
   
-  suppfiles <- dir(local_suppfile_folder) %>% 
+  suppfiles <- local_suppfile_folder %>% 
+    dir(pattern = "GSE[[:digit:]]*", full.names = TRUE) %>% 
     data_frame(files = .) %>% 
     mutate(Accession = str_extract(toupper(files), "GSE[[:digit:]]*")) %>% 
     select(Accession, everything())
@@ -21,9 +23,8 @@ munge_matrixfiles <- function(out_path) {
     distinct()
   
   safely_getGEO <- safely(
-    function(x, path) {
-      message(x)
-      path <- file.path(path, x)
+    function(path) {
+      message(path)
       getGEO(filename = path, getGPL = FALSE)
     }
   )

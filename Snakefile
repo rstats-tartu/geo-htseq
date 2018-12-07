@@ -1,6 +1,6 @@
 
 rule all:
-  input: "output/gsem.rds", "output/suppdata.rds"
+  input: "output/gsem.rds", "output/suppdata.rds", "index.html"
 
 rule geo_query:
   output: 
@@ -83,3 +83,11 @@ rule merge_suppdata:
     "envs/r.yaml"
   script:
     "R/07_merge_suppdata.R"
+
+rule report:
+  input: "index.Rmd", "01_introduction.Rmd", "02_methods.Rmd", "03_results.Rmd", "04_discussion.Rmd", "05_references.Rmd", "output/document_summaries.rds", "output/suppfilenames.rds", "output/suppfilenames_filtered.rds", "output/gsem.rds", "output/suppdata.rds"
+  output: "index.html"
+  conda:
+    "envs/r.yaml"
+  shell:
+    "_build.sh"
