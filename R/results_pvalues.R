@@ -128,7 +128,8 @@ p_values_bm <- unnest_listcol(p_values_bm, pvalues)
 #' and datasets where number of features is less than nrowthreshold
 # calculate pi0, the proportion of true nulls
 # devtools::install_github("tpall/SRP")
-library(SRP)
+# alternatively, let's use pacman to (install and) load SRP package
+pacman::p_load_gh("tpall/SRP")
 safe_srp <- safely(srp)
 p_values <- p_values %>% 
   filter(map_lgl(pvalues, is.numeric)) %>% 
