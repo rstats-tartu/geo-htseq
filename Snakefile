@@ -90,4 +90,7 @@ rule report:
   conda:
     "envs/r.yaml"
   shell:
-    "./_build.sh"
+    """
+    chmod +x ./_build.sh
+    ./_build.sh
+    """
