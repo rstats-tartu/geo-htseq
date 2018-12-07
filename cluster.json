@@ -11,6 +11,10 @@
     {
         "mem" : 32000
     },
+    "merge_suppdata" :
+    {   
+        "mem" : 32000
+    },
     "download_suppfilenames" :
     {   
         "time" : 960,
