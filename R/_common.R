@@ -5,7 +5,10 @@ if (!require("pacman")) install.packages("pacman", repos = "https://cloud.r-proj
 
 pacman::p_load(ggplot2, purrr, tibble, dplyr, tidyr, stringr, readr, lubridate, glue, stringr, Biobase, limma, ape, ggtree, data.table, bookdown, viridis, kableExtra, knitr, formattable, sparkline, grid, gridExtra)
 pacman::p_load_gh("tpall/entrezquery")
-pacman::p_load_gh("tpall/SRP")
+#' default pacman and devtools install fails in conda, this should work 
+library(devtools)
+options(unzip = "internal")
+devtools::install_github("tpall/SRP")
 
 # Plot options
 opts_chunk$set(echo = FALSE, 
