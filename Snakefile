@@ -84,6 +84,14 @@ rule merge_suppdata:
   script:
     "R/07_merge_suppdata.R"
 
+rule download_publications:
+  input: rules.geo_query.output
+  output: "output/publications.rds"
+  conda:
+    "envs/r.yaml"
+  script:
+    "R/07_download_publications.R"
+
 rule report:
   input: "index.Rmd", "01_introduction.Rmd", "02_methods.Rmd", "03_results.Rmd", "04_discussion.Rmd", "05_references.Rmd", "output/document_summaries.rds", "output/suppfilenames.rds", "output/suppfilenames_filtered.rds", "output/gsem.rds", "output/suppdata.rds"
   output: "index.html"

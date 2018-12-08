@@ -40,11 +40,10 @@ get_stat <- function(path,title) {
 }
 
     
-write(paste("Source","Imported_GEOs","Pvalue_GEOs","Imported_datasets","Pvalue_datasets",sep="\t"),
-      "output.txt") 
+write(paste("Source", "Imported_GEOs", "Pvalue_GEOs", "Imported_datasets", "Pvalue_datasets", sep = "\t"), "output.txt")
 
-#get_stat(file.path("output","tmp_tabs_data","suppdata_1.rds"),"Ori")  
-get_stat(file.path("output","Taavis_import_versio","suppdata.rds"),"Original")
-get_stat(file.path("output","Taavis_import_versio","suppdata_regex.rds"),"Regex") 
-get_stat(file.path("output","Taavis_import_versio","suppdata_regex_xls.rds"),"Regex_xls") 
+get_stat(file.path("output", "suppdata.rds"), "Original")
+# get_stat(file.path("output", "Taavis_import_versio", "suppdata.rds"), "Original")
+get_stat(file.path("output", "Taavis_import_versio", "suppdata_regex.rds"), "Regex") 
+get_stat(file.path("output", "Taavis_import_versio", "suppdata_regex_xls.rds"), "Regex_xls") 
 

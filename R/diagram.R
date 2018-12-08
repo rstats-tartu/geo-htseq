@@ -7,10 +7,12 @@ if (!pacman::p_isinstalled("gridDiagram")) {
 }
 
 library(gridDiagram)
+pacman::p_load("svglite")
 
 # Draw boxes --------------------------------------------------------------
 
-svg("figures/diagram.svg", width = 9, height = 2)
+if (!dir.exists("figures")) dir.create("figures")
+svglite("figures/diagram.svg", width = 9, height = 2)
 
 grid.box("GEO series", sum(table(ds_redline$model)), 
          x = 1/6, y = 2/3,

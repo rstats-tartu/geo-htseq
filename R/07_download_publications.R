@@ -26,6 +26,6 @@ ds_pmids <- ds %>%
   distinct()
 
 publications <- ds_pmids %>% 
-  mutate(docsums = map(PubMedIds, ~{message(.x); entrez_docsums(uid = .x, db = "pubmed")}))
+  mutate(docsums = map(PubMedIds, ~{message(.x); entrez_docsums(uid = .x, db = "pubmed"); Sys.sleep(0.2)}))
 publications <- publications %>% unnest()
 write_rds(publications, "output/publications.rds")
