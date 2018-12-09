@@ -13,8 +13,8 @@ if (!"p_values" %in% ls()) {
 
 pubs <- read_rds("output/publications.rds")
 
-# Drop duplicate Id column
-pubs <- pubs %>% select(-Id)
+# Rename Id to PubMedIds
+pubs <- pubs %>% rename(PubMedIds = Id)
 
 pvals_pub <- p_values %>% 
   select(Accession, suppdata_id, pi0)
