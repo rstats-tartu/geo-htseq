@@ -212,7 +212,9 @@ get_pvalues_basemean <- function(x){
   }
   
   # Select only basemean and pvalue columns
-  x <- dplyr::select(x, matches(paste0("bmean|^", pval_regexp)))
+  ## changed regexp as matches does not seam to work with named classes with [], eg [:punct:]
+  pval_regexp2 <- "p( )*(.)*(_)*( )*(.)*(_)*val"
+  x <- dplyr::select(x, matches(paste0("bmean|^", pval_regexp2)))
   
   # Rename pvalue column
   colnames(x)[stringr::str_detect(colnames(x), pval_regexp)] <- "pvalue"
