@@ -25,4 +25,6 @@ dependencies:
   - r-knitr=1.20
   - r-ape=5.1
   - r-data.table=1.11.4
-  
+  - r-svglite
+  - r-gdtools
+  - cairo
