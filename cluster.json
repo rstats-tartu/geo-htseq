@@ -5,7 +5,7 @@
         "time" : "02:00:00",
         "mem" : 4000,
         "partition" : "testing",
-        "output" : "output/log/slurm_%j.log"
+        "output" : "output/logs/slurm_%j.log"
     },
     "import_suppfiles" :
     {
@@ -18,6 +18,11 @@
     "download_suppfilenames" :
     {   
         "time" : 960,
+        "partition": "main"
+    },
+    "download_suppfiles" :
+    {   
+        "time" : 1440,
         "partition": "main"
     }
 }
