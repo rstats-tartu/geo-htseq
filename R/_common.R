@@ -1,14 +1,34 @@
 
-# Install and load libraries
-source("https://bioconductor.org/biocLite.R")
-if (!require("pacman")) install.packages("pacman", repos = "https://cloud.r-project.org/")
+# Load installed libraries
+library(ggplot2)
+library(purrr)
+library(tibble)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(readr)
+library(lubridate)
+library(glue)
+library(stringr)
+library(limma)
+library(ape)
+library(ggtree)
+library(data.table)
+library(bookdown)
+library(viridis)
+library(kableExtra)
+library(knitr)
+library(formattable)
+library(sparkline)
+library(grid)
+library(gridExtra)
 
-pacman::p_load(ggplot2, purrr, tibble, dplyr, tidyr, stringr, readr, lubridate, glue, stringr, Biobase, limma, ape, ggtree, data.table, bookdown, viridis, kableExtra, knitr, formattable, sparkline, grid, gridExtra)
-pacman::p_load_gh("tpall/entrezquery")
 #' default pacman and devtools install fails in conda, this should work 
 library(devtools)
 options(unzip = "internal")
 devtools::install_github("tpall/SRP")
+devtools::install_github("tpall/entrezquery")
+library(entrezquery)
 
 # Plot options
 opts_chunk$set(echo = FALSE, 

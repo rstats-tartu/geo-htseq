@@ -3,11 +3,11 @@ channels:
   - bioconda
   - conda-forge
   - defaults
+  - russh
 dependencies:
   - r-base=3.4.1
   - r-bookdown
   - r-xml=3.98_1.16
-  - unzip
   - r-devtools
   - r-ggplot2=3.1.0
   - r-purrr=0.2.5
@@ -27,5 +27,11 @@ dependencies:
   - r-data.table=1.11.4
   - r-svglite
   - r-gdtools
+  - r-kableextra
+  - r-sparkline
   - cairo
+  - unzip
   - bioconductor-geoquery
+  - bioconductor-biobase
+  - bioconductor-limma
+  - bioconductor-ggtree
