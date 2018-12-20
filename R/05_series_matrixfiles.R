@@ -1,6 +1,6 @@
 
 source("R/_common.R")
-pacman::p_load_gh("seandavi/GEOquery")
+library(GEOquery)
 
 munge_matrixfiles <- function(out_path) {
   # Munge matrixfiles -------------------------------------------------------
