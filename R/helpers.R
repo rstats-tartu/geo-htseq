@@ -10,7 +10,7 @@ Mode <- function(x) {
 # myversion function ------------------------------------------------------
 
 myversion <- function(pkg) {
-  paste0("v", package.version(pkg))
+  paste0("v", package_version(pkg, strict = FALSE))
 }
 
 # Function to format numbers ------
