@@ -47,7 +47,7 @@ pubsum_other <- pubs %>%
 pubsum_pval <- pubs %>% 
   filter(Accession %in% p_values$Accession) %>% 
   pub_fun() %>% 
-  filter(N >= 2) %>% 
+  top_n(10) %>% 
   arrange(desc(N))
 
 pubplot <- function(data) {

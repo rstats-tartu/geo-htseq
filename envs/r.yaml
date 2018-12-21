@@ -29,6 +29,8 @@ dependencies:
   - r-data.table=1.11.4
   - r-kableextra=0.8.0
   - r-sparkline
+  - r-evaluate
+  - r-hexbin
   - cairo
   - unzip
   - bioconductor-geoquery

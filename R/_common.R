@@ -22,6 +22,7 @@ library(formattable)
 library(sparkline)
 library(grid)
 library(gridExtra)
+library(Biobase)
 
 #' default pacman and devtools install fails in conda, this should work 
 library(devtools)
@@ -56,7 +57,7 @@ source("R/helpers.R")
 
 # Last date to consider geo series and suppfilenames
 last_date <- ymd("2017-12-31")
-nrowthreshold <- 4000
+nrowthreshold <- 1000
 pi0threshold <- 0.05
 
 # Folder where downloaded supplementary and matrix files live

@@ -1,6 +1,6 @@
 
 rule all:
-  input: "output/gsem.rds", "output/suppdata.rds", "index.html"
+  input: "output/gsem.rds", "output/suppdata.rds", "_main.html"
 
 rule geo_query:
   output: 
@@ -94,7 +94,7 @@ rule download_publications:
 
 rule report:
   input: "index.Rmd", "01_introduction.Rmd", "02_methods.Rmd", "03_results.Rmd", "04_discussion.Rmd", "05_references.Rmd", "output/document_summaries.rds", "output/suppfilenames.rds", "output/suppfilenames_filtered.rds", "output/gsem.rds", "output/suppdata.rds", "output/publications.rds"
-  output: "index.html"
+  output: "_main.html"
   conda:
     "envs/r.yaml"
   shell:

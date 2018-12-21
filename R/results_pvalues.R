@@ -29,7 +29,6 @@ gsem <- readRDS("output/gsem.rds")
 gsem <- mutate(gsem, series_matrix = map(gse, "result"))
 
 ## Remove errored matrixes
-library(Biobase)
 gsem_error <- filter(gsem, map_lgl(series_matrix, is.null))
 
 gsem <- gsem %>%

@@ -2,8 +2,11 @@
 title: "Analysis of high-throughput sequencing data from NIH GEO database"
 author: 
   - name: Taavi Päll
-    affiliation: Department of Chemistry and Biotechnology, Tallinn University of Technology, Akadeemia tee 15, 12618 Tallinn, Estonia
-    email: taavi.pall@ttu.ee
+    affiliation: Department of Microbiology, Institute of Biomedicine and Translational Medicine, University of Tartu, Ravila 19, Tartu, 50411, Estonia
+    email: taavi.pall@ut.ee
+  - name: Hannes Luidalepp
+    affiliation: 
+    email: luidale@gmail.com
   - name: Tanel Tenson
     affiliation: Institute of Technology, University of Tartu, Nooruse 1, 50411, Tartu, Estonia
     email: tanel.tenson@ut.ee
