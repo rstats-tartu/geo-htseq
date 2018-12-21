@@ -28,5 +28,10 @@
     "report" :
     {
         "mem" : 32000
+    },
+    "series_matrixfiles" :
+    {
+        "time" : 960,
+        "partition": "main"
     }
 }
