@@ -3,11 +3,13 @@ channels:
   - bioconda
   - conda-forge
   - defaults
+  - r
   - russh
+  - mostlyai
 dependencies:
-  - r-base=3.4.1
+  - r-base
   - r-bookdown
-  - r-xml=3.98_1.16
+  - r-xml
   - r-devtools
   - r-ggplot2=3.1.0
   - r-purrr=0.2.5
@@ -25,9 +27,7 @@ dependencies:
   - r-knitr=1.20
   - r-ape=5.1
   - r-data.table=1.11.4
-  - r-svglite
-  - r-gdtools
-  - r-kableextra
+  - r-kableextra=0.8.0
   - r-sparkline
   - cairo
   - unzip
