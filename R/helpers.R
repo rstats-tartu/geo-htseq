@@ -10,7 +10,7 @@ Mode <- function(x) {
 # myversion function ------------------------------------------------------
 
 myversion <- function(pkg) {
-  paste0("v", package_version(pkg, strict = FALSE))
+  paste0("v", Biobase::package.version(pkg))
 }
 
 # Function to format numbers ------
