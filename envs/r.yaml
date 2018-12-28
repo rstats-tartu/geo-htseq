@@ -33,6 +33,7 @@ dependencies:
   - r-hexbin
   - r-broom
   - r-readxl
+  - r-digest
   - cairo
   - unzip
   - bioconductor-geoquery
