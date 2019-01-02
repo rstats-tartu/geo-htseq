@@ -1,5 +1,5 @@
 
-pacman::p_load(tidyverse)
+library(tidyverse)
 
 merge_suppdata <- function(rds_files, out_path) {
   
