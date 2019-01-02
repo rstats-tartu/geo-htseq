@@ -29,8 +29,15 @@ library(Biobase)
 #' default pacman and devtools install fails in conda, this should work 
 library(devtools)
 options(unzip = "internal")
-devtools::install_github("tpall/SRP")
-devtools::install_github("tpall/entrezquery")
+
+if (!require(SRP)) {
+        devtools::install_github("tpall/SRP")
+}
+
+if (!require(entrezquery)) {
+        devtools::install_github("tpall/entrezquery")
+}
+
 library(entrezquery)
 
 # Plot options
