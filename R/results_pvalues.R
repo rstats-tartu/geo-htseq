@@ -268,6 +268,21 @@ spark_table_bm <- p_values_bm %>%
                                 chartRangeMin = 0,
                                 type = "bar"))
 
+# Save pvalue histograms in 44 bin format
+# Used for classification with maschine learning approach
+
+spark_table_write <- p_values %>%
+  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/44), plot = FALSE)$counts)) %>%
+  mutate(values = map(values, ~ .x/sum(.x))) %>%
+  select(Accession,suppdata_id,annot,values)
+write_rds(spark_table_write,"output/pvalue_spark_bins.rds")
+
+spark_table_write <- p_values_bm %>%
+  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/44), plot = FALSE)$counts)) %>%
+  mutate(values = map(values, ~ .x/sum(.x))) %>%
+  select(Accession,suppdata_id,annot,values)
+write_rds(spark_table_write,"output/pvalue_bm_spark_bins.rds")
+
 # Curated p value histogram classes ---------------------------------------
 
 # Load manually assigned classes
