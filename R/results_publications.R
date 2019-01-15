@@ -13,8 +13,8 @@ if (!"p_values" %in% ls()) {
 
 pubs <- read_rds("output/publications.rds")
 
-# Drop duplicate Id column
-pubs <- pubs %>% select(-Id)
+# Rename Id to PubMedIds
+pubs <- pubs %>% rename(PubMedIds = Id)
 
 pvals_pub <- p_values %>% 
   select(Accession, suppdata_id, pi0)
@@ -24,13 +24,6 @@ pubs <- ds_redline %>%
   inner_join(pubs) %>% 
   mutate(ISSN = case_when(str_length(ISSN) == 0 ~ ESSN,
                           str_length(ISSN) != 0 ~ ISSN))
-
-jiffy <- read_csv("data/JIF_incites.csv", skip = 1)
-jiffy <- jiffy %>% select(-starts_with("X"))
-colnames(jiffy)[c(2, 3, 6)] <- c("FullJournalName", "Source", "IF")
-jiffy <- jiffy %>% 
-  select(c(2:4, 6)) %>% 
-  mutate_at(c("FullJournalName", "Source"), str_to_lower)
 
 pub_fun <- . %>% 
   select(PubMedIds, Source, ISSN) %>% 
@@ -54,7 +47,7 @@ pubsum_other <- pubs %>%
 pubsum_pval <- pubs %>% 
   filter(Accession %in% p_values$Accession) %>% 
   pub_fun() %>% 
-  filter(N >= 2) %>% 
+  top_n(10) %>% 
   arrange(desc(N))
 
 pubplot <- function(data) {
@@ -84,8 +77,11 @@ grid.draw(pga)
 scopus <- read_rds("data/scopus_citedbycount.rds")
 
 # Merge publication data with citations and pvalues
-pubs_citations <- pubs %>% 
-  left_join(scopus) %>% 
+publications_citations <- left_join(pubs, scopus) %>% 
+  select_if(function(x) !is.list(x))
+write_csv(publications_citations, "output/publications_citations.csv")
+
+pubs_citations <- publications_citations %>% 
   select(Accession, PubMedIds, DOI, citations) %>% 
   left_join(pvals_pub)
 

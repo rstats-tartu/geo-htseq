@@ -1,17 +1,18 @@
 
 # Test integer function ---------------------------------------------------
-testInteger <- function(x, id = NULL){
+testInteger <- function(x, id = NULL) {
   
-  if(!is.null(id)){
+  if (!is.null(id)) {
     message(id)
   }
   
-  if(!is.matrix(x)){
+  if (!is.matrix(x)) {
     message("Not matrix!")
     return(FALSE)
   }
   
-  x <- x[sample(nrow(x), 100),]
+  idx <- sample(nrow(x), 100)
+  x <- x[idx, ]
   x <- vapply(x, function(z) as.integer(z) == z, logical(1L))
   all(vapply(x, all, logical(1L)))
 }
@@ -47,15 +48,16 @@ read_excelfs <- function(path) {
   names(tabs) <- sheets
   
   if (length(tabs) == 1) {
-    tabs <- tabs[[1]]
+    tabs <- purrr::flatten_df(tabs)
   }
+  
   return(tabs)
 }
 
 
 # Find duplicated columns -------------------------------------------------
 
-find_duplicated_columns <- function(x){
+find_duplicated_columns <- function(x) {
   hashs <- vapply(x, function(x) digest::digest(x), character(1))
   duplicated(hashs)
 }
@@ -68,15 +70,26 @@ find_duplicated_columns <- function(x){
 #' @import data.table
 #' @import CePa
 #' @import tibble
-read_geotabs <- function(path){
+read_geotabs <- function(path) {
   
   message(path)
-  # system(paste("echo '", path, "' >> log.txt"))
   
   if (stringr::str_detect(path, "xls(x)?(\\.gz)?")) {
+    #If packed xls(x) file then work with unpacked file
+    if (stringr::str_detect(path, "\\.gz$")) {
+      #Unpack if unpacked file does not exist
+      if(!file.exists(gsub("[.]gz$", "", path))) {
+        gunzip(path, destname = gsub("[.]gz$", "", path),remove = FALSE)
+      }
+      tab <- read_excelfs(gsub("[.]gz$", "", path))
+	  #remove unpacked file after processing
+      file.remove(gsub("[.]gz$", "", path))
+      return(tab)
+    }
     tab <- read_excelfs(path)
     return(tab)
   }
+
   
   if (stringr::str_detect(path, "gct$")) {
     tab <- CePa::read.gct(path)
@@ -111,7 +124,6 @@ read_geotabs <- function(path){
   
   if (inherits(tab, "try-error")) {
     message <- cat("as_tibble: ", tab[1])
-    # system(paste("echo '", path, "\n", message,"' >> log.txt"))
     return(tibble())
   }
   
@@ -122,7 +134,7 @@ read_geotabs <- function(path){
 #' @param x full set of p values, a numeric vector
 check_pvalues <- function(x) {
   x <- range(x, na.rm = TRUE) 
-  all(x >= 0 & x <= 1 & max(x) > 0.5)
+  all(x >= 0 & x <= 1)
   }
 
 # get_pvalues_basemean ----------------------------------------------------
@@ -167,12 +179,24 @@ get_pvalues_basemean <- function(x){
   # Now convert column names to lower case
   colnames(x) <- stringr::str_to_lower(colnames(x))
   
-  pval_regexp <- "p([:punct:][:space:])?val"
+  pval_regexp <- "p[:punct:]*[:space:]*[:punct:]*[:space:]*val"
   pval_col <- stringr::str_detect(colns, pval_regexp) & !stringr::str_detect(colns, "adj|fdr|corr")
   
   # Return NULL if P values not present
   if (!any(pval_col)) {
     return(NULL)
+  }
+    
+  #Check that P value data is not as characters, if it is convert
+  #It can be as characters if there is:
+  #1) NA in xsl(x) files
+  #2) there is a comma used as a decimal marker
+  for (j in 1:length(x[pval_col])) {
+    for (k in 1:ncol(x[pval_col][j])) {
+      if (typeof(x[pval_col][j][,k][[1]]) == "character") {
+        x[pval_col][j][,k][[1]] <- as.numeric(gsub(",",".", x[pval_col][j][,k][[1]]))
+      }
+    }
   }
   
   # Check if P values are between 0 and 1
@@ -188,7 +212,9 @@ get_pvalues_basemean <- function(x){
   }
   
   # Select only basemean and pvalue columns
-  x <- dplyr::select(x, matches(paste0("bmean|^", pval_regexp)))
+  ## changed regexp as matches does not seam to work with named classes with [], eg [:punct:]
+  pval_regexp2 <- "p( )*(.)*(_)*( )*(.)*(_)*val"
+  x <- dplyr::select(x, matches(paste0("bmean|^", pval_regexp2)))
   
   # Rename pvalue column
   colnames(x)[stringr::str_detect(colnames(x), pval_regexp)] <- "pvalue"

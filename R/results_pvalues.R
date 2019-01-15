@@ -11,9 +11,11 @@ st <- readRDS("output/suppdata.rds")
 imported_geos <- select(st, Accession) %>%  n_distinct()
 
 st_unnested <- unnest(st, result)
+
+# Unnest xls file sheet names
 st_unnested <- unnest(st_unnested, sheets)
 
-# Add sheet names to xls files
+# Append sheet names to xls file names for unique table id
 st_unnested <- st_unnested %>% 
   mutate(suppdata_id = case_when(
     str_length(sheets) > 0 ~ str_c(suppfiles, "-sheet-", sheets),
@@ -27,11 +29,10 @@ gsem <- readRDS("output/gsem.rds")
 gsem <- mutate(gsem, series_matrix = map(gse, "result"))
 
 ## Remove errored matrixes
-library(Biobase)
-gsem_error <- filter(gsem, is.null(series_matrix))
+gsem_error <- filter(gsem, map_lgl(series_matrix, is.null))
 
 gsem <- gsem %>%
-  filter(!is.null(series_matrix)) %>% 
+  filter(!map_lgl(series_matrix, is.null)) %>% 
   mutate(samples = map_int(series_matrix, ~ ncol(exprs(.x))),
          annot = map_chr(series_matrix, annotation)) %>% 
   select(Accession, annot, series_matrix, samples, everything())
@@ -127,13 +128,21 @@ p_values_bm <- unnest_listcol(p_values_bm, pvalues)
 #' Filter out one dataset with pvalue threshold info (logical)
 #' and datasets where number of features is less than nrowthreshold
 # calculate pi0, the proportion of true nulls
+# devtools::install_github("tpall/SRP")
+# alternatively, use pacman to (install and) load SRP package
+library(SRP)
+safe_srp <- safely(srp)
 p_values <- p_values %>% 
   filter(map_lgl(pvalues, is.numeric)) %>% 
-  mutate(pi0 = map_dbl(pvalues, propTrueNull))
+  mutate(pi0 = map_dbl(pvalues, propTrueNull),
+         srp = map(pvalues, safe_srp),
+         srp = map(srp, "result"))
 
 p_values_bm <- p_values_bm %>% 
   filter(map_lgl(pvalues, is.numeric)) %>% 
-  mutate(pi0 = map_dbl(pvalues, propTrueNull))
+  mutate(pi0 = map_dbl(pvalues, propTrueNull),
+         srp = map(pvalues, safe_srp),
+         srp = map(srp, "result"))
 
 # Filter out sets with supposedly bad sets of P values
 p_values <- p_values %>% 
@@ -259,6 +268,21 @@ spark_table_bm <- p_values_bm %>%
                                 chartRangeMin = 0,
                                 type = "bar"))
 
+# Save pvalue histograms in 44 bin format
+# Used for classification with maschine learning approach
+
+spark_table_write <- p_values %>%
+  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/44), plot = FALSE)$counts)) %>%
+  mutate(values = map(values, ~ .x/sum(.x))) %>%
+  select(Accession,suppdata_id,annot,values)
+write_rds(spark_table_write,"output/pvalue_spark_bins.rds")
+
+spark_table_write <- p_values_bm %>%
+  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/44), plot = FALSE)$counts)) %>%
+  mutate(values = map(values, ~ .x/sum(.x))) %>%
+  select(Accession,suppdata_id,annot,values)
+write_rds(spark_table_write,"output/pvalue_bm_spark_bins.rds")
+
 # Curated p value histogram classes ---------------------------------------
 
 # Load manually assigned classes
@@ -341,12 +365,14 @@ hist_types <- spark_table %>%
 # Recalculated frequencies after basemean filtering
 
 type_conversion_rate <- left_join(select(spark_table, Accession, `Supplementary file name`, type), 
-                                  select(his_bm, Accession, `Supplementary file name`, type_after_filter=type)) %>% 
+                                  select(his_bm, Accession, `Supplementary file name`, type_after_filter = type)) %>% 
   filter(!is.na(type_after_filter)) %>% 
   distinct() %>% 
   mutate(type_conversion = case_when(
     type_after_filter == type ~ "same",
     type_after_filter != type & type_after_filter == 1 ~ "improvement",
+    type_after_filter > 1 & type == 1 ~ "worse",
+    type_after_filter == 0 & type == 1 ~ "effects were lost",
     TRUE ~ "no improvement"
   )) %>% 
   group_by(type_conversion) %>% 
@@ -360,7 +386,11 @@ his_bm_converted <- anti_join(select(his_bm, Accession, `Supplementary file name
 hist_types_bm <- select(spark_table, Accession, `Supplementary file name`, type, comment) %>% 
   filter(!(`Supplementary file name` %in% his_bm_converted$`Supplementary file name`)) %>% 
   bind_rows(his_bm_converted) %>% 
-  left_join(types_legend) %>% 
+  left_join(types_legend)
+
+write_csv(hist_types_bm, "output/hist_types_after_bm_filter.csv")
+
+hist_types_bm <- hist_types_bm %>% 
   group_by(Type = typetext, Comment = comment) %>% 
   summarise(`N after filter` = n()) %>%
   ungroup() %>% 
@@ -406,3 +436,16 @@ pvalue_spark %>%
 
 write_rds(pvalue_spark, "output/pvalue_spark_table.rds")
 
+
+# srp stats ---------------------------------------------------------------
+
+p_values_srp <- select(p_values, Accession, suppfiles, suppdata_id, annot, features, samples, pi0, srp) %>% 
+  filter(map_lgl(srp, is.data.frame)) %>% 
+  unnest(srp) %>% 
+  rename(pi0_raw = pi0, SRP_raw = SRP, pi01_raw = pi01, fp_raw = fp, rs_raw = rs, ud_raw = ud)
+p_values_srp_bm <- select(p_values_bm, Accession, suppfiles, suppdata_id, annot, features, samples, pi0, srp) %>% 
+  filter(map_lgl(srp, is.data.frame)) %>% 
+  unnest(srp) %>% 
+  rename(pi0_bm = pi0, SRP_bm = SRP, pi01_bm = pi01, fp_bm = fp, rs_bm = rs, ud_bm = ud)
+srp_stats <- full_join(p_values_srp, p_values_srp_bm)
+write_csv(srp_stats, "output/srp_stats.csv")

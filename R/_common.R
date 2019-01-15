@@ -1,13 +1,46 @@
 
-## install and load dependencies
-source("https://bioconductor.org/biocLite.R")
-if (!require("pacman")) install.packages("pacman", repos = "https://cloud.r-project.org/")
+# Load installed libraries
+library(ggplot2)
+library(purrr)
+library(tibble)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(readr)
+library(readxl)
+library(broom)
+library(lubridate)
+library(glue)
+library(stringr)
+library(limma)
+library(ape)
+library(ggtree)
+library(data.table)
+library(bookdown)
+library(viridis)
+library(kableExtra)
+library(knitr)
+library(formattable)
+library(sparkline)
+library(grid)
+library(gridExtra)
+library(Biobase)
 
-pacman::p_load(bookdown, tidyverse, lubridate, glue, stringr, formattable, Biobase, grid, 
-                 gridExtra, limma, viridis, sparkline, kableExtra, knitr,
-                 ape, ggtree, data.table)
-pacman::p_load_gh("tpall/entrezquery")
+#' default pacman and devtools install fails in conda, this should work 
+library(devtools)
+options(unzip = "internal")
 
+if (!require(SRP)) {
+        devtools::install_github("tpall/SRP")
+}
+
+if (!require(entrezquery)) {
+        devtools::install_github("tpall/entrezquery")
+}
+
+library(entrezquery)
+
+# Plot options
 opts_chunk$set(echo = FALSE, 
                message = FALSE, 
                warning = FALSE,
@@ -25,17 +58,17 @@ options(htmltools.dir.version = FALSE,
         warnPartialMatchAttr = FALSE, 
         warnPartialMatchDollar = FALSE)
 
+# Set panel label case
+panel_label_case <- "upper"
+
 # Load helper functions
 source("R/helpers.R")
 
-# Set panel label case
-panel_label_case <- "upper"
-nrowthreshold <- 4000
+# Last date to consider geo series and suppfilenames
+last_date <- ymd("2017-12-31")
+nrowthreshold <- 1000
 pi0threshold <- 0.05
 
-# Last date to consider geo series and suppfilenames
-last_date <- ymd("2017-06-19")
-
-# folder where downloaded supplementary and matrix files live
+# Folder where downloaded supplementary and matrix files live
 local_suppfile_folder <- "output/suppl" 
 local_matrixfile_folder <- "output/matrix"

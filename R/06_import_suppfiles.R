@@ -1,11 +1,11 @@
 
-# Load libs, settings and functions
+# Load libs, local_suppfile_folder, and helper functions
 source("R/_common.R")
 source("R/munge_geo.R")
-source("R/checkFullRank.R")
-source("R/text_funs.R")
-pacman::p_load(digest, glue)
-pacman::p_load_gh("seandavi/GEOquery")
+
+library(digest)
+library(glue)
+library(GEOquery)
 
 import_suppdata <- function(supptab, out_path) {
   supptab <- read_rds(supptab)

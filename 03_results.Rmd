@@ -76,7 +76,7 @@ However, tables containing top-ranked genes/features (toptables) from gene expre
 ```
 
 
-(ref:filesofinterest) Distribution of supplementary files per GEO Accession before and after filtering supplementary files for download. Left, all supplementary files. Right, supplementary files to be downloaded after filtering for tabular formats. Numbers show total number of files, respectively, before and after filtering.
+(ref:filesofinterest) __Distribution of supplementary files per GEO Accession__ before and after filtering supplementary files for download. Left, all supplementary files. Right, supplementary files to be downloaded after filtering for tabular formats. Numbers show total number of files, respectively, before and after filtering.
 
 ```{r filesofinterest, fig.cap='(ref:filesofinterest)'}
 
@@ -95,7 +95,7 @@ Resulting dataset consisted of `r nrow(suppfiles_of_interest)` files from `r n_d
 
 ```
 
-(ref:block) Retention of HT-seq GEO series and supplementary files in filter for full sets of p values. Arrows from left to right, (1) GEO sets with supplementary files, (2) filter out RAW.tar and filelist.txt files from supplementary file names, (3) supplementary files with flat table formats that were downloaded, (4) tables with p values. Number of p value sets is the number of sets with `r glue(">{nrowthreshold}")` features.
+(ref:block) __Retention of HT-seq GEO series and supplementary files in filter for full sets of p values.__ Arrows from left to right, (1) GEO sets with supplementary files, (2) filter out RAW.tar and filelist.txt files from supplementary file names, (3) supplementary files with flat table formats that were downloaded, (4) tables with p values. Number of p value sets is the number of sets with `r glue(">{nrowthreshold}")` features.
 
 ```{r block, fig.cap='(ref:block)'}
 source("R/diagram.R")
@@ -105,7 +105,7 @@ knitr::include_graphics("figures/diagram.svg")
 
 ### Processed data
 
-(ref:dims) __Number of samples and features of HT-seq experiments.__ (`r ref_labels("A", panel_label_case)`) Number of features in GEO series where supplementary file with p values was uploaded (dark grey) compared to all GEO series with supplementary files (light grey). (`r ref_labels("B", panel_label_case)`) Number of samples in GEO series where p values were available (dark grey) compared to all series with supplementary files (light grey). (`r ref_labels("C", panel_label_case)`) Mean number of samples was `r round(n_samples$samples_mean)` and median `r n_samples$samples_median`. Most frequent sample size was `r n_samples$samples_Mode`. Mean number of features was `r paste(floor(n_samples$features_mean))` and median `r paste(n_samples$features_median)`. Number of samples was taken from series matrix files and number of features is number of rows in supplementary files. Dashed line denotes cutoff for complete sets of features/p values.
+(ref:dims) __Global view on number of samples and features of HT-seq experiments.__ (`r ref_labels("A", panel_label_case)`) Number of features in GEO series where supplementary file with p values was uploaded (dark grey) compared to all GEO series with supplementary files (light grey). (`r ref_labels("B", panel_label_case)`) Number of samples in GEO series where p values were available (dark grey) compared to all series with supplementary files (light grey). (`r ref_labels("C", panel_label_case)`) Mean number of samples was `r round(n_samples$samples_mean)` and median `r n_samples$samples_median`. Most frequent sample size was `r n_samples$samples_Mode`. Mean number of features was `r paste(floor(n_samples$features_mean))` and median `r paste(n_samples$features_median)`. Number of samples was taken from series matrix files and number of features is number of rows in supplementary files. Dashed line denotes cutoff for complete sets of features/p values.
 
 ```{r plotdims, fig.cap='(ref:dims)'}
 
@@ -117,7 +117,7 @@ knitr::include_graphics("figures/diagram.svg")
 
 ```
 
-(ref:publications) __Journals publishing HT-seq data.__ (`r ref_labels("A", panel_label_case)`) Top 20 journals publishing non-human or -mouse datasets. (`r ref_labels("B", panel_label_case)`) Top 20 journals publishing human or mouse datasets. (`r ref_labels("C", panel_label_case)`) Journals that have published at least two articles reporting P values in GEO supplementary files.
+(ref:publications) __Journals publishing HT-seq data.__ (`r ref_labels("A", panel_label_case)`) Top 20 journals publishing non-human or -mouse datasets. (`r ref_labels("B", panel_label_case)`) Top 20 journals publishing human or mouse datasets. (`r ref_labels("C", panel_label_case)`) Top 10 journals publishing articles reporting P values in GEO supplementary files.
 
 ```{r publications, fig.cap='(ref:publications)'}
 

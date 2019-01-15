@@ -1,0 +1,37 @@
+{
+    "__default__" :
+    {
+        "name" : "{rule}",
+        "time" : "02:00:00",
+        "mem" : 4000,
+        "partition" : "testing",
+        "output" : "output/logs/slurm_%j.log"
+    },
+    "import_suppfiles" :
+    {
+        "mem" : 32000
+    },
+    "merge_suppdata" :
+    {   
+        "mem" : 32000
+    },
+    "download_suppfilenames" :
+    {   
+        "time" : 960,
+        "partition": "main"
+    },
+    "download_suppfiles" :
+    {   
+        "time" : 1440,
+        "partition": "main"
+    },
+    "report" :
+    {
+        "mem" : 32000
+    },
+    "series_matrixfiles" :
+    {
+        "time" : 960,
+        "partition": "main"
+    }
+}

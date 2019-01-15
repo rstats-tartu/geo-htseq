@@ -1,10 +1,10 @@
 
-# Load libs
 source("R/_common.R")
+
 # Load out strings
 source("R/out_strings.R")
 
-filter_suppfilenames <- function(suppfilenames, suppfilenames_filtered_out) {
+filter_suppfilenames <- function(suppfilenames, outpath) {
   
   # Load supplementary file names
   suppfilenames <- read_rds(suppfilenames)
@@ -23,11 +23,19 @@ filter_suppfilenames <- function(suppfilenames, suppfilenames_filtered_out) {
   suppfilenames_filtered <- suppfilenames_unnested %>%
     filter(!str_detect(tolower(files), str_c(out_string1, collapse = "|")),
            !str_detect(tolower(files), str_c(out_string2, "(\\.gz|\\.bz2)?$", 
-                                             collapse = "|")))
+                                             collapse = "|"))) %>% 
+    ungroup()
   
-  write_rds(suppfilenames_filtered, suppfilenames_filtered_out)
+  # 639 series matrix files are downloaded from supplementary files folder, relabel them as matrix files
+  suppfilenames_filtered  <- mutate(suppfilenames_filtered, 
+                                    type = case_when(
+                                      str_detect(files, "series_matrix.txt.gz$") ~ "matrix",
+                                      TRUE ~ "suppl"
+                                    ))
+  
+  write_rds(suppfilenames_filtered, outpath)
 }
 
-filter_suppfilenames(snakemake@input[["suppfilenames"]], 
-                     snakemake@output[["suppfilenames_filtered_out"]])
+filter_suppfilenames(snakemake@input[[1]], 
+                     snakemake@output[[1]])
 

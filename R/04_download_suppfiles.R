@@ -2,24 +2,21 @@
 pacman::p_load(tidyverse)
 pacman::p_load_gh("tpall/entrezquery")
 
-download_suppfiles <- function(data_path) {
+download_suppfiles <- function(suppfilenames_filtered) {
   
-  sfn <- read_rds(data_path)
+  suppfilenames_filtered <- read_rds(suppfilenames_filtered)
   
   # Filter out local files
   local_matrix_files <- list.files("output/matrix")
   local_suppl_files <- list.files("output/suppl")
   
-  sfn_missing <- sfn %>% 
-    filter(!(files %in% c(local_suppl_files, local_matrix_files)))
+  suppfilenames_tobe_downloaded <- filter(suppfilenames_filtered, !(files %in% c(local_suppl_files, local_matrix_files)))
   
   # Safe wrap download function
   safe_download <- safely(~ download_gsefile(.x, dest = "output"))
   
   # Start download
-  sfn_missing %>% 
-    ungroup() %>% 
-    mutate(d = map(files, safe_download))
+  mutate(suppfilenames_tobe_downloaded, d = map(files, safe_download))
 }
 
 download_suppfiles(snakemake@input[[1]])

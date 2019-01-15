@@ -1,6 +1,6 @@
 # Download and install gridDiagram from 
 # https://www.stat.auckland.ac.nz/~paul/R/Diagram/gridDiagram_0.2-1.tar.gz
-if (!pacman::p_isinstalled("gridDiagram")) {
+if (!require("gridDiagram")) {
   install.packages("https://www.stat.auckland.ac.nz/~paul/R/Diagram/gridDiagram_0.2-1.tar.gz", 
                    repos = NULL, 
                    type = "source") 
@@ -10,6 +10,7 @@ library(gridDiagram)
 
 # Draw boxes --------------------------------------------------------------
 
+if (!dir.exists("figures")) dir.create("figures")
 svg("figures/diagram.svg", width = 9, height = 2)
 
 grid.box("GEO series", sum(table(ds_redline$model)), 
