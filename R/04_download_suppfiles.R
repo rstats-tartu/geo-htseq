@@ -1,6 +1,6 @@
 
-pacman::p_load(tidyverse)
-pacman::p_load_gh("tpall/entrezquery")
+library(tidyverse)
+library(entrezquery)
 
 download_suppfiles <- function(suppfilenames_filtered) {
   

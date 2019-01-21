@@ -1,7 +1,7 @@
 
 # Load libs
 source("R/_common.R")
-pacman::p_load(entrezquery)
+library(entrezquery)
 
 download_suppfilenames <- function(data_path, out_path, last_date) {
   
