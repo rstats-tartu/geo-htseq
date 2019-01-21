@@ -144,7 +144,7 @@ p_values_bm <- p_values_bm %>%
          srp = map(pvalues, safe_srp),
          srp = map(srp, "result"))
 
-# Filter out sets with supposedly bad sets of P values
+# Identify pvalue sets with low pi0
 p_values <- p_values %>% 
   filter(features > nrowthreshold,
          pi0 > pi0threshold)
@@ -152,6 +152,41 @@ p_values <- p_values %>%
 p_values_bm <- p_values_bm %>% 
   filter(features > nrowthreshold,
          pi0 > pi0threshold)
+
+# Identify pvalue sets with low pi0
+p_values_low <- p_values %>% 
+  filter(features > nrowthreshold,
+         pi0 <= pi0threshold)
+p_values_bm_low <- p_values_bm %>% 
+  filter(features > nrowthreshold,
+         pi0 <= pi0threshold)
+
+p_values_low <- select(p_values,Accession, suppdata_id)
+p_values_low <- p_values_low %>%
+  mutate(type = 6)
+write_csv(p_values_low, "output/histogram_classes_all_efects.csv")
+
+p_values_bm_low <- select(p_values_bm,Accession, suppdata_id)
+p_values_bm_low <- p_values_bm_low %>%
+  mutate(type = 6)
+write_csv(p_values_bm_low, "output/histogram_classes_all_efects_filtered.csv")
+
+# Filter out sets with supposedly bad sets of P values
+
+#p_values <- p_values %>% 
+#  filter(features > nrowthreshold,
+#         pi0 > pi0threshold)
+#
+#p_values_bm <- p_values_bm %>% 
+#  filter(features > nrowthreshold,
+#         pi0 > pi0threshold)
+
+p_values <- p_values %>% 
+  filter(features > nrowthreshold)
+
+p_values_bm <- p_values_bm %>% 
+  filter(features > nrowthreshold)
+
 
 ## ---- pi0hist -----
 
