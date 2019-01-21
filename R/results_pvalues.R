@@ -152,12 +152,12 @@ p_values_bm_low <- p_values_bm %>%
   filter(features > nrowthreshold,
          pi0 <= pi0threshold)
 
-p_values_low <- select(p_values,Accession, suppdata_id)
+p_values_low <- select(p_values,Accession, suppdata_id, pi0)
 p_values_low <- p_values_low %>%
   mutate(type = 6)
 write_csv(p_values_low, "output/histogram_classes_all_efects.csv")
 
-p_values_bm_low <- select(p_values_bm,Accession, suppdata_id)
+p_values_bm_low <- select(p_values_bm,Accession, suppdata_id, pi0)
 p_values_bm_low <- p_values_bm_low %>%
   mutate(type = 6)
 write_csv(p_values_bm_low, "output/histogram_classes_all_efects_filtered.csv")
