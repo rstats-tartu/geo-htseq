@@ -145,15 +145,6 @@ p_values_bm <- p_values_bm %>%
          srp = map(srp, "result"))
 
 # Identify pvalue sets with low pi0
-p_values <- p_values %>% 
-  filter(features > nrowthreshold,
-         pi0 > pi0threshold)
-
-p_values_bm <- p_values_bm %>% 
-  filter(features > nrowthreshold,
-         pi0 > pi0threshold)
-
-# Identify pvalue sets with low pi0
 p_values_low <- p_values %>% 
   filter(features > nrowthreshold,
          pi0 <= pi0threshold)
@@ -285,7 +276,7 @@ treecut <- data_frame(histclus = map_chr(treecut, ~ barcolors[.x]))
 p_values <- p_values %>% bind_cols(treecut)
 
 spark_table <- p_values %>%
-  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/44), plot = FALSE)$counts),
+  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/40), plot = FALSE)$counts),
          pi0 = digits(pi0, 2)) %>%
   unnest(values) %>%
   group_by(Accession, suppdata_id, pi0, histclus) %>%
@@ -295,7 +286,7 @@ spark_table <- p_values %>%
                                 type = "bar"))
 
 spark_table_bm <- p_values_bm %>%
-  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/44), plot = FALSE)$counts),
+  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/40), plot = FALSE)$counts),
          pi0 = digits(pi0, 2)) %>%
   unnest(values) %>%
   group_by(Accession, suppdata_id, pi0) %>%
@@ -303,17 +294,17 @@ spark_table_bm <- p_values_bm %>%
                                 chartRangeMin = 0,
                                 type = "bar"))
 
-# Save pvalue histograms in 44 bin format
+# Save pvalue histograms in 40 bin format
 # Used for classification with maschine learning approach
 
 spark_table_write <- p_values %>%
-  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/44), plot = FALSE)$counts)) %>%
+  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/40), plot = FALSE)$counts)) %>%
   mutate(values = map(values, ~ .x/sum(.x))) %>%
   select(Accession,suppdata_id,annot,values)
 write_rds(spark_table_write,"output/pvalue_spark_bins.rds")
 
 spark_table_write <- p_values_bm %>%
-  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/44), plot = FALSE)$counts)) %>%
+  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/40), plot = FALSE)$counts)) %>%
   mutate(values = map(values, ~ .x/sum(.x))) %>%
   select(Accession,suppdata_id,annot,values)
 write_rds(spark_table_write,"output/pvalue_bm_spark_bins.rds")
@@ -348,8 +339,9 @@ his <- his %>%
   select(Accession, suppdata_id, code) %>% 
   distinct() %>% 
   mutate(type = case_when(
-    str_detect(code, "2") ~ 2,
     str_detect(code, "6") ~ 3,
+    str_detect(code, "2") & str_detect(code, "1") ~ 5,
+    str_detect(code, "2") ~ 2,
     code == 1 ~ 1,
     code == 0 ~ 0,
     suppdata_id == "GSE90615_DifferentialExpression.xlsx-sheet-1dP-MI_vs_Sfrp2_12dP-MI" ~ 4,
@@ -365,8 +357,9 @@ his_bm <- read_delim("data/pvalue_histogram_codes_after_filtering.csv", delim = 
 his_bm <- select(his_bm, Accession, `Supplementary file name`, `True nulls proportion filtered`, code_after_filter)
 his_bm <- distinct(his_bm) %>% 
   mutate(type = case_when(
-    str_detect(code_after_filter, "2") ~ 2,
     str_detect(code_after_filter, "6") ~ 3,
+    str_detect(code_after_filter, "2") & str_detect(code_after_filter, "1") ~ 5,
+    str_detect(code_after_filter, "2") ~ 2,
     code_after_filter == 1 ~ 1,
     code_after_filter == 0 ~ 0,
     TRUE ~ 4
@@ -382,7 +375,8 @@ spark_table <- spark_table %>%
          'Supplementary file name' = suppdata_id,
          'Type' = typetext) %>% 
   arrange(Accession) %>% 
-  distinct()
+  distinct() #%>% 
+  #filter(!map_int(Type,is.na)) #if you want to show only manually classified stuff
 
 # Save empty table for manual classification. 
 if (!any(str_detect(list.files("output"), "pvalue_histogram_classes.csv"))) {
@@ -445,25 +439,34 @@ type_conversion_rate %>%
 
 pv_hist_caption <- glue::glue("P value histograms and proportion of true nulls. Histograms are colored according to clustering of their empirical cumulative distribution function outputs. Supplementary file names for tables from xls(x) files might be appended with sheet name. This table contains {nrow(spark_table)} unique P value histograms from {length(unique(spark_table$'Supplementary file name'))} supplementary tables related to {length(unique(spark_table$Accession))} GEO Accessions.")
 
-spark_table_bm_renamed <- spark_table_bm %>% 
+spark_table_bm_renamed <- spark_table_bm %>%
   rename('P value histogram,\nfiltered' = Histogram,
-       'True nulls proportion,\nfiltered' = pi0,
-       'Supplementary file name' = suppdata_id) %>% 
+         'True nulls proportion,\nfiltered' = pi0,
+         'Supplementary file name' = suppdata_id) %>%
+  ungroup() %>% 
+  left_join(his_bm) %>%
+  rename('Type,\nfiltered' = typetext) %>%
   arrange(Accession) %>% 
-  distinct()
+  distinct() #%>%
+  #filter(!map_int('Type,\nfiltered',is.na)) #used to show only manually classified sets
 
-pvalue_spark <- left_join(spark_table, spark_table_bm_renamed) %>% 
+## type and comment has to be removed to avoid conflict between spark_table and spark_table_bm_renamed  
+pvalue_spark <- left_join(select(spark_table,-type,-comment),
+                          select(spark_table_bm_renamed,-type,-comment)) %>%
   select(Accession, 
          `Supplementary file name`, 
          `P value histogram`, 
          Type, 
          `True nulls proportion`,
          `P value histogram,\nfiltered`,
+         `Type,\nfiltered`,
          `True nulls proportion,\nfiltered`) 
 
 pvalue_spark %>% 
   select(-matches("histogram")) %>%
   write_csv("output/pvalue_spark_table.csv")
+
+#pvalue_spark <- arrange(pvalue_spark, Type)
 
 (pvalue_spark <- pvalue_spark %>%
   knitr::kable("html", escape = FALSE, caption = pv_hist_caption) %>%
