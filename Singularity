@@ -20,8 +20,8 @@ From: tpall/singularity-r:3.5.2
   Rscript -e "BiocManager::install(c('GEOquery','Biobase','limma','ggtree'),update=FALSE,ask=FALSE)"
 
   # Install Github packages
-  Rscript -e "devtools::install_github("tpall/SRP")"
-  Rscript -e "devtools::install_github("tpall/entrezquery")"
+  Rscript -e "devtools::install_github('tpall/SRP')"
+  Rscript -e "devtools::install_github('tpall/entrezquery')"
 
   # Clean up
   rm -rf /var/lib/apt/lists/*
