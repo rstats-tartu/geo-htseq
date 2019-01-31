@@ -10,7 +10,12 @@ From: tpall/singularity-r:3.5.2
 %post
   # Install dependencies
   apt-get update
-  apt-get install -y unzip 
+  apt-get install -y \
+    unzip \
+    xorg \
+    libx11-dev \
+    libglu1-mesa-dev \
+    libfreetype6-dev
   
   # Install CRAN packages
   Rscript -e "install.packages(c('bookdown','XML','devtools','ggplot2','purrr','tibble','dplyr','tidyr','stringr','readr','lubridate','glue','formattable','gridExtra','gridBase','viridis','knitr','ape','data.table','kableExtra','sparkline','evaluate','hexbin','broom','readxl','digest','tidyverse','BiocManager'), repos = 'https://cloud.r-project.org', dependencies = TRUE)"
