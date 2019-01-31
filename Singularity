@@ -27,6 +27,9 @@ From: tpall/singularity-r:3.5.2
   # Install Github packages
   Rscript -e "devtools::install_github('tpall/SRP')"
   Rscript -e "devtools::install_github('tpall/entrezquery')"
+  
+  # Install gridDiagram
+  Rscript -e  "install.packages('https://www.stat.auckland.ac.nz/~paul/R/Diagram/gridDiagram_0.2-1.tar.gz', repos = NULL, type = 'source')" 
 
   # Clean up
   rm -rf /var/lib/apt/lists/*
