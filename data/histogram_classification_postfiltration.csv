@@ -1,0 +1,55 @@
+Accession,suppdata_id,pi0,Type
+GSE39605,GSE39605_All_KOvsWT_filtered_final.xlsx.gz-sheet-All_KOvsWT_filtered,0.999914,other
+GSE40218,GSE40218_processed_DESeq.txt.gz,0.893395,anti-conservative
+GSE55870,GSE55870_CAF90vsNF1493.xlsx.gz,0.999614,other
+GSE61336,GSE61336_results_167_vs_WTL.txt.gz,0.418877,anti-conservative
+GSE61336,GSE61336_results_167_vs_WTZ.txt.gz,0.413778,anti-conservative
+GSE61336,GSE61336_results_WTL_vs_WTZ.txt.gz,0.985689,anti-conservative
+GSE63091,GSE63091_diffana_DESeq_GFP-4A3-Y14_MLN51-UPF1.Ensembl65.tsv.gz,0.943176,anti-conservative
+GSE63091,GSE63091_diffana_DESeq_GFP-4A3-Y14_MLN51-UPF1.Ensembl65.tsv.gz,0.994995,anti-conservative
+GSE63091,GSE63091_diffana_DESeq_GFP-4A3-Y14_MLN51-UPF1.Ensembl65.tsv.gz,0.999313,other
+GSE63091,GSE63091_diffana_DESeq_GFP-4A3-Y14_MLN51-UPF1.Ensembl65.tsv.gz,0.998871,other
+GSE63750,GSE63750_chemhigh-batch-result-using-R-DeSeq.csv.gz,0.984892,other
+GSE63750,GSE63750_chemlow-batch-result-using-R-DeSeq.csv.gz,0.991698,other
+GSE65328,GSE65328_A17_6V.tab.gz,0.918161,anti-conservative
+GSE65406,GSE65406_control_vs_gld1_DESeq.csv.gz,0.998081,other
+GSE66148,GSE66148_NC_v_CNS.txt.gz,0.273893,anti-conservative
+GSE66148,GSE66148_NC_v_CNS.txt.gz,0.236473,anti-conservative
+GSE66148,GSE66148_NC_v_CNS.txt.gz,0.281224,anti-conservative
+GSE70382,GSE70382_DESeq_allresp_vs_nonresp.xlsx-sheet-Blad1,0.999749,other
+GSE74103,GSE74103_Tobacco_FS_v_WT_DESeq_refGene.all.annotated.txt.gz,0.526337,anti-conservative
+GSE74103,GSE74103_Tobacco_G1_v_WT_DESeq_refGene.all.annotated.txt.gz,0.267378,anti-conservative
+GSE74103,GSE74103_Tobacco_GS_v_WT_DESeq_refGene.all.annotated.txt.gz,0.229954,anti-conservative
+GSE74920,GSE74920_SupplementalTable1.xlsx.gz,0.332956,anti-conservative
+GSE74920,GSE74920_SupplementalTable3.xlsx.gz,0.458699,anti-conservative
+GSE74993,GSE74993_SupplementalTables.xlsx-sheet-Table S1,0.332956,anti-conservative
+GSE75833,GSE75833_DESeq-processed_FB.control_vs_BR.txt.gz,0.142250,anti-conservative
+GSE77351,GSE77351_Farshchian.txt.gz,0.885021,anti-conservative
+GSE80128,GSE80128_P035_DESeq_KO-WT_pathway.txt.gz,0.802974,anti-conservative
+GSE80135,GSE80135_Lipo_siProx_sig_results.csv.gz,0.733512,anti-conservative
+GSE80135,GSE80135_siNeg_Lipo_results.csv.gz,0.765982,anti-conservative
+GSE81043,GSE81043_sh109_final_unique_DESeq_InfFixed_DiffExp.xlsx.gz,0.136011,anti-conservative
+GSE81593,GSE81593_1.Mcf10A_p53delVec_and_p53delHras.xlsx,0.360176,anti-conservative
+GSE81593,GSE81593_2.Mcf10A_Vec_and_Hras.xlsx,0.629803,anti-conservative
+GSE85329,GSE85329_IGF_project_IGF_results.txt.gz,0.550178,anti-conservative
+GSE85554,GSE85554_deg_and_counts_table_new_read_counts.txt.gz,0.893159,anti-conservative
+GSE85627,GSE85627_mDUX-mESC.xlsx.gz-sheet-Sorted,0.183600,anti-conservative
+GSE85627,GSE85627_mDUX-mESC.xlsx.gz-sheet-Transient,0.999702,other
+GSE85627,GSE85627_mDUX-mESC.xlsx.gz-sheet-Unsorted,0.158886,anti-conservative
+GSE85847,GSE85847_matrix_rnaseq_GEO_submission_jsantos20160817.txt.gz,0.566132,anti-conservative
+GSE87706,GSE87706_SM_vs_RODI.txt.gz,0.134417,anti-conservative
+GSE89004,GSE89004_ppGpp0_vs_H78_differential_all.xls.gz,0.214381,anti-conservative
+GSE89773,GSE89773_combined_expression_table.txt.gz,0.211405,anti-conservative
+GSE89773,GSE89773_combined_expression_table.txt.gz,0.264938,anti-conservative
+GSE90889,GSE90889_geo_hiPSC-RPE_Vehicle_vs_NAM.xlsx,0.645568,anti-conservative
+GSE90977,GSE90977_RNA_seq_COMPLETE_4_4_SETS_DEFINITIVE.xlsx.gz-sheet-120 dpi,0.373604,anti-conservative
+GSE90977,GSE90977_RNA_seq_COMPLETE_4_4_SETS_DEFINITIVE.xlsx.gz-sheet-180 dpi,0.828413,anti-conservative
+GSE94512,GSE94512_NaPi_vs_Lys.txt.gz,0.977567,anti-conservative
+GSE96814,GSE96814_Deseq_TotRNA.xlsx-sheet-Feuil1,0.998575,other
+GSE96814,GSE96814_Deseq2_MS2RsaA.xlsx-sheet-Feuil1,0.999340,other
+GSE96999,GSE96999_DESeq2_miseq_output.txt.gz,0.229398,anti-conservative
+GSE96999,GSE96999_DESeq2_nextseq_output.txt.gz,0.092193,anti-conservative
+GSE97525,GSE97525_Dm_AKHR_F2_RNA-seq.xlsx-sheet-PM vs WT,0.999990,other
+GSE97525,GSE97525_Dm_AKHR_F2_RNA-seq.xlsx-sheet-PP vs PM,0.999992,other
+GSE97525,GSE97525_Dm_AKHR_F2_RNA-seq.xlsx-sheet-PP vs WT,0.999929,other
+GSE98869,GSE98869_diffexp.tsv.gz,0.999366,other
