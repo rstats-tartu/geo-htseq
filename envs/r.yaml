@@ -10,7 +10,7 @@ dependencies:
   - r-base
   - r-bookdown
   - r-xml
-  - r-devtools
+  - r-remotes
   - r-ggplot2=3.1.0
   - r-purrr=0.2.5
   - r-tibble=1.4.2

@@ -31,11 +31,11 @@ library(devtools)
 options(unzip = "internal")
 
 if (!require(SRP)) {
-        devtools::install_github("tpall/SRP")
+        remotes::install_github("tpall/SRP")
 }
 
 if (!require(entrezquery)) {
-        devtools::install_github("tpall/entrezquery")
+        remotes::install_github("tpall/entrezquery")
 }
 
 library(entrezquery)
