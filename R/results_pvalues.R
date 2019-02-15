@@ -106,8 +106,8 @@ grid.draw(pga)
 # plot geo series with p values size distribution over all series
 
 # ad hoc filter to remove uninformative features with less than 100 counts per 1M reads on average
-p_values_bm <- mutate(p_value_dims, 
-                     basemean = map(pvalues, "basemean"),
+p_values_bm <- p_value_dims %>% 
+  mutate(basemean = map(pvalues, "basemean"),
                      basemean = map_lgl(basemean, ~ !all(is.na(.x)))) %>% 
   filter(basemean) %>%
   mutate(pvalues = map(pvalues, make_unique_colnames),
@@ -122,9 +122,62 @@ p_values <- p_value_dims %>%
          pvalues = map(pvalues, as.list)) %>% 
   select(Accession, suppfiles, suppdata_id, annot, features, columns, samples, pvalues)
 
-p_values <- unnest_listcol(p_values, pvalues)
+#' Some tables (53) have multiple columns with p-values, we need to assign 
+#' unique ids to these p-value sets and respectively update suppdata_ids.
+# add id counts
+p_values_suppdata_id <- p_values %>% 
+  group_by(suppdata_id) %>% 
+  add_count()
 
-p_values_bm <- unnest_listcol(p_values_bm, pvalues)
+p_values_bm_suppdata_id <- p_values_bm %>% 
+  group_by(suppdata_id) %>% 
+  add_count()
+
+# accessions with multiple annotations
+multi_annot <- p_values_suppdata_id %>% 
+  filter(n > 1) %>%
+  mutate(annot = str_c(annot, collapse = ",")) %>% 
+  slice(1)
+
+multi_annot_bm <- p_values_bm_suppdata_id %>% 
+  filter(n > 1) %>%
+  mutate(annot = str_c(annot, collapse = ",")) %>% 
+  slice(1)
+
+# accessions with single annotation
+single_annot <- p_values_suppdata_id %>% 
+  filter(n == 1)
+
+single_annot_bm <- p_values_bm_suppdata_id %>% 
+  filter(n == 1)
+
+p_values <- bind_rows(single_annot, multi_annot) %>% 
+  select(-n) %>% 
+  ungroup() %>% 
+  mutate(pvalues = map(pvalues, ~tibble(set = names(.x), pvalues = .x))) %>% 
+  unnest(pvalues) %>% 
+  add_count(suppdata_id) %>% 
+  mutate(set = str_extract(set, "\\d+"),
+         set = case_when(
+           is.na(set) ~ "0",
+           TRUE ~ set
+         ),
+         suppdata_id = if_else(n > 1, str_c(suppdata_id, "-set-", set), suppdata_id)) %>% 
+  select(-set, -n)
+
+p_values_bm <- bind_rows(single_annot_bm, multi_annot_bm) %>% 
+  select(-n) %>% 
+  ungroup() %>% 
+  mutate(pvalues = map(pvalues, ~tibble(set = names(.x), pvalues = .x))) %>% 
+  unnest(pvalues) %>% 
+  add_count(suppdata_id) %>% 
+  mutate(set = str_extract(set, "\\d+"),
+         set = case_when(
+           is.na(set) ~ "0",
+           TRUE ~ set
+         ),
+         suppdata_id = if_else(n > 1, str_c(suppdata_id, "-set-", set), suppdata_id)) %>% 
+  select(-set, -n)
 
 #' Filter out one dataset with pvalue threshold info (logical)
 #' and datasets where number of features is less than nrowthreshold
@@ -260,7 +313,7 @@ p_values <- p_values %>% bind_cols(treecut)
 
 spark_table <- p_values %>%
   mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/40), plot = FALSE)$counts),
-         pi0 = as.character(digits(pi0, 6))) %>%
+         pi0 = digits(pi0, 2)) %>%
   unnest(values) %>%
   group_by(Accession, suppdata_id, pi0, histclus) %>%
   summarise(Histogram = spk_chr(values,
@@ -270,7 +323,7 @@ spark_table <- p_values %>%
 
 spark_table_bm <- p_values_bm %>%
   mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/40), plot = FALSE)$counts),
-         pi0 = as.character(digits(pi0, 6))) %>%
+         pi0 = digits(pi0, 2)) %>%
   unnest(values) %>%
   group_by(Accession, suppdata_id, pi0) %>%
   summarise(Histogram = spk_chr(values,
@@ -282,14 +335,14 @@ spark_table_bm <- p_values_bm %>%
 
 spark_table_write <- p_values %>%
   mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/40), plot = FALSE)$counts),
-         pi0 = as.character(digits(pi0, 6))) %>%
+         pi0 = digits(pi0, 2)) %>%
   mutate(values = map(values, ~ .x/sum(.x))) %>%
   select(Accession,suppdata_id,pi0,annot,values)
 write_rds(spark_table_write,"output/pvalue_spark_bins.rds")
 
 spark_table_write <- p_values_bm %>%
   mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/40), plot = FALSE)$counts),
-         pi0 = as.character(digits(pi0, 6))) %>%
+         pi0 = digits(pi0, 2)) %>%
   mutate(values = map(values, ~ .x/sum(.x))) %>%
   select(Accession,suppdata_id,pi0,annot,values)
 write_rds(spark_table_write,"output/pvalue_bm_spark_bins.rds")
@@ -313,7 +366,7 @@ his_bm <- his_all %>%
          Type = `Type filtered`) %>%
   filter(!is.na(Type))
 
-his<- his_all %>%
+his <- his_all %>%
   select(Accession,
          suppdata_id = `Supplementary file name`,
          pi0 = `True nulls proportion`,
@@ -342,7 +395,7 @@ his_bm <- his_post
 # Merge with classes and generate output table
 spark_table <- spark_table %>%
   ungroup() %>% 
-  left_join(his) %>%
+  left_join(select(his, -pi0)) %>%
   arrange(Accession) %>% 
   distinct() %>%
   #mutate(Type = replace(Type,as.numeric(pi0) <= pi0threshold, "all_effects")) %>%
@@ -388,7 +441,7 @@ type_conversion_rate <- left_join(select(spark_table, Accession, `Supplementary 
 # Merge with classes and generate output table
 spark_table_bm_renamed <- spark_table_bm %>%
   ungroup() %>% 
-  left_join(his_bm) %>%
+  left_join(select(his_bm, -pi0)) %>%
   #mutate(Type = replace(Type,as.numeric(pi0) <= pi0threshold, "all_effects")) %>%
   rename('P value histogram,\nfiltered' = Histogram,
          'True nulls proportion,\nfiltered' = pi0,
@@ -459,7 +512,6 @@ value_spark <- arrange(pvalue_spark, Type)
   kable_styling(full_width = FALSE))
 
 write_rds(pvalue_spark, "output/pvalue_spark_table.rds")
-
 
 # srp stats ---------------------------------------------------------------
 
