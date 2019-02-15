@@ -19,7 +19,7 @@ st_unnested <- unnest(st_unnested, sheets)
 st_unnested <- st_unnested %>% 
   mutate(suppdata_id = case_when(
     str_length(sheets) > 0 ~ str_c(suppfiles, "-sheet-", sheets),
-    str_length(sheets) == 0 ~ suppfiles
+    TRUE ~ suppfiles
   ))
 
 ## Let's use gsem table
@@ -37,12 +37,12 @@ gsem <- gsem %>%
          annot = map_chr(series_matrix, annotation)) %>% 
   select(Accession, annot, series_matrix, samples, everything())
 
-## Match samples to right table/assay 
+## Match samples to correct table/assay 
 dims <- left_join(st_unnested, gsem) %>%
   group_by(suppdata_id) %>%
   mutate(idcols = columns - samples) %>%
-  filter(idcols >= 0, idcols == min(idcols)) %>%
-  ungroup %>%
+  filter(idcols >= 0, min_rank(idcols) == 1) %>%
+  ungroup() %>%
   select(-series_matrix_file)
 
 group_by(dims, samples) %>% 
@@ -51,10 +51,11 @@ group_by(dims, samples) %>%
 
 n_samples <- summarise_at(dims, 
                           vars(samples, features), 
-                          funs(mean, median, Mode, min, max))
+                          list(mean = mean, median = median, Mode = Mode, min = min, max = max))
 
-#' Datasets with p values
-p_value_dims <- filter(dims, !map_lgl(pvalues, is.null), 
+# Filter datasets with p values
+p_value_dims <- filter(dims, 
+                       !map_lgl(pvalues, is.null), 
                        !map_lgl(pvalues, inherits, "try-error"))
 
 ## ---- plotdims -----
@@ -71,7 +72,7 @@ dims_tabp <- ggplot() +
 legend <- g_legend(dims_tabp)
 dims_tabp <- dims_tabp + theme(legend.position = "none")
 
-n_imported_sets <- length(unique(dims$Accession))
+n_imported_sets <- n_distinct(dims$Accession)
 
 dims_featuresp <- dims %>%
   ggplot(aes(log10(features))) + 
