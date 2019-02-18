@@ -19,6 +19,10 @@
 library(readr)
 library(dplyr)
 library(randomForest)
+library(rsample)
+library(recipes)
+library(parsnip)
+library(yardstick)
 source("R/_common.R")
 
 # Histogram types summary table
@@ -106,7 +110,7 @@ pvalues_coded <- pvalues_bins %>%
   filter(!is.na(Type))
 
 pvalues_bm_coded <- pvalues_bm_bins %>%
-  left_join(his_bm) %>%
+  left_join(his_bm) %>% 
   filter(!is.na(Type))
 
 # Combine pvalue datasets and convert type text to factor
@@ -116,51 +120,52 @@ pvalues_all_coded <- bind_rows(pvalues_coded, pvalues_bm_coded) %>%
 # RANDOM FOREST ---- CREATE CLASSIFICATION MODEL -----------------------------
 
 # Splitting the dataset into train and validation set in the ratio 70:30
-train <- sample(nrow(pvalues_all_coded), 0.7*nrow(pvalues_all_coded), replace = FALSE)
-TrainSet <- pvalues_all_coded[train,]
-ValidSet <- pvalues_all_coded[-train,]
-summary(TrainSet)
-summary(ValidSet)
+set.seed(11)
+data_split <- select(pvalues_all_coded, pi0:Type) %>%
+  select(Type, everything()) %>% 
+  initial_split(p = 0.8)
+train <- training(data_split)
+test <- testing(data_split)
+   
+pvalue_train <- recipe(Type ~ ., data = train) %>%
+  prep(training = train, retain = TRUE)
 
- #Using For loop to identify the right mtry for model
-   a=c()
-   for (i in 3:40) {
-     model1 <- randomForest(Type ~ ., data = TrainSet, ntree = 500, mtry = i, importance = TRUE)
-     predValid <- predict(model1, ValidSet, type = "class")
-     a[i-2] = mean(predValid == ValidSet$Type)
-   }
-   a
-   plot(3:40,a)
-
-# Maximum or near maximum mtry seams to work well in most of the times. Sometimes the maximum is at 10-20 mtry,
+# Maximum or near maximum mtry seems to work well in most of the times. Sometimes the maximum is at 10-20 mtry,
 # and it seams to depend from the random nature of creation of training set.
 # Probable reason seams to be the (difficult and therefore non stable) classification of spiky histograms. 
 # As there are not many spiky histograms (and many of them are not correctly assigned) they tend to be distributed
 # between training and validation sets differently in different runs. 
 # It Will continue with near maximum mtry. This migth allowe more better to replace the wrong classification
 # of filtered datasets later.
+rf_fit <- 
+  rand_forest(mode = "classification", mtry = .preds(), trees = 3000) %>%
+  set_engine("ranger") %>% 
+  fit(Type ~ ., data = juice(pvalue_train))
+test_results <- test %>%
+  select(Type) %>%
+  as_tibble() %>% 
+  mutate(
+    `rf class` = predict_class(rf_fit, new_data = test)
+  ) %>% 
+  bind_cols(predict_classprob(rf_fit, new_data = test))
+test_results %>% roc_auc(Type, `anti-conservative`:uniform)
+test_results %>% accuracy(Type, `rf class`)
+test_results %>% conf_mat(Type, `rf class`)
 
-model2 <- randomForest(Type ~ ., data = TrainSet, mtry = 40, ntree = 2000, importance = TRUE)
-model2
-
-# Predicting on train set
-predTrain <- predict(model2, TrainSet, type = "class")
-mean(predTrain == TrainSet$Type)
-# Checking classification accuracy
-table(predTrain, TrainSet$Type)
-
-# Predicting on Validation set
-predValid <- predict(model2, ValidSet, type = "class")
-# Checking classification accuracy
-mean(predValid == ValidSet$Type)                    
-table(predValid,ValidSet$Type)
-
-# Predicting on full set
-predValid <- predict(model2, pvalues_all_coded, type = "class")
-# Checking classification accuracy
-mean(predValid == pvalues_all_coded$Type)                    
-table(predValid,pvalues_all_coded$Type)
-
+fit <- 
+  boost_tree(mode = "classification", mtry = .preds(), trees = 100, min_n = 8) %>%
+  set_engine("xgboost") %>% 
+  fit(Type ~ ., data = juice(pvalue_train))
+test_results <- test %>%
+  select(Type) %>%
+  as_tibble() %>% 
+  mutate(
+    class = predict_class(fit, new_data = test)
+  ) %>% 
+  bind_cols(predict_classprob(fit, new_data = test))
+test_results %>% roc_auc(Type, `anti-conservative`:uniform)
+test_results %>% accuracy(Type, class)
+test_results %>% conf_mat(Type, class)
 
 # PREDICT AND ADD CLASSIFICATION -----------------------------------------------------
 
