@@ -1,11 +1,10 @@
 
 # Load libs
 source("R/_common.R")
-
 # Import of tabular supplementary files -----------------------------------
 
 ## ---- loadst -----
-st <- readRDS("output/suppdata.rds")
+st <- read_rds(here("output/suppdata.rds"))
 
 # imported files
 imported_geos <- select(st, Accession) %>%  n_distinct()
@@ -23,7 +22,7 @@ st_unnested <- st_unnested %>%
   ))
 
 ## Let's use gsem table
-gsem <- readRDS("output/gsem.rds")
+gsem <- read_rds(here("output/gsem.rds"))
 
 # Pull out series matrixes
 gsem <- mutate(gsem, series_matrix = map(gse, "result"))
@@ -47,7 +46,7 @@ dims <- left_join(st_unnested, gsem) %>%
 
 group_by(dims, samples) %>% 
   summarise(N = n()) %>% 
-  write_csv("output/number_of_samples_in_geo.csv")
+  write_csv(here("output/number_of_samples_in_geo.csv"))
 
 n_samples <- summarise_at(dims, 
                           vars(samples, features), 
@@ -337,14 +336,14 @@ spark_table_write <- p_values %>%
          pi0 = digits(pi0, 2)) %>%
   mutate(values = map(values, ~ .x/sum(.x))) %>%
   select(Accession,suppdata_id,pi0,annot,values)
-write_rds(spark_table_write,"output/pvalue_spark_bins.rds")
+write_rds(spark_table_write, here("output/pvalue_spark_bins.rds"))
 
 spark_table_write <- p_values_bm %>%
   mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/40), plot = FALSE)$counts),
          pi0 = digits(pi0, 2)) %>%
   mutate(values = map(values, ~ .x/sum(.x))) %>%
   select(Accession,suppdata_id,pi0,annot,values)
-write_rds(spark_table_write,"output/pvalue_bm_spark_bins.rds")
+write_rds(spark_table_write, here("output/pvalue_bm_spark_bins.rds"))
 
 # Curated p value histogram classes ---------------------------------------
 
@@ -353,7 +352,7 @@ write_rds(spark_table_write,"output/pvalue_bm_spark_bins.rds")
 #types_legend <- read_csv("data/pvalue_hist_types.csv")
 
 # Load manually assigned classes
-his_all <- read_delim("data/pvalue_hist_UM_190121.csv", 
+his_all <- read_delim(here("data/pvalue_hist_UM_190121.csv"), 
                       delim = ",", 
                       locale = locale(decimal_mark = ","))
 # Code used to identify rows for fixing in data/pvalue_hist_UM_190121.csv
@@ -381,13 +380,9 @@ his <- his_all %>%
   filter(!is.na(Type))
 
 # Read in classifications from random forest.
-his_pre <- read_delim("data/histogram_classification_prefiltration.csv", 
-                      delim = ",", 
-                      locale = locale(decimal_mark = ",")) 
+his_pre <- read_csv(here("data/histogram_classification_prefiltration.csv")) 
 
-his_post <- read_delim("data/histogram_classification_postfiltration.csv", 
-                       delim = ",", 
-                       locale = locale(decimal_mark = ",")) 
+his_post <- read_csv(here("data/histogram_classification_postfiltration.csv")) 
 
 # combine classifications and rename low pi0 to all_effects
 #his <- full_join(distinct(his),distinct(his_pre)) %>%
@@ -395,7 +390,7 @@ his_post <- read_delim("data/histogram_classification_postfiltration.csv",
 #his_bm <- full_join(distinct(his_bm),distinct(his_post)) %>%
 #  mutate(Type = replace(Type,as.numeric(pi0) <= pi0threshold, "all_effects"))
 
-# Modul to use only classification from random forest.
+# Module to use only classification from random forest.
 his <- his_pre
 his_bm <- his_post
 
@@ -405,7 +400,6 @@ spark_table <- spark_table %>%
   left_join(select(his, -pi0)) %>%
   arrange(Accession) %>% 
   distinct() %>%
-  #mutate(Type = replace(Type,as.numeric(pi0) <= pi0threshold, "all_effects")) %>%
   rename('P value histogram' = Histogram,
          'True nulls proportion' = pi0,
          'Supplementary file name' = suppdata_id) %>% 
@@ -413,10 +407,10 @@ spark_table <- spark_table %>%
   filter(!map_int(Type,is.na)) #if you want to show only classified stuff
 
 # Save empty table for manual classification. 
-if (!any(str_detect(list.files("output"), "pvalue_histogram_classes.csv"))) {
+if (!any(str_detect(list.files(here("output")), "pvalue_histogram_classes.csv"))) {
   spark_table %>% 
     select(-`P value histogram`) %>% 
-    write_excel_csv("output/pvalue_histogram_classes.csv")
+    write_excel_csv(here("output/pvalue_histogram_classes.csv"))
 }
 
 hist_types <- spark_table %>% 
@@ -429,10 +423,12 @@ hist_types <- spark_table %>%
 # Does nto work properly as for the same suppdata_id can be several sets which will get combined multiple times,
 # therefore increasing number of rows used for comparision. It means that all combinations from the same set will be 
 # compared.
-type_conversion_rate <- left_join(select(spark_table, Accession, `Supplementary file name`, Type), 
-                                  select(his_bm, Accession, `Supplementary file name` = suppdata_id, type_after_filter = Type)) %>% 
+type_conversion_rate <- 
+  left_join(
+  select(spark_table, Accession, `Supplementary file name`, Type), 
+  select(his_bm, Accession, `Supplementary file name` = suppdata_id, type_after_filter = Type)
+  ) %>% 
   filter(!is.na(type_after_filter)) %>% 
-  distinct() %>% 
   mutate(type_conversion = case_when(
     type_after_filter == Type ~ "same",
     type_after_filter != Type & type_after_filter == "anti-conservative" ~ "improvement",
@@ -449,31 +445,31 @@ type_conversion_rate <- left_join(select(spark_table, Accession, `Supplementary 
 spark_table_bm_renamed <- spark_table_bm %>%
   ungroup() %>% 
   left_join(select(his_bm, -pi0)) %>%
-  #mutate(Type = replace(Type,as.numeric(pi0) <= pi0threshold, "all_effects")) %>%
   rename('P value histogram,\nfiltered' = Histogram,
          'True nulls proportion,\nfiltered' = pi0,
          'Supplementary file name' = suppdata_id) %>%
   rename('Type,\nfiltered' = Type) %>%
   arrange(Accession) %>% 
-  distinct() %>%
-  filter(!map_int('Type,\nfiltered',is.na)) #used to show only manually classified sets
+  filter(!map_lgl(`Type,\nfiltered`, is.na)) # used to show only manually classified sets
 
-
-#This part was not correct
-#instead of his_mb spark_table_bm_renamed was used
-# this is important when reference list is bigger than actual list of sets
-his_bm_converted <- anti_join(select(spark_table_bm_renamed, Accession, `Supplementary file name`, Type = 'Type,\nfiltered'),
-                              select(spark_table, Accession, `Supplementary file name`, Type))
+# This part was not correct
+# instead of his_mb spark_table_bm_renamed was used
+# this is important when reference list is bigger than actual list of sets.
+# By using anti_join we keep only sets with Type conversion after basemean filtering.
+his_bm_converted <- 
+  anti_join(
+    select(spark_table_bm_renamed, Accession, `Supplementary file name`, Type = 'Type,\nfiltered'),
+    select(spark_table, Accession, `Supplementary file name`, Type)
+    )
 
 # This part is not very correct: sets are cross checked at the level 
-# os supplementary file names (actually suppdata_id), but often there are more than 1 set per
+# of supplementary file names (actually suppdata_id), but often there are more than 1 set per
 # suppdata_id
 hist_types_bm <- select(spark_table, Accession, `Supplementary file name`, Type) %>% 
   filter(!(`Supplementary file name` %in% his_bm_converted$`Supplementary file name`)) %>% 
-  bind_rows(his_bm_converted) #%>% 
-#  left_join(types_legend)
+  bind_rows(his_bm_converted)
 
-write_csv(hist_types_bm, "output/hist_types_after_bm_filter.csv")
+write_csv(hist_types_bm, here("output/hist_types_after_bm_filter.csv"))
 
 hist_types_bm <- hist_types_bm %>% 
   group_by(Type) %>% 
@@ -481,7 +477,11 @@ hist_types_bm <- hist_types_bm %>%
   ungroup() %>% 
   mutate(`% after filter` = percent(`N after filter` / sum(`N after filter`), digits = 1))
 
-hist_types <- left_join(hist_types, hist_types_bm)
+# Merge summary tables with pre and post filtration summaries.
+hist_types <- full_join(hist_types, hist_types_bm) 
+
+# replace NA-s (missing types) with zeros.
+hist_types[is.na(hist_types)] <- 0
 
 hist_types_caption <- "Summary of histogram types in supplementary files of GEO HT-seq submissions."
 
@@ -497,7 +497,7 @@ pv_hist_caption <- glue::glue("P value histograms and proportion of true nulls. 
 
 
 ## type and comment has to be removed to avoid conflict between spark_table and spark_table_bm_renamed  
-pvalue_spark <- left_join(spark_table,spark_table_bm_renamed) %>%
+pvalue_spark <- left_join(spark_table, spark_table_bm_renamed) %>%
   select(Accession, 
          `Supplementary file name`, 
          `P value histogram`, 
@@ -509,16 +509,16 @@ pvalue_spark <- left_join(spark_table,spark_table_bm_renamed) %>%
 
 pvalue_spark %>% 
   select(-matches("histogram")) %>%
-  write_csv("output/pvalue_spark_table.csv")
+  write_csv(here("output/pvalue_spark_table.csv"))
 
-#to group histograms by the type
+# to group histograms by the type
 value_spark <- arrange(pvalue_spark, Type) 
 
 (pvalue_spark <- pvalue_spark %>%
   knitr::kable("html", escape = FALSE, caption = pv_hist_caption) %>%
   kable_styling(full_width = FALSE))
 
-write_rds(pvalue_spark, "output/pvalue_spark_table.rds")
+write_rds(pvalue_spark, here("output/pvalue_spark_table.rds"))
 
 # srp stats ---------------------------------------------------------------
 
@@ -526,9 +526,12 @@ p_values_srp <- select(p_values, Accession, suppfiles, suppdata_id, annot, featu
   filter(map_lgl(srp, is.data.frame)) %>% 
   unnest(srp) %>% 
   rename(pi0_raw = pi0, SRP_raw = SRP, pi01_raw = pi01, fp_raw = fp, rs_raw = rs, ud_raw = ud)
+
 p_values_srp_bm <- select(p_values_bm, Accession, suppfiles, suppdata_id, annot, features, samples, pi0, srp) %>% 
   filter(map_lgl(srp, is.data.frame)) %>% 
   unnest(srp) %>% 
   rename(pi0_bm = pi0, SRP_bm = SRP, pi01_bm = pi01, fp_bm = fp, rs_bm = rs, ud_bm = ud)
+
 srp_stats <- full_join(p_values_srp, p_values_srp_bm)
-write_csv(srp_stats, "output/srp_stats.csv")
+
+write_csv(srp_stats, here("output/srp_stats.csv"))
