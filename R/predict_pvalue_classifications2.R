@@ -153,7 +153,7 @@ test_results %>% accuracy(Type, `rf class`)
 test_results %>% conf_mat(Type, `rf class`)
 
 fit <- 
-  boost_tree(mode = "classification", mtry = .preds(), trees = 100, min_n = 8) %>%
+  boost_tree(mode = "classification", mtry = 5, trees = 100, min_n = 8) %>%
   set_engine("xgboost") %>% 
   fit(Type ~ ., data = juice(pvalue_train))
 test_results <- test %>%
@@ -173,36 +173,31 @@ test_results %>% conf_mat(Type, class)
 ## sets with bad pi0
 pvalues_bins_unclass <- pvalues_bins %>%
   left_join(distinct(his)) %>%
-  filter(is.na(Type),pi0 > pi0threshold)
-
+  filter(is.na(Type), pi0 > pi0threshold)
 
 pvalues_bm_bins_unclass <- pvalues_bm_bins %>%
   left_join(distinct(his_bm)) %>%
-  filter(is.na(Type),pi0 > pi0threshold)
+  filter(is.na(Type), pi0 > pi0threshold)
 
-# get bins only
-pvalues_bins_only <- pvalues_bins_unclass %>%
-  select(-Accession,
-         -suppdata_id, -annot, -values, -pi0)
+# Get bins only
+pvalues_bins_only <- pvalues_bins_unclass %>% 
+  select(pi0:Type)
 
 pvalues_bm_bins_only <- pvalues_bm_bins_unclass %>%
-  select(-Accession,
-         -suppdata_id, -annot, -values, -pi0) 
+  select(pi0:Type)
 
-pred_all <- predict(model2, pvalues_bins_only, Type = "class")
-pred_bm_all <- predict(model2, pvalues_bm_bins_only, Type = "class")
+pred_all <- predict_class(fit, pvalues_bins_only)
+pred_bm_all <- predict_class(fit, pvalues_bm_bins_only)
 
-# add predicted classification
+# Add predicted classification
 pvalues_bins_unclass <- pvalues_bins_unclass %>%
   mutate(Type = pred_all) %>%
-  select(Accession, suppdata_id,pi0,Type)
+  select(Accession, suppdata_id, pi0, annot, Type)
 
 pvalues_bm_bins_unclass <- pvalues_bm_bins_unclass %>%
   mutate(Type = pred_bm_all) %>%
-  select(Accession, suppdata_id,pi0,Type)
+  select(Accession, suppdata_id, pi0, annot, Type)
 
 # write new reference files
-write_csv(pvalues_bins_unclass,"../output/histogram_classification_prefiltration.csv")
-write_csv(pvalues_bm_bins_unclass,"../output/histogram_classification_postfiltration.csv")
-
-
+write_csv(pvalues_bins_unclass, here("output/histogram_classification_prefiltration.csv"))
+write_csv(pvalues_bm_bins_unclass, here("output/histogram_classification_postfiltration.csv"))
