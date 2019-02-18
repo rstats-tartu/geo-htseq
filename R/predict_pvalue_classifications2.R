@@ -19,18 +19,19 @@
 library(readr)
 library(dplyr)
 library(randomForest)
-source("_common.R")
+source("R/_common.R")
 
 # Histogram types summary table
-types_legend <- read_csv("../data/pvalue_hist_types.csv")
+types_legend <- read_csv(here("data/pvalue_hist_types.csv"))
+
 # remove comments
 types_legend <- types_legend %>%
-  select(type,typetext)
+  select(type, typetext)
 
 # READ IN CLASSIFICATIONS --------------------------------------------
 
 # Load manually assigned classes
-his_all <- read_delim("../data/pvalue_hist_UM_190121.csv", 
+his_all <- read_delim(here("data/pvalue_hist_UM_190121.csv"), 
                   delim = ",", 
                   locale = locale(decimal_mark = ","))
 
@@ -38,14 +39,12 @@ his_all <- read_delim("../data/pvalue_hist_UM_190121.csv",
 his_bm <- his_all %>%
   select(Accession,
          suppdata_id = `Supplementary file name`,
-         pi0 = `True nulls proportion filtered`,
          Type = `Type filtered`) %>%
   filter(!is.na(Type))
 
-his<- his_all %>%
+his <- his_all %>%
   select(Accession,
          suppdata_id = `Supplementary file name`,
-         pi0 = `True nulls proportion`,
          Type) %>%
   filter(!is.na(Type))
 
@@ -74,61 +73,45 @@ his<- his_all %>%
 # READ IN DATASET WITH PVALUE BINS ----------------------------------
 
 # Pre basemean corrected data
+pvalues <- read_rds(here("output/pvalue_spark_bins.rds"))
 
-pvalues <- readRDS("../output/pvalue_spark_bins.rds")
-
-# Sort
+# Sort by id
 pvalues <- pvalues %>%
-  arrange(suppdata_id) %>%
-  mutate(pi0 = as.character(digits(pi0, 6)))
+  arrange(suppdata_id) %>% 
+  mutate_at("pi0", as.numeric)
 
-pvalues_bins <- pvalues
-
-#add pvalue frequency bins to columns
-for (i in 1:40) {
-  new_col_name <-paste0('V', i)
-  pvalues_bins <- pvalues_bins %>%
-    add_column(!!new_col_name:=map_dbl(pvalues[,5][[1]], ~ .x[i]))
-}
+# Rearrange pvalue frequency bins to columns
+pvalues_bins <- pvalues %>% 
+  mutate(values = map(values, ~as.tibble(matrix(.x, nrow = 1)))) %>% 
+  unnest(values) %>% 
+  select(Accession, suppdata_id, annot, everything())
 
 # Post basemean corrected data
+pvalues_bm <- read_rds(here("output/pvalue_bm_spark_bins.rds"))
 
-pvalues_bm <- readRDS("../output/pvalue_bm_spark_bins.rds")
-
-# Sort
+# Sort by id
 pvalues_bm <- pvalues_bm %>%
-  arrange(suppdata_id) %>%
-  mutate(pi0 = as.character(digits(pi0, 6)))
+  arrange(suppdata_id) %>% 
+  mutate_at("pi0", as.numeric)
 
-pvalues_bm_bins <- pvalues_bm
-
-#add pvalue frequency bins to columns
-for (i in 1:40) {
-  new_col_name <-paste0('V', i)
-  pvalues_bm_bins <- pvalues_bm_bins %>%
-    add_column(!!new_col_name:=map_dbl(pvalues_bm[,5][[1]], ~ .x[i]))
-}
+# Rearrange pvalue frequency bins to columns
+pvalues_bm_bins <- pvalues_bm %>% 
+  mutate(values = map(values, ~as.tibble(matrix(.x, nrow = 1)))) %>% 
+  unnest(values) %>% 
+  select(Accession, suppdata_id, annot, everything())
 
 # ADD MANUAL HISTOGRAM CODING ----------------------------------------------------
-
 pvalues_coded <- pvalues_bins %>%
   left_join(his) %>%
-  filter(!is.na(Type)) %>%
-  select(-Accession,
-         -suppdata_id, -pi0,-annot, -values)
+  filter(!is.na(Type))
 
 pvalues_bm_coded <- pvalues_bm_bins %>%
   left_join(his_bm) %>%
-  filter(!is.na(Type)) %>%
-  select(-Accession,
-         -suppdata_id, -pi0,-annot, -values) 
+  filter(!is.na(Type))
 
-# type text has to be factor
-pvalues_coded$Type <- as.factor(pvalues_coded$Type)
-pvalues_bm_coded$Type <- as.factor(pvalues_bm_coded$Type)
-
-# combine pvalue datasets
-pvalues_all_coded <- rbind(pvalues_coded,pvalues_bm_coded)
+# Combine pvalue datasets and convert type text to factor
+pvalues_all_coded <- bind_rows(pvalues_coded, pvalues_bm_coded) %>% 
+  mutate_at("Type", as.factor)
 
 # RANDOM FOREST ---- CREATE CLASSIFICATION MODEL -----------------------------
 

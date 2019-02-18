@@ -308,7 +308,7 @@ ggt
 ## ---- sparklines -----
 
 # Merge clusters to p value dataframe and create sparklines -------
-treecut <- data_frame(histclus = map_chr(treecut, ~ barcolors[.x]))
+treecut <- tibble(histclus = map_chr(treecut, ~ barcolors[.x]))
 p_values <- p_values %>% bind_cols(treecut)
 
 spark_table <- p_values %>%
@@ -331,8 +331,7 @@ spark_table_bm <- p_values_bm %>%
                                 type = "bar"))
 
 # Save pvalue histograms in 40 bin format
-# Used for classification with maschine learning approach
-
+# Used for classification with machine learning approach
 spark_table_write <- p_values %>%
   mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/40), plot = FALSE)$counts),
          pi0 = digits(pi0, 2)) %>%
@@ -356,7 +355,15 @@ write_rds(spark_table_write,"output/pvalue_bm_spark_bins.rds")
 # Load manually assigned classes
 his_all <- read_delim("data/pvalue_hist_UM_190121.csv", 
                       delim = ",", 
-                      locale = locale(decimal_mark = ",")) 
+                      locale = locale(decimal_mark = ","))
+# Code used to identify rows for fixing in data/pvalue_hist_UM_190121.csv
+# his_all_to_be_updated <- bind_rows(p_values %>% 
+#             filter(suppfiles %in% his_all$`Supplementary file name`, suppfiles != suppdata_id) %>% 
+#             select(suppfiles, suppdata_id, pi0),
+#           p_values_bm %>% 
+#             filter(suppfiles %in% his_all$`Supplementary file name`, suppfiles != suppdata_id) %>% 
+#             select(suppfiles, suppdata_id, pi0), .id = "id")
+
 
 # Split manualy assigned classes to filtered and non-filtered
 his_bm <- his_all %>%
