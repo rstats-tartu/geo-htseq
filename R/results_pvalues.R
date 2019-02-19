@@ -372,44 +372,46 @@ spark_table_bm_renamed <- spark_table_bm %>%
          'True nulls proportion,\nfiltered' = pi0,
          'Supplementary file name' = suppdata_id)
 
+## ---- histtypes-tab ----
 hist_types_caption <- "Summary of histogram types in supplementary files of GEO HT-seq submissions."
-
 hist_types %>% 
   knitr::kable("html", escape = FALSE, caption = hist_types_caption) %>%
   kable_styling(full_width = FALSE)
 
+## ---- histtypesbm-tab ----
+hist_types_bm_caption <- "Type conversion of histograms by filtering out non-informative features."
+hist_types_bm %>% 
+  knitr::kable("html", escape = FALSE, caption = hist_types_bm_caption) %>%
+  kable_styling(full_width = FALSE)
+
+## ---- typeconversion-tab ----
 type_conversion_rate %>% 
   rename(`Type conversion` = type_conversion) %>% 
   knitr::kable("html", escape = FALSE, 
                caption = "Fraction of histograms that could be fixed by filtering out non-informative features.") %>%
   kable_styling(full_width = FALSE)
 
-pv_hist_caption <- glue::glue("P value histograms and proportion of true nulls. Histograms are colored according to clustering of their empirical cumulative distribution function outputs. Supplementary file names for tables from xls(x) files might be appended with sheet name. This table contains {nrow(spark_table)} unique P value histograms from {length(unique(spark_table$'Supplementary file name'))} supplementary tables related to {length(unique(spark_table$Accession))} GEO Accessions.")
-
-
-## type and comment has to be removed to avoid conflict between spark_table and spark_table_bm_renamed  
-pvalue_spark <- left_join(spark_table, spark_table_bm_renamed) %>%
+## ---- pvaluespark-tab ----
+#' Merge basemean filtered results with spark_table   
+pvalue_spark <- left_join(spark_table, spark_table_bm_renamed) %>% 
+  mutate(`Supplementary file name` = cell_spec(`Supplementary file name`, color = ifelse(Method == "human", "black", "gray"))) %>% 
   select(Accession, 
-         `Supplementary file name`, 
+         `Supplementary file name\n(with p-value set id)` = `Supplementary file name`, 
          `P value histogram`, 
          Type, 
          `True nulls proportion`,
          `P value histogram,\nfiltered`,
-         `Type,\nfiltered`,
+         `Type,\nfiltered` = `Type filtered`,
          `True nulls proportion,\nfiltered`) 
 
 pvalue_spark %>% 
   select(-matches("histogram")) %>%
   write_csv(here("output/pvalue_spark_table.csv"))
 
-# to group histograms by the type
-value_spark <- arrange(pvalue_spark, Type) 
-
-(pvalue_spark <- pvalue_spark %>%
-  knitr::kable("html", escape = FALSE, caption = pv_hist_caption) %>%
-  kable_styling(full_width = FALSE))
-
-write_rds(pvalue_spark, here("output/pvalue_spark_table.rds"))
+pv_spark_caption <- glue::glue("P value histograms and proportion of true nulls. Histograms are colored according to clustering of their empirical cumulative distribution function outputs. Supplementary file names for tables from xls(x) files might be appended with sheet name. This table contains {nrow(spark_table)} unique P value histograms from {length(unique(spark_table$'Supplementary file name'))} supplementary tables related to {length(unique(spark_table$Accession))} GEO Accessions. Supplementary table names, black, human classified histograms, gray, model based classification.")
+pvalue_spark %>%
+  knitr::kable("html", escape = FALSE, caption = pv_spark_caption) %>%
+  kable_styling(full_width = FALSE)
 
 # srp stats ---------------------------------------------------------------
 
