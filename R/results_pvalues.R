@@ -1,33 +1,35 @@
 
-# Load libs
+#' ## Load libs
 source("R/_common.R")
-# Import of tabular supplementary files -----------------------------------
+
+#' ## Import tabular supplementary files
 
 ## ---- loadst -----
+#' Import parsed supplementary files.
 st <- read_rds(here("output/suppdata.rds"))
 
-# imported files
+#' Imported files object.
 imported_geos <- select(st, Accession) %>%  n_distinct()
 
 st_unnested <- unnest(st, result)
 
-# Unnest xls file sheet names
+#' Unnest xls file sheet names.
 st_unnested <- unnest(st_unnested, sheets)
 
-# Append sheet names to xls file names for unique table id
+#' Append sheet names to xls file names for unique table id.
 st_unnested <- st_unnested %>% 
   mutate(suppdata_id = case_when(
     str_length(sheets) > 0 ~ str_c(suppfiles, "-sheet-", sheets),
     TRUE ~ suppfiles
   ))
 
-## Let's use gsem table
+#' Import gsem table
 gsem <- read_rds(here("output/gsem.rds"))
 
-# Pull out series matrixes
+#' Pull out GEO series matrixes.
 gsem <- mutate(gsem, series_matrix = map(gse, "result"))
 
-## Remove errored matrixes
+#' Remove errored GEO series matrixes.
 gsem_error <- filter(gsem, map_lgl(series_matrix, is.null))
 
 gsem <- gsem %>%
@@ -36,7 +38,7 @@ gsem <- gsem %>%
          annot = map_chr(series_matrix, annotation)) %>% 
   select(Accession, annot, series_matrix, samples, everything())
 
-## Match samples to correct table/assay 
+#' Match samples to correct table/assay. 
 dims <- left_join(st_unnested, gsem) %>%
   group_by(suppdata_id) %>%
   mutate(idcols = columns - samples) %>%
@@ -52,14 +54,14 @@ n_samples <- summarise_at(dims,
                           vars(samples, features), 
                           list(mean = mean, median = median, Mode = Mode, min = min, max = max))
 
-# Filter datasets with p values
+#' Filter datasets with p values.
 p_value_dims <- filter(dims, 
                        !map_lgl(pvalues, is.null), 
                        !map_lgl(pvalues, inherits, "try-error"))
 
 ## ---- plotdims -----
 
-## Plot features versus samples
+#' ## Plot features versus samples
 dims_tabp <- ggplot() + 
   geom_hex(aes(log10(samples), log10(features), fill = ..count.. / sum(..count..)), data = p_value_dims) +
   geom_hex(aes(log10(samples), log10(features), fill = ..count.. / sum(..count..)), data = dims, alpha = 0.5) +
@@ -88,7 +90,7 @@ dims_samplesp <- dims %>%
   labs(x = bquote(N~samples~(log[10])),
        y = "Count")
 
-# Compose plot
+#' Compose plot.
 pg <- lapply(list(dims_featuresp, dims_samplesp, dims_tabp), ggplotGrob)
 pg <- add_labels(pg, case = panel_label_case)
 pga <- arrangeGrob(grobs = pg, ncol = length(pg), widths = c(3, 3, 5))
@@ -97,17 +99,46 @@ pga <- arrangeGrob(pga, legend,
                    ncol = 2, 
                    widths = unit.c(unit(1, "npc") - lwidth, lwidth))
 
-# draw plot
+#' Draw plot.
 grid.draw(pga)
 
 ## ---- pvalues -----
-## 
-# plot geo series with p values size distribution over all series
 
-# ad hoc filter to remove uninformative features with less than 100 counts per 1M reads on average
+#' ## Collapse rows from GEO series with multiple annotations.
+#' Some of the tables have multiple columns with p-values, we need to assign 
+#' unique ids to these p-value sets and respectively update suppdata_ids.
+#' add id counts
+p_value_dims_suppdata_id <- p_value_dims %>% 
+  group_by(suppdata_id) %>% 
+  add_count()
+
+#' First, collapse annotations in GEO series with multiple annotations.
+multi_annot <- p_value_dims_suppdata_id %>% 
+  filter(n > 1) %>%
+  mutate(annot = str_c(annot, collapse = ",")) %>% 
+  slice(1)
+
+#' Then, merge dataset with collapsed annotations back.
+p_value_dims <- p_value_dims_suppdata_id %>% 
+  filter(n == 1) %>% 
+  bind_rows(multi_annot) %>% 
+  select(-n) %>% 
+  ungroup()
+
+#'
+#' Plot geo series with p values size distribution over all series.
+#' Ad hoc filter to remove uninformative features with less than 100 counts 
+#' per 1M reads.
+p_values <- p_value_dims %>% 
+  mutate(pvalues = map(pvalues, make_unique_colnames),
+         pvalues = map(pvalues, select, matches("pvalue")),
+         pvalues = map(pvalues, as.list)) %>% 
+  select(Accession, suppfiles, suppdata_id, annot, features, columns, samples, pvalues)
+
+#' Subset of pvalues with basemean.
 p_values_bm <- p_value_dims %>% 
   mutate(basemean = map(pvalues, "basemean"),
-                     basemean = map_lgl(basemean, ~ !all(is.na(.x)))) %>% 
+         basemean = map_lgl(basemean, ~ !all(is.na(.x)))) %>% 
   filter(basemean) %>%
   mutate(pvalues = map(pvalues, make_unique_colnames),
          pvalues = map(pvalues, filter, basemean / (sum(basemean) / 1e6) > 100),
@@ -115,108 +146,56 @@ p_values_bm <- p_value_dims %>%
          pvalues = map(pvalues, as.list)) %>% 
   select(Accession, suppfiles, suppdata_id, annot, features, columns, samples, pvalues)
 
-p_values <- p_value_dims %>% 
-  mutate(pvalues = map(pvalues, make_unique_colnames),
-         pvalues = map(pvalues, select, matches("pvalue")),
-         pvalues = map(pvalues, as.list)) %>% 
-  select(Accession, suppfiles, suppdata_id, annot, features, columns, samples, pvalues)
+#' Proportion of pvalue GSE sets with basemean.
+prop_pvalues_with_basemean <- percent(nrow(p_values_bm) / nrow(p_values))
 
-#' Some tables (53) have multiple columns with p-values, we need to assign 
-#' unique ids to these p-value sets and respectively update suppdata_ids.
-# add id counts
-p_values_suppdata_id <- p_values %>% 
-  group_by(suppdata_id) %>% 
-  add_count()
+#' Unnest GSE series with multiple pvalue sets and make unique unique ids 
+#' for each set.
+add_set_to_suppdata_id <- function(pvalue_dataset) {
+  mutate(pvalue_dataset, pvalues = map(pvalues, ~tibble(set = names(.x), pvalues = .x))) %>% 
+    unnest(pvalues) %>% 
+    add_count(suppdata_id) %>% 
+    mutate(set = str_extract(set, "\\d+"),
+           set = case_when(
+             is.na(set) ~ "0",
+             TRUE ~ set
+           ),
+           suppdata_id = if_else(n > 1, str_c(suppdata_id, "-set-", set), suppdata_id)) %>% 
+    select(-set, -n)
+}
 
-p_values_bm_suppdata_id <- p_values_bm %>% 
-  group_by(suppdata_id) %>% 
-  add_count()
+#' Append set id to suppdata_ids
+p_values <- p_values %>% add_set_to_suppdata_id
+p_values_bm <- p_values_bm %>% add_set_to_suppdata_id
 
-# accessions with multiple annotations
-multi_annot <- p_values_suppdata_id %>% 
-  filter(n > 1) %>%
-  mutate(annot = str_c(annot, collapse = ",")) %>% 
-  slice(1)
-
-multi_annot_bm <- p_values_bm_suppdata_id %>% 
-  filter(n > 1) %>%
-  mutate(annot = str_c(annot, collapse = ",")) %>% 
-  slice(1)
-
-# accessions with single annotation
-single_annot <- p_values_suppdata_id %>% 
-  filter(n == 1)
-
-single_annot_bm <- p_values_bm_suppdata_id %>% 
-  filter(n == 1)
-
-p_values <- bind_rows(single_annot, multi_annot) %>% 
-  select(-n) %>% 
-  ungroup() %>% 
-  mutate(pvalues = map(pvalues, ~tibble(set = names(.x), pvalues = .x))) %>% 
-  unnest(pvalues) %>% 
-  add_count(suppdata_id) %>% 
-  mutate(set = str_extract(set, "\\d+"),
-         set = case_when(
-           is.na(set) ~ "0",
-           TRUE ~ set
-         ),
-         suppdata_id = if_else(n > 1, str_c(suppdata_id, "-set-", set), suppdata_id)) %>% 
-  select(-set, -n)
-
-p_values_bm <- bind_rows(single_annot_bm, multi_annot_bm) %>% 
-  select(-n) %>% 
-  ungroup() %>% 
-  mutate(pvalues = map(pvalues, ~tibble(set = names(.x), pvalues = .x))) %>% 
-  unnest(pvalues) %>% 
-  add_count(suppdata_id) %>% 
-  mutate(set = str_extract(set, "\\d+"),
-         set = case_when(
-           is.na(set) ~ "0",
-           TRUE ~ set
-         ),
-         suppdata_id = if_else(n > 1, str_c(suppdata_id, "-set-", set), suppdata_id)) %>% 
-  select(-set, -n)
-
-#' Filter out one dataset with pvalue threshold info (logical)
+#' ## Calculate retrospective power (SRP - shitty retrospective power)
+#' Filter out one dataset with pvalue threshold info column? (logical)
 #' and datasets where number of features is less than nrowthreshold
 # calculate pi0, the proportion of true nulls
 # devtools::install_github("tpall/SRP")
-# alternatively, use pacman to (install and) load SRP package
+# alternatively, use remotes::install_github()
 library(SRP)
 safe_srp <- safely(srp)
-p_values <- p_values %>% 
-  filter(map_lgl(pvalues, is.numeric)) %>% 
-  mutate(pi0 = map_dbl(pvalues, propTrueNull),
-         srp = map(pvalues, safe_srp),
-         srp = map(srp, "result"))
+calculate_pi0_and_srp <- function(pvalue_dataset) {
+  filter(pvalue_dataset, map_lgl(pvalues, is.numeric)) %>% 
+    mutate(pi0 = map_dbl(pvalues, propTrueNull),
+           srp = map(pvalues, safe_srp),
+           srp = map(srp, "result"))
+}
 
-p_values_bm <- p_values_bm %>% 
-  filter(map_lgl(pvalues, is.numeric)) %>% 
-  mutate(pi0 = map_dbl(pvalues, propTrueNull),
-         srp = map(pvalues, safe_srp),
-         srp = map(srp, "result"))
+p_values <- p_values %>% calculate_pi0_and_srp
+p_values_bm <- p_values_bm %>% calculate_pi0_and_srp
 
-# Filter out sets with supposedly bad sets of P values
-
-#p_values <- p_values %>% 
-#  filter(features > nrowthreshold,
-#         pi0 > pi0threshold)
-#
-#p_values_bm <- p_values_bm %>% 
-#  filter(features > nrowthreshold,
-#         pi0 > pi0threshold)
-
+#' Filter out too small sets of P values.
 p_values <- p_values %>% 
   filter(features > nrowthreshold)
 
 p_values_bm <- p_values_bm %>% 
   filter(features > nrowthreshold)
-
 
 ## ---- pi0hist -----
 
-#' Calculate bins 
+#' Calculate bins for building a histogram. 
 p_values <- p_values %>%
   mutate(bins = map(pvalues, ntile, 60))
 
@@ -230,22 +209,18 @@ pi0hist <- ggplot(data = p_values) +
        y = "Fraction of P value sets")
 
 pi0hist_bm <- pi0hist %+% p_values_bm
+recode_pi0_features <- function(pvalue_dataset) {
+  mutate(pvalue_dataset, 
+         samples = case_when(
+           samples < 4 ~ "2 to 3",
+           samples > 3 & samples < 7 ~ "4 to 6",
+           samples > 6 & samples < 11 ~ "7 to 10",
+           samples > 10 ~ "10+"
+         ))
+}
 
-pi0_features_recoded <- p_values %>%
-  mutate(samples = case_when(
-    samples < 4 ~ "2 to 3",
-    samples > 3 & samples < 7 ~ "4 to 6",
-    samples > 6 & samples < 11 ~ "7 to 10",
-    samples > 10 ~ "10+"
-  ))
-
-pi0_features_recoded_bm <- p_values_bm %>%
-  mutate(samples = case_when(
-    samples < 4 ~ "2 to 3",
-    samples > 3 & samples < 7 ~ "4 to 6",
-    samples > 6 & samples < 11 ~ "7 to 10",
-    samples > 10 ~ "10+"
-  ))
+pi0_features_recoded <- p_values %>% recode_pi0_features()
+pi0_features_recoded_bm <- p_values_bm %>% recode_pi0_features()
 
 pi0_features <- ggplot(pi0_features_recoded, aes(x = pi0, y = log10(features))) +
   geom_point(aes(color = samples)) +
@@ -262,7 +237,7 @@ pi0_features_bm <- pi0_features_bm + theme(legend.position = "none")
 legend <- g_legend(pi0_features)
 pi0_features <- pi0_features + theme(legend.position = "none")
 
-# Compose plot
+#' Compose pi0 plot.
 pg <- lapply(list(pi0hist, pi0_features), ggplotGrob)
 pg <- add_labels(pg, case = panel_label_case)
 pga <- arrangeGrob(grobs = pg, ncol = length(pg), widths = c(1, 1))
@@ -271,12 +246,16 @@ pga <- arrangeGrob(pga, legend,
                    ncol = 2, 
                    widths = unit.c(unit(1, "npc") - lwidth, lwidth))
 
-# draw plot
+#' Draw pi0 plot.
 grid.draw(pga)
 
 ## ---- pi0histends -----
 
-# Calculate ecdf and cluster histograms -----------------------------
+#' Save pvalue datasets for classification using machine learning
+write_rds(p_values, here("output/pvalues.rds"))
+write_rds(p_values_bm, here("output/pvalues_bm.rds"))
+
+#' ## Calculate ecdf and cluster histograms
 p_values <- p_values %>%
   mutate(eCDF = map(pvalues, ecdf))
 
@@ -287,7 +266,7 @@ probs_mtrx <- p_values$probs %>%
   matrix(nrow = nrow(p_values), byrow = T)
 rownames(probs_mtrx) <- p_values$Accession
 
-# Ok, let's use default eucl + ward.d 
+#' Use default euclidean distance 
 # barcolors <- c("#070d0d", "#feb308", "#9b5fc0", "#6ecb3c", "#1d5dec", "#fe4b03")
 hc <- probs_mtrx %>% dist(method = "euclidean") %>% hclust() 
 treecut <- hc %>% cutree(k = 6)
@@ -303,10 +282,9 @@ ggt <- hc_phylo %>%
 
 ggt
 
-
 ## ---- sparklines -----
 
-# Merge clusters to p value dataframe and create sparklines -------
+#' ## Merge clusters to p value dataframe and create sparklines
 treecut <- tibble(histclus = map_chr(treecut, ~ barcolors[.x]))
 p_values <- p_values %>% bind_cols(treecut)
 
@@ -328,22 +306,6 @@ spark_table_bm <- p_values_bm %>%
   summarise(Histogram = spk_chr(values,
                                 chartRangeMin = 0,
                                 type = "bar"))
-
-# Save pvalue histograms in 40 bin format
-# Used for classification with machine learning approach
-spark_table_write <- p_values %>%
-  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/40), plot = FALSE)$counts),
-         pi0 = digits(pi0, 2)) %>%
-  mutate(values = map(values, ~ .x/sum(.x))) %>%
-  select(Accession,suppdata_id,pi0,annot,values)
-write_rds(spark_table_write, here("output/pvalue_spark_bins.rds"))
-
-spark_table_write <- p_values_bm %>%
-  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/40), plot = FALSE)$counts),
-         pi0 = digits(pi0, 2)) %>%
-  mutate(values = map(values, ~ .x/sum(.x))) %>%
-  select(Accession,suppdata_id,pi0,annot,values)
-write_rds(spark_table_write, here("output/pvalue_bm_spark_bins.rds"))
 
 # Curated p value histogram classes ---------------------------------------
 
