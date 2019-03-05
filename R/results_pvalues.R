@@ -404,14 +404,22 @@ pvalue_spark <- left_join(spark_table, spark_table_bm_renamed) %>%
          `Type,\nfiltered` = `Type filtered`,
          `True nulls proportion,\nfiltered`) 
 
-pvalue_spark %>% 
-  select(-matches("histogram")) %>%
-  write_csv(here("output/pvalue_spark_table.csv"))
-
 pv_spark_caption <- glue::glue("P value histograms and proportion of true nulls. Histograms are colored according to clustering of their empirical cumulative distribution function outputs. Supplementary file names for tables from xls(x) files might be appended with sheet name. This table contains {nrow(spark_table)} unique P value histograms from {length(unique(spark_table$'Supplementary file name'))} supplementary tables related to {length(unique(spark_table$Accession))} GEO Accessions. Supplementary table names, black, human classified histograms, gray, model based classification.")
 pvalue_spark %>%
   knitr::kable("html", escape = FALSE, caption = pv_spark_caption) %>%
   kable_styling(full_width = FALSE)
+
+#' Write table for manual reclassification.
+left_join(spark_table, spark_table_bm_renamed) %>% 
+  select(
+    Accession, 
+    suppdata_id = `Supplementary file name`,
+    type = Type, 
+    pi0 = `True nulls proportion`,
+    type_filtered = `Type filtered`,
+    pi0_filtered = `True nulls proportion,\nfiltered`
+  ) %>% 
+  write_csv(here("output/pvalue_sets_classes.csv"))
 
 # srp stats ---------------------------------------------------------------
 

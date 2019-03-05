@@ -15,16 +15,30 @@ types_legend <- types_legend %>%
 
 #' READ IN CLASSIFICATIONS --------------------------------------------
 #' Load manually assigned classes
-his_all <- read_delim(here("data/pvalue_hist_UM_190121.csv"), 
-                  delim = ",", 
-                  locale = locale(decimal_mark = ","))
+# his_all <- read_delim(here("data/pvalue_hist_UM_190121.csv"), 
+#                   delim = ",", 
+#                   locale = locale(decimal_mark = ","))
+his_all <- read_csv("data/pvalue_table_YM_with_set.csv")
 
 #' Split manualy assigned classes to filtered and non filtered
 #' 
+# his_all <- his_all %>% 
+#   select(Accession, suppdata_id = `Supplementary file name`, starts_with("Type")) %>% 
+#   gather(key = Filter, value = Type, Type, `Type filtered`) %>%
+#   na.omit() %>% 
+#   mutate(Filter = case_when(
+#     Filter == "Type" ~ "raw",
+#     TRUE ~ "basemean"
+#   ))
 his_all <- his_all %>% 
-  select(Accession, suppdata_id = `Supplementary file name`, starts_with("Type")) %>% 
+  mutate(suppdata_id = case_when(
+    is.na(set) ~ suppdata_id,
+    !is.na(set) ~ str_c(suppdata_id, "-set-", set)
+  )) %>% 
+  select(Accession, suppdata_id, starts_with("type")) %>% 
+  rename(Type = type, `Type filtered` = type_filt) %>% 
   gather(key = Filter, value = Type, Type, `Type filtered`) %>%
-  filter(complete.cases(.)) %>% 
+  na.omit() %>% 
   mutate(Filter = case_when(
     Filter == "Type" ~ "raw",
     TRUE ~ "basemean"
