@@ -8,9 +8,6 @@ library(yardstick)
 
 #' READ IN CLASSIFICATIONS --------------------------------------------
 #' Load manually assigned classes
-# his_all <- read_delim(here("data/pvalue_hist_UM_190121.csv"), 
-#                   delim = ",", 
-#                   locale = locale(decimal_mark = ","))
 his_all <- read_csv("data/pvalue_table_YM_with_set.csv")
 
 #' Split manualy assigned classes to filtered and non filtered
