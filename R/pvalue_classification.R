@@ -8,7 +8,7 @@ library(yardstick)
 
 #' READ IN CLASSIFICATIONS --------------------------------------------
 #' Load manually assigned classes
-his_all <- read_csv("data/pvalue_table_YM_with_set.csv")
+his_all <- read_csv2(here("data/pvalue_sets_classes.csv"))
 
 #' Split manualy assigned classes to filtered and non filtered
 #' 
