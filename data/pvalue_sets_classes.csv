@@ -1,0 +1,1362 @@
+Accession;suppdata_id;type;pi0;type_filtered;pi0_filtered
+GSE17970;GSE17970_supplemental_table_1.xls.gz;anti-conservative;0.47;NA; NA
+GSE29992;GSE29992_Het1_KO2_expr.txt.gz;bimodal;0.89;NA; NA
+GSE32038;GSE32038_cds_exp.diff.gz;conservative;1.00;NA; NA
+GSE32038;GSE32038_cds.diff.gz;anti-conservative;0.07;NA; NA
+GSE32038;GSE32038_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE32038;GSE32038_isoform_exp.diff.gz;conservative;1.00;NA; NA
+GSE32038;GSE32038_splicing.diff.gz;anti-conservative;0.06;NA; NA
+GSE32038;GSE32038_tss_group_exp.diff.gz;conservative;1.00;NA; NA
+GSE33141;GSE33141_TopHatTranscriptsFPKM.xls.gz-sheet-mRNA-Transcripts-FPKM;other;0.97;NA; NA
+GSE33141;GSE33141_TopHatTranscriptsFPKM.xls.gz-sheet-Pseudogenes-FPKM;other;0.98;NA; NA
+GSE33265;GSE33265_gene_exp.diff.gz;bimodal;0.94;NA; NA
+GSE33265;GSE33265_isoform_exp.diff.gz;bimodal;0.95;NA; NA
+GSE33736;GSE33736_HAmCqG0_G8expression.txt.gz;anti-conservative;0.60;NA; NA
+GSE33782;GSE33782_gene_exp.diff.txt.gz;conservative;0.98;NA; NA
+GSE33782;GSE33782_isoform_exp.diff.txt.gz;conservative;0.95;NA; NA
+GSE34097;GSE34097_aff2_genes_cufflinks.txt.gz;conservative;1.00;NA; NA
+GSE34097;GSE34097_aff3_genes_cufflinks.txt.gz;conservative;0.99;NA; NA
+GSE34097;GSE34097_aff4_genes_cufflinks.txt.gz;conservative;0.95;NA; NA
+GSE34274;GSE34274_Reads_Table_1_Original_RV_Mu1_RV_Mu3_RV_Wt1_RV_Wt2.expr.txt.gz-set-0;bimodal;0.84;NA; NA
+GSE34274;GSE34274_Reads_Table_1_Original_RV_Mu1_RV_Mu3_RV_Wt1_RV_Wt2.expr.txt.gz-set-1;bimodal;0.77;NA; NA
+GSE34274;GSE34274_Reads_Table_1_Original_RV_Mu1_RV_Mu3_RV_Wt1_RV_Wt2.expr.txt.gz-set-2;bimodal;0.80;NA; NA
+GSE34274;GSE34274_Reads_Table_1_Original_RV_Mu1_RV_Mu3_RV_Wt1_RV_Wt2.expr.txt.gz-set-3;spiky;0.75;NA; NA
+GSE34274;GSE34274_Reads_Table_1_Original_RV_Mu1_RV_Mu3_RV_Wt1_RV_Wt2.expr.txt.gz-set-4;spiky;0.75;NA; NA
+GSE34274;GSE34274_Reads_Table_1_Original_RV_Mu1_RV_Mu3_RV_Wt1_RV_Wt2.expr.txt.gz-set-5;bimodal;0.78;NA; NA
+GSE34329;GSE34329_processed_RNAseq_N_way_cuffdiff_combined_replicates_NIvIvPAvPS1145.diff.gz;conservative;0.96;NA; NA
+GSE35178;GSE35178_gene_exp.diff.gz;conservative;0.99;NA; NA
+GSE35178;GSE35178_isoform_exp.diff.gz;conservative;0.98;NA; NA
+GSE35616;GSE35616_DESeq.txt.gz;spiky;0.76;anti-conservative;0.87
+GSE36005;GSE36005_emo_gene.diff.gz;conservative;1.00;NA; NA
+GSE36005;GSE36005_res_gene.diff.gz;conservative;1.00;NA; NA
+GSE36005;GSE36005_sus_gene.diff.gz;bimodal;0.86;NA; NA
+GSE36695;GSE36695_H1H9KSR_hfSFM.txt.gz;conservative;1.00;NA; NA
+GSE36695;GSE36695_H1H9KSR_SFM.txt.gz;conservative;0.99;NA; NA
+GSE36695;GSE36695_H1KSR_H1SFM.txt.gz;bimodal;0.95;NA; NA
+GSE36695;GSE36695_H1SFM_H9SFM.txt.gz;conservative;1.00;NA; NA
+GSE36695;GSE36695_H1SFM_hfSFM.txt.gz;conservative;1.00;NA; NA
+GSE36695;GSE36695_H9KSR_H9SFM.txt.gz;bimodal;0.98;NA; NA
+GSE36695;GSE36695_H9KSR_hfSFM.txt.gz;conservative;1.00;NA; NA
+GSE36695;GSE36695_H9SFM_hfSFM.txt.gz;conservative;1.00;NA; NA
+GSE36710;GSE36710_RBFOX1_Splicing_Events.txt.gz;conservative;0.89;NA;NaN
+GSE36710;GSE36710_RBFOX1_Transcriptional_Events.txt.gz;bimodal;0.94;anti-conservative;1.00
+GSE36781;GSE36781_gene_exp_diff.txt.gz;anti-conservative;0.96;NA; NA
+GSE36866;GSE36866_gene_exp.diff.gz;conservative;0.98;NA; NA
+GSE36871;GSE36871_RNASeq_Mouse_Liver_NormalizedGeneSignal.txt.gz;spiky;0.70;NA; NA
+GSE36872;GSE36872_NascentSeq_Mouse_Liver_NormalizedGeneSignal.txt.gz;spiky;0.63;NA; NA
+GSE36959;GSE36959_gene_exp_diff.txt.gz;anti-conservative;0.64;NA; NA
+GSE37111;GSE37111_clip.txt.gz;conservative;0.98;NA; NA
+GSE37682;GSE37682_RAW.txt.gz;anti-conservative;0.69;NA; NA
+GSE37703;GSE37703_hiseq_cuffdiff_cds_exp.diff.gz;bimodal;0.95;NA; NA
+GSE37703;GSE37703_hiseq_cuffdiff_cds.diff.gz;bimodal;0.70;NA; NA
+GSE37703;GSE37703_hiseq_cuffdiff_gene_exp.diff.gz;bimodal;0.80;NA; NA
+GSE37703;GSE37703_hiseq_cuffdiff_isoform_exp.diff.gz;bimodal;0.96;NA; NA
+GSE37703;GSE37703_hiseq_cuffdiff_promoters.diff.gz;bimodal;0.78;NA; NA
+GSE37703;GSE37703_hiseq_cuffdiff_splicing.diff.gz;bimodal;0.61;NA; NA
+GSE37703;GSE37703_hiseq_cuffdiff_tss_group_exp.diff.gz;bimodal;0.91;NA; NA
+GSE37703;GSE37703_miseq_cuffdiff_cds_exp.diff.gz;bimodal;0.98;NA; NA
+GSE37703;GSE37703_miseq_cuffdiff_cds.diff.gz;bimodal;0.63;NA; NA
+GSE37703;GSE37703_miseq_cuffdiff_gene_exp.diff.gz;bimodal;0.93;NA; NA
+GSE37703;GSE37703_miseq_cuffdiff_isoform_exp.diff.gz;bimodal;0.99;NA; NA
+GSE37703;GSE37703_miseq_cuffdiff_promoters.diff.gz;bimodal;0.71;NA; NA
+GSE37703;GSE37703_miseq_cuffdiff_splicing.diff.gz;conservative;0.47;NA; NA
+GSE37703;GSE37703_miseq_cuffdiff_tss_group_exp.diff.gz;bimodal;0.97;NA; NA
+GSE38413;GSE38413_Maize_Pericarp_14DAP_mRNA-Seq_gene_exp.diff.gz;conservative;0.94;NA; NA
+GSE38413;GSE38413_Maize_Pericarp_25DAP_mRNA-Seq_gene_exp.diff.gz;conservative;0.96;NA; NA
+GSE38414;GSE38414_Maize_Silks_mRNA-Seq_gene_exp.diff.gz;conservative;0.96;NA; NA
+GSE39605;GSE39605_All_KOvsWT_filtered_final.xlsx.gz-sheet-All_KOvsWT_filtered;conservative;1.00;other;1.00
+GSE39652;GSE39652_20111201c2Day3_gene_exp.txt.gz;bimodal;0.91;NA; NA
+GSE39652;GSE39652_20111201c2LZ_gene_exp.txt.gz;conservative;1.00;NA; NA
+GSE39652;GSE39652_20111201c2Pach_gene_exp.txt.gz;conservative;0.99;NA; NA
+GSE39652;GSE39652_20111201c2PreMeiotic_gene_exp.txt.gz;conservative;1.00;NA; NA
+GSE39812;GSE39812_FB_result_transcript_summary.tsv.txt.gz;anti-conservative;0.65;NA; NA
+GSE39812;GSE39812_FT_result_transcript_summary.tsv.txt.gz;conservative;0.83;NA; NA
+GSE39812;GSE39812_TB_result_transcript_summary.tsv.txt.gz;bimodal;0.70;NA; NA
+GSE40187;GSE40187_gene_exp_diff_Control_NXD30001_fromtophat120_cufflinks102_c0_081612.txt.gz;conservative;0.99;NA; NA
+GSE40187;GSE40187_gene_exp_diff_MG1_MG2_fromtophat120_cufflinks102_c0_081612.txt.gz;conservative;0.98;NA; NA
+GSE40218;GSE40218_processed_DESeq.txt.gz;bimodal;0.92;anti-conservative;0.89
+GSE40228;GSE40228_gene_exp.diff.txt.gz;conservative;0.99;NA; NA
+GSE40478;GSE40478_output_score.txt.gz;anti-conservative;0.32;NA; NA
+GSE40548;GSE40548_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE40948;GSE40948_MEF_vs_ESC_2replicates_expression.tsv.gz;bimodal;0.67;NA; NA
+GSE40948;GSE40948_NPC_vs_ESC_2replicates_result_10.transcript_summary.tsv.gz;anti-conservative;0.48;NA; NA
+GSE41090;GSE41090_WT_vs_KO_full_genes.tab.txt.gz;conservative;0.99;NA; NA
+GSE41367;GSE41367_brenneri_gns.expr.txt.gz;anti-conservative;0.36;NA; NA
+GSE41367;GSE41367_brenneri_soap.expr.txt.gz;anti-conservative;0.37;NA; NA
+GSE41367;GSE41367_briggsae_gns.expr.txt.gz;anti-conservative;0.33;NA; NA
+GSE41367;GSE41367_briggsae_soap.expr.txt.gz;anti-conservative;0.35;NA; NA
+GSE41367;GSE41367_elegans_gns.expr.txt.gz;anti-conservative;0.30;NA; NA
+GSE41367;GSE41367_elegans_soap.expr.txt.gz;anti-conservative;0.26;NA; NA
+GSE41367;GSE41367_japonica_gns.expr.txt.gz;anti-conservative;0.29;NA; NA
+GSE41367;GSE41367_japonica_soap.expr.txt.gz;anti-conservative;0.29;NA; NA
+GSE41367;GSE41367_remanei_gns.expr.txt.gz;anti-conservative;0.27;NA; NA
+GSE41367;GSE41367_remanei_soap.expr.txt.gz;anti-conservative;0.25;NA; NA
+GSE41487;GSE41487_ResultsContr123vsRas123Multiple.xls.gz-sheet-RawData Contr123 vs Ras123;conservative;1.00;NA; NA
+GSE41487;GSE41487_ResultsContr123vsRas12Multiple.xls.gz-sheet-RawData Contr123 vs Ras12;conservative;0.97;NA; NA
+GSE41766;GSE41766_PRE1-Ox_IBH1-Ox_vs_IBH1-Ox.txt.gz;anti-conservative;0.62;anti-conservative;0.29
+GSE41873;GSE41873_FPKM_all_genes_from_CuffDiff.txt.gz;anti-conservative;0.74;NA; NA
+GSE41908;GSE41908_E11.5_E13.5f_cuffdiff1.2.txt.gz;conservative;0.91;NA; NA
+GSE41908;GSE41908_E11.5_E13.5m_cuffdiff1.2.txt.gz;conservative;0.96;NA; NA
+GSE41908;GSE41908_E9.5_E11.5_cuffdiff1.2.txt.gz;conservative;0.93;NA; NA
+GSE42381;GSE42381_gene_exp.diff.gz;bimodal;0.89;NA; NA
+GSE42443;GSE42443_Brg1cKO_gene_exp.diff.gz;conservative;0.98;NA; NA
+GSE42805;GSE42805_acute_gene.diff.gz;conservative;1.00;NA; NA
+GSE42805;GSE42805_cds_exp.diff.gz;conservative;1.00;NA; NA
+GSE42805;GSE42805_cds.diff.gz;bimodal;0.86;NA; NA
+GSE42805;GSE42805_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE42805;GSE42805_isoform_exp.diff.gz;bimodal;0.99;NA; NA
+GSE42805;GSE42805_promoters.diff.gz;bimodal;0.87;NA; NA
+GSE42805;GSE42805_splicing.diff.gz;bimodal;0.95;NA; NA
+GSE42805;GSE42805_tss_group_exp.diff.gz;bimodal;0.99;NA; NA
+GSE43143;GSE43143_tooth_FPKM_DE.txt.gz-set-0;anti-conservative;0.65;NA; NA
+GSE43143;GSE43143_tooth_FPKM_DE.txt.gz-set-1;anti-conservative;0.99;NA; NA
+GSE43143;GSE43143_tooth_FPKM_DE.txt.gz-set-2;anti-conservative;0.82;NA; NA
+GSE43189;GSE43189_processed_h99_rim101.csv.gz;anti-conservative;0.46;NA; NA
+GSE43194;GSE43194_E11_ICR_abundance_rep1.txt.gz-set-0;bimodal;0.87;NA; NA
+GSE43194;GSE43194_E11_ICR_abundance_rep1.txt.gz-set-1;spiky;0.95;NA; NA
+GSE43194;GSE43194_E11_ICR_abundance_rep1.txt.gz-set-2;spiky;0.87;NA; NA
+GSE43194;GSE43194_E11_ICR_abundance_rep2.txt.gz-set-0;spiky;0.91;NA; NA
+GSE43194;GSE43194_E11_ICR_abundance_rep2.txt.gz-set-1;spiky;0.88;NA; NA
+GSE43194;GSE43194_E11_ICR_abundance_rep2.txt.gz-set-2;spiky;0.86;NA; NA
+GSE43194;GSE43194_HH18chick_abundance.txt.gz-set-0;spiky;0.75;NA; NA
+GSE43194;GSE43194_HH18chick_abundance.txt.gz-set-1;spiky;0.72;NA; NA
+GSE43194;GSE43194_HH18chick_abundance.txt.gz-set-2;bimodal;0.76;NA; NA
+GSE43431;GSE43431_mRNA_STHdh_CUFF_gene_exp.diff.txt.gz;bimodal;0.98;NA; NA
+GSE43614;GSE43614_diff_out.txt.gz;other;1.00;NA; NA
+GSE43660;GSE43660_control_vs_il33_1hr.txt.gz;bimodal;0.98;NA; NA
+GSE43660;GSE43660_control_vs_il33_4hr.txt.gz;bimodal;0.98;NA; NA
+GSE43660;GSE43660_control_vs_IL4_1hr.txt.gz;bimodal;0.97;NA; NA
+GSE43660;GSE43660_control_vs_IL4_4hr.txt.gz;bimodal;0.97;NA; NA
+GSE44233;GSE44233_processed_data.txt.gz;spiky;0.93;anti-conservative;0.72
+GSE44333;GSE44333_d33_mock_vs_mhv_res_noNA.txt.gz;bimodal;1.00;anti-conservative;0.96
+GSE44402;GSE44402_QW_Table_S2-AS_targets_of_PQBP1_identified_from_RNA-seq.xlsx.gz;anti-conservative;0.23;NA; NA
+GSE44536;GSE44536_GEO_Processed_file_excel.xlsx.gz-sheet-FPKM_NC_009338;bimodal;0.98;NA; NA
+GSE44665;GSE44665_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE44668;GSE44668_gene_exp_diff.txt.gz;conservative;1.00;NA; NA
+GSE44831;GSE44831_BALBfab_BALBmj_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE44831;GSE44831_BALBfabD1_BALBmockD1_24hr_post_expr.txt.gz;conservative;1.00;NA; NA
+GSE44831;GSE44831_BALBfabD1_BALBmockD1_exp.txt.gz;conservative;1.00;NA; NA
+GSE44831;GSE44831_C57BL6fabD1_C57BL6mockD1_24hr_post_expr.txt.gz;conservative;1.00;NA; NA
+GSE44831;GSE44831_C57BL6fabD1_C57BL6mockD1_exp.txt.gz;conservative;1.00;NA; NA
+GSE44831;GSE44831_C57BLfab_C57BLmj_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE44831;GSE44831_matrix_BALB_C57BL.txt.gz;conservative;1.00;NA; NA
+GSE44846;GSE44846_O157_genome_total.xlsx.gz-sheet-Sheet1;bimodal;0.99;NA; NA
+GSE45788;GSE45788_S72_2_RefII_S72_1_Emf_exp.cuff.gz;anti-conservative;0.83;NA; NA
+GSE46046;GSE46046_GenesTable.txt.gz;spiky;1.00;anti-conservative;0.93
+GSE46066;GSE46066_ICRFVsDMSO.txt.gz;bimodal;0.77;anti-conservative;0.79
+GSE46486;GSE46486_young_old_deseq.txt.gz;conservative;0.97;spiky;0.99
+GSE46502;GSE46502_diff_gene_exp_PR_all.xlsx.gz-sheet-gene_exp.diff;conservative;1.00;NA; NA
+GSE46807;GSE46807_GEO_values_TAF4_RNAseq_Tophat.Cufflinks_mm9_WeiYi.txt.gz-set-0;bimodal;0.80;NA; NA
+GSE46807;GSE46807_GEO_values_TAF4_RNAseq_Tophat.Cufflinks_mm9_WeiYi.txt.gz-set-1;bimodal;0.90;NA; NA
+GSE46807;GSE46807_GEO_values_TAF4_RNAseq_Tophat.Cufflinks_mm9_WeiYi.txt.gz-set-2;conservative;1.00;NA; NA
+GSE47062;GSE47062_KO_vs_WT.txt.gz;conservative;0.98;NA; NA
+GSE47083;GSE47083_WTvsSclKO_WTvsGata12KO.xlsx.gz-set-0;conservative;0.96;NA; NA
+GSE47083;GSE47083_WTvsSclKO_WTvsGata12KO.xlsx.gz-set-1;conservative;0.93;NA; NA
+GSE47095;GSE47095_splicing_diff.txt.gz;bimodal;0.85;NA; NA
+GSE47395;GSE47395_gene_exp.diff.anno.known.csv.gz;conservative;1.00;NA; NA
+GSE47399;GSE47399_diff_exp_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE48166;GSE48166_Cufflinks_FPKM.txt.gz;anti-conservative;0.95;NA; NA
+GSE48230;GSE48230_PC3-EMT14_v_PC3-EMT14-OVOL1_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE48230;GSE48230_PC3-EMT14_v_PC3-EMT14-OVOL1_isoform_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE48230;GSE48230_PC3-EMT14_v_PC3-EMT14-OVOL2_gene_exp.diff.txt.gz;bimodal;0.88;NA; NA
+GSE48230;GSE48230_PC3-EMT14_v_PC3-EMT14-OVOL2_isoform_exp.diff.txt.gz;bimodal;0.94;NA; NA
+GSE48230;GSE48230_PC3-EMT14_v_PC3-Epi_gene_exp.diff.txt.gz;bimodal;0.81;NA; NA
+GSE48230;GSE48230_PC3-EMT14_v_PC3-Epi_isoform_exp.diff.txt.gz;bimodal;0.91;NA; NA
+GSE48230;GSE48230_PC3-EMT14-OVOL1_v_PC3-EMT14-OVOL2_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE48230;GSE48230_PC3-EMT14-OVOL1_v_PC3-EMT14-OVOL2_isoform_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE48671;GSE48671_all.GeneDiffExp.txt.gz-set-0;anti-conservative;0.27;NA; NA
+GSE48671;GSE48671_all.GeneDiffExp.txt.gz-set-1;anti-conservative;0.16;NA; NA
+GSE49097;GSE49097_BetweenGenotypes_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE49097;GSE49097_CompareAll_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE49097;GSE49097_Within_A_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE49097;GSE49097_Within_B_gene_exp.diff.gz;conservative;0.99;NA; NA
+GSE49097;GSE49097_Within_WT_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE49147;GSE49147_ESC_KO_vs_WT.txt.gz;conservative;0.98;NA; NA
+GSE49147;GSE49147_iPS_PF1_vs_PF2.txt.gz;conservative;1.00;NA; NA
+GSE49147;GSE49147_iPS_TTF1_vs_TTF2.txt.gz;conservative;1.00;NA; NA
+GSE49313;GSE49313_DRRi_GFPi_cds_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE49313;GSE49313_PhanDRR1.2_PhanGFP_cds_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE49389;GSE49389_RNAseq_gene_exp.txt.gz;conservative;0.98;NA; NA
+GSE49581;GSE49581_lincBrn1b_All_timepoints_cuffdiff.tab.gz-set-0;bimodal;0.87;NA; NA
+GSE49581;GSE49581_lincBrn1b_All_timepoints_cuffdiff.tab.gz-set-1;bimodal;0.88;NA; NA
+GSE49581;GSE49581_lincBrn1b_All_timepoints_cuffdiff.tab.gz-set-2;bimodal;0.88;NA; NA
+GSE49581;GSE49581_lincBrn1b_All_timepoints_cuffdiff.tab.gz-set-3;bimodal;0.89;NA; NA
+GSE49581;GSE49581_lincBrn1b_All_timepoints_cuffdiff.tab.gz-set-4;conservative;0.99;NA; NA
+GSE49581;GSE49581_lincBrn1b_All_timepoints_cuffdiff.tab.gz-set-5;bimodal;0.87;NA; NA
+GSE49581;GSE49581_lincBrn1b_All_timepoints_cuffdiff.tab.gz-set-6;bimodal;0.88;NA; NA
+GSE49581;GSE49581_lincBrn1b_All_timepoints_cuffdiff.tab.gz-set-7;bimodal;0.88;NA; NA
+GSE49581;GSE49581_lincBrn1b_All_timepoints_cuffdiff.tab.gz-set-8;bimodal;0.89;NA; NA
+GSE49587;GSE49587_L2_L3P1_2_DEUtable.txt.gz;other;0.86;NA; NA
+GSE49587;GSE49587_L312hr_L3P1_2_DEUtable.txt.gz;other;0.84;NA; NA
+GSE49587;GSE49587_ORvSmn_DEUtable.txt.gz;anti-conservative;0.77;NA; NA
+GSE49700;GSE49700_aza.repeats.txt.gz;conservative;0.93;NA; NA
+GSE49700;GSE49700_aza.txt.gz;other;1.00;NA; NA
+GSE49700;GSE49700_FB_FLM.RNA.txt.gz;other;1.00;NA; NA
+GSE49716;GSE49716_pei1vspei3_gene_exp.diff.txt.gz;conservative;0.98;NA; NA
+GSE49843;GSE49843_gene_exp.diff_22345-22353.txt.gz;conservative;0.97;NA; NA
+GSE50068;GSE50068_Cuffdiff_output.txt.gz;bimodal;0.89;NA; NA
+GSE50156;GSE50156_mas5D_AND_WT_24oC.txt.gz;conservative;1.00;NA; NA
+GSE50156;GSE50156_nmt1-hsf1_MMThi-_AND_WT_MMThi-.txt.gz;conservative;1.00;NA; NA
+GSE50156;GSE50156_ssa2D_AND_WT_24oC.txt.gz;conservative;1.00;NA; NA
+GSE50156;GSE50156_WT_36oC_15min_AND_WT_24oC.txt.gz;conservative;1.00;NA; NA
+GSE50198;GSE50198_Tet1kd_vs_v6.5_DESeq_results.txt.gz-set-0;anti-conservative;0.57;anti-conservative;0.35
+GSE50198;GSE50198_Tet1kd_vs_v6.5_DESeq_results.txt.gz-set-1;anti-conservative;0.46;anti-conservative;0.17
+GSE50198;GSE50198_Tet1kd_vs_v6.5_DEXSeq_results.txt.gz;anti-conservative;0.67;NA; NA
+GSE50198;GSE50198_Tet2kd_vs_v6.5_DESeq_results.txt.gz-set-0;bimodal;0.70;anti-conservative;0.66
+GSE50198;GSE50198_Tet2kd_vs_v6.5_DESeq_results.txt.gz-set-1;anti-conservative;0.57;anti-conservative;0.31
+GSE50198;GSE50198_Tet2kd_vs_v6.5_DEXSeq_results.txt.gz;anti-conservative;0.68;NA; NA
+GSE50203;GSE50203_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE50203;GSE50203_isoform_exp.diff.gz;conservative;1.00;NA; NA
+GSE50424;GSE50424_Adipose.tsv.gz;conservative;1.00;NA; NA
+GSE50424;GSE50424_Liver.tsv.gz;conservative;1.00;NA; NA
+GSE50535;GSE50535_diffexp_1.txt.gz-set-0;anti-conservative;0.63;NA; NA
+GSE50535;GSE50535_diffexp_1.txt.gz-set-1;anti-conservative;0.64;NA; NA
+GSE50535;GSE50535_diffexp_2.txt.gz;anti-conservative;0.56;NA; NA
+GSE50535;GSE50535_diffexp_3.txt.gz-set-0;anti-conservative;0.61;NA; NA
+GSE50535;GSE50535_diffexp_3.txt.gz-set-1;anti-conservative;0.30;NA; NA
+GSE50554;GSE50554_Routine_gene.diff.gz;conservative;1.00;NA; NA
+GSE50554;GSE50554_Routine_isoform.diff.gz;conservative;1.00;NA; NA
+GSE50554;GSE50554_Stringent_gene.diff.gz;conservative;1.00;NA; NA
+GSE50554;GSE50554_Stringent_isoform.diff.gz;conservative;1.00;NA; NA
+GSE50557;GSE50557_rnaseq-lbl1-Cuffdiff_gene_expression.txt.gz;conservative;1.00;NA; NA
+GSE50708;GSE50708_DE_result.txt.gz;anti-conservative;0.32;NA; NA
+GSE50739;GSE50739_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE51037;GSE51037_Untreated_Nitrate_Processed_CunninghamBussel.xlsx.gz;anti-conservative;0.90;NA; NA
+GSE51119;GSE51119_bHLH159KD_vs_Col_gene_exp.diff.txt.gz;conservative;0.97;NA; NA
+GSE51119;GSE51119_bHLH159ox_vs_Col_gene_exp.diff.txt.gz;conservative;0.92;NA; NA
+GSE51119;GSE51119_IBH1KD_vs_Col_gene_exp.diff.txt.gz;conservative;0.97;NA; NA
+GSE51119;GSE51119_IBH1ox_vs_Col_gene_exp.diff.txt.gz;conservative;0.95;NA; NA
+GSE51144;GSE51144_all_exons.txt.gz;other;0.86;NA; NA
+GSE51645;GSE51645_ASE_processed_data.txt.gz;anti-conservative;0.98;NA; NA
+GSE51645;GSE51645_DE_processed_data.txt.gz;anti-conservative;0.76;NA; NA
+GSE51847;GSE51847_Expression_table_LE-2_x_HR-3.txt.gz;conservative;1.00;NA; NA
+GSE51893;GSE51893_wt_v_MZeomesa-sphere_gene_exp.txt.gz;conservative;1.00;NA; NA
+GSE51975;GSE51975_C_v_OVOL1_2_gene_exp.diff.gz;bimodal;0.87;NA; NA
+GSE51975;GSE51975_C_v_OVOL1_2_isoform_exp.diff.gz;bimodal;0.94;NA; NA
+GSE51975;GSE51975_C_v_OVOL1_gene_exp.diff.gz;bimodal;0.95;NA; NA
+GSE51975;GSE51975_C_v_OVOL1_isoform_exp.diff.gz;bimodal;0.98;NA; NA
+GSE51975;GSE51975_C_v_OVOL2_gene_exp.diff.gz;bimodal;0.94;NA; NA
+GSE51975;GSE51975_C_v_OVOL2_isoform_exp.diff.gz;bimodal;0.97;NA; NA
+GSE52038;GSE52038_Supplementary-table-1-date11021.txt.gz;bimodal;0.85;NA; NA
+GSE52058;GSE52058_Cuffdiff_Dana_TestisOvary.gene_exp.diff.gz;anti-conservative;0.35;NA; NA
+GSE52058;GSE52058_Cuffdiff_Dpse_TestisOvary.gene_exp.diff.gz;anti-conservative;0.42;NA; NA
+GSE52080;GSE52080_processed_data.txt.gz;bimodal;0.82;NA; NA
+GSE52153;GSE52153_czt-1DMSOvsczt-1STS.txt.gz;anti-conservative;0.55;NA; NA
+GSE52153;GSE52153_wtDMSOvsczt-1DMSO.txt.gz;bimodal;0.92;NA; NA
+GSE52153;GSE52153_wtDMSOvswtSTS.txt.gz;anti-conservative;0.71;NA; NA
+GSE52201;GSE52201_RNAseq_processed_data_L_D_siLSD1.txt.gz;conservative;1.00;NA; NA
+GSE52284;GSE52284_gene_exp.diff.gz;bimodal;0.97;NA; NA
+GSE52367;GSE52367_Cuflinks_2338_2339.txt.gz;conservative;1.00;NA; NA
+GSE52385;GSE52385_siCtrl_VS_siSRA_assemblenewgenes.txt.gz;conservative;1.00;NA; NA
+GSE52385;GSE52385_siCtrl_VS_siSRA_notassemblenewgenes.txt.gz;conservative;1.00;NA; NA
+GSE52402;GSE52402_B19P16_B20P3_RPKM.txt.gz;anti-conservative;0.63;NA; NA
+GSE52450;GSE52450_Cuffdiff_on_pre-pro-B_and_pro-B_aligned_reads_transcript_differential_expression_testing_Bv46.txt.gz;conservative;1.00;NA; NA
+GSE52502;GSE52502_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE52551;GSE52551_delta_Rv3263_expr.txt.gz;other;1.00;NA; NA
+GSE52911;GSE52911_gene_exp.txt.gz;conservative;1.00;NA; NA
+GSE53022;GSE53022_mt_vs_wt.DESeq.txt.gz;conservative;1.00;other;1.00
+GSE53040;GSE53040_wtDMSOvswtD1.txt.gz;bimodal;0.93;NA; NA
+GSE53040;GSE53040_wtDMSOvswtTX129.txt.gz;conservative;1.00;NA; NA
+GSE53040;GSE53040_wtDMSOvswtTX34.txt.gz;bimodal;0.98;NA; NA
+GSE53040;GSE53040_wtDMSOvswtTX87.txt.gz;conservative;0.94;NA; NA
+GSE53040;GSE53040_wtDMSOvswtXP13.txt.gz;anti-conservative;0.69;NA; NA
+GSE53470;GSE53470_gene_exp_P251_PCJ_3rep_combined.diff.gz;conservative;1.00;NA; NA
+GSE53470;GSE53470_gene_exp_P251_PJD_3rep_combined.diff.gz;conservative;1.00;NA; NA
+GSE53599;GSE53599_D5-1322_vs_RLuc-713_24hrs.txt.gz;conservative;1.00;NA; NA
+GSE53599;GSE53599_D5-1322_vs_RLuc-713_48hrs.txt.gz;conservative;0.99;NA; NA
+GSE53599;GSE53599_D5-2086_vs_RLuc-713_24hrs.txt.gz;conservative;1.00;NA; NA
+GSE53599;GSE53599_D5-2086_vs_RLuc-713_48hrs.txt.gz;conservative;0.97;NA; NA
+GSE53653;GSE53653_st10.5_Foxh1_MO_gene_exp_diff.txt.gz;conservative;0.99;NA; NA
+GSE53653;GSE53653_st10.5_SB431542_gene_exp_diff.txt.gz;conservative;1.00;NA; NA
+GSE53789;GSE53789_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE53789;GSE53789_GFP_FACS_x_GFP_LCM-not_significant.diff.txt.gz;conservative;1.00;NA; NA
+GSE53789;GSE53789_GFP_FACS_x_WT_FACS-not_significant.diff.txt.gz;conservative;1.00;NA; NA
+GSE53789;GSE53789_GFP_LCM_gt_GFP_FACS_gene_exp_with_zeros.diff.txt.gz;other;0.33;NA; NA
+GSE53789;GSE53789_GFP_LCM_gt_WT_FACS_gene_exp_with_zeros.diff.txt.gz;other;0.32;NA; NA
+GSE53789;GSE53789_GFP_LCM_x_GFP_FACS-not_significant.diff.txt.gz;conservative;1.00;NA; NA
+GSE53789;GSE53789_GFP_LCM_x_WT_FACS-not_significant.diff.txt.gz;conservative;1.00;NA; NA
+GSE53789;GSE53789_WT_FACS_x_GFP_FACS-not_significant.diff.txt.gz;conservative;1.00;NA; NA
+GSE53789;GSE53789_WT_FACS_x_GFP_LCM-not_significant.diff.txt.gz;conservative;1.00;NA; NA
+GSE53976;GSE53976_gene_exp.diff.txt.gz;conservative;0.96;NA; NA
+GSE54240;GSE54240_phoP_RNA-seq.tsv.gz;bimodal;1.00;NA;1.00
+GSE54246;GSE54246_Control_vs._4_NQO_Tongue_gene_exp.xlsx.gz;bimodal;0.94;NA; NA
+GSE54286;GSE54286_Lys_sup_pelle_rs_mvhip_Exp.txt.gz;bimodal;0.96;NA; NA
+GSE54433;GSE54433_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE54440;GSE54440_WT_Z2_RNAseq_rep2.txt.gz;anti-conservative;0.51;NA; NA
+GSE54473;GSE54473_Suv420_gene_exp.xlsx.gz-sheet-gene_exp;bimodal;0.91;NA; NA
+GSE54602;GSE54602_D4_D8_D11_D14_isoform_exp.diff.parsed.txt.gz-set-0;bimodal;0.93;NA; NA
+GSE54602;GSE54602_D4_D8_D11_D14_isoform_exp.diff.parsed.txt.gz-set-1;conservative;1.00;NA; NA
+GSE54602;GSE54602_D4_D8_D11_D14_isoform_exp.diff.parsed.txt.gz-set-2;conservative;1.00;NA; NA
+GSE54641;GSE54641_cuffdiff2_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE54641;GSE54641_DESeq.txt.gz;conservative;0.94;anti-conservative;0.98
+GSE54846;GSE54846_130529.DESeq.120813.combined-htseq-Luc123-m1_123.HGNC.protein_coding.rsgt20.txt.gz;anti-conservative;0.79;anti-conservative;0.45
+GSE54982;GSE54982_Differential_Gene_Expression_Summary.xlsx.gz-sheet-C1_WtE8.0_Vs_Wt10.0;bimodal;0.98;NA; NA
+GSE54982;GSE54982_Differential_Gene_Expression_Summary.xlsx.gz-sheet-C2_Wt_VS_ Tc E8.0;bimodal;0.99;NA; NA
+GSE54982;GSE54982_Differential_Gene_Expression_Summary.xlsx.gz-sheet-C3_Wt_VS_Tc_E10.0;bimodal;0.99;NA; NA
+GSE54982;GSE54982_Differential_Gene_Expression_Summary.xlsx.gz-sheet-C4_TcE8.0_VS_TcE10.0;bimodal;0.99;NA; NA
+GSE54984;GSE54984_Differential_Gene_Expression_Summary.xlsx.gz-sheet-EBDay4_ControlVSBrachyuryKD;bimodal;0.99;NA; NA
+GSE54984;GSE54984_Differential_Gene_Expression_Summary.xlsx.gz-sheet-ESCs_VS_EBDay4;bimodal;0.94;NA; NA
+GSE55090;GSE55090_cds_exp.diff.txt.gz;bimodal;0.85;NA; NA
+GSE55090;GSE55090_gene_exp.diff.txt.gz;bimodal;0.84;NA; NA
+GSE55090;GSE55090_isoform_exp.diff.txt.gz;bimodal;0.90;NA; NA
+GSE55090;GSE55090_tss_group_exp.diff.txt.gz;bimodal;0.86;NA; NA
+GSE55394;GSE55394_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE55528;GSE55528_gene_exp_PA.diff.gz;anti-conservative;0.56;NA; NA
+GSE55528;GSE55528_gene_exp_SA.diff.gz;anti-conservative;0.68;NA; NA
+GSE55596;GSE55596_alldiff_nonovel.txt.gz;conservative;1.00;NA; NA
+GSE55596;GSE55596_LOLOdiff_nonovel.txt.gz;conservative;0.99;NA; NA
+GSE55682;GSE55682_16h.xls.gz;other;1.00;NA; NA
+GSE55682;GSE55682_20h.xls.gz;other;1.00;NA; NA
+GSE55682;GSE55682_24h.xls.gz;other;1.00;NA; NA
+GSE55682;GSE55682_48h.xls.gz;other;1.00;NA; NA
+GSE55682;GSE55682_Baf250a6days.csv.gz;other;1.00;NA; NA
+GSE55870;GSE55870_CAF90vsNF1493.xlsx.gz;conservative;0.99;other;1.00
+GSE56013;GSE56013_A.Wildtype_wholefly_DCVrel.Mock.txt.gz;conservative;0.99;NA; NA
+GSE56013;GSE56013_B.G9amutant_wholefly_DCVrel.Mock.txt.gz;conservative;0.99;NA; NA
+GSE56013;GSE56013_E.Wildtype_fatbody_DCVrel.Mock.txt.gz;conservative;0.98;NA; NA
+GSE56013;GSE56013_F.G9amutant_fatbody_DCVrel.Mock.txt.gz;conservative;0.97;NA; NA
+GSE56013;GSE56013_I.G9amutant_rel.to_Wildtype_DCV_WholeFly.txt.gz;spiky;0.99;NA; NA
+GSE56013;GSE56013_J.G9amutant_rel.to_Wildtype_DCV_Fatbody.txt.gz;conservative;0.96;NA; NA
+GSE56052;GSE56052_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE56058;GSE56058_differentialExpressionGenes_RD19.txt.gz;other;1.00;NA; NA
+GSE56073;GSE56073_PARP-1-KD_tss_group_exp.diff.gz;conservative;1.00;NA; NA
+GSE56073;GSE56073_PARylation_tss_group_exp.diff.gz;conservative;1.00;NA; NA
+GSE56097;GSE56097_Cufflinks_CuffDiff_gene_exp.txt.gz;conservative;1.00;NA; NA
+GSE56122;GSE56122_IFN-gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE56122;GSE56122_LPS-gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE56132;GSE56132_Pm_Si_expression.txt.gz-set-0;anti-conservative;0.67;NA; NA
+GSE56132;GSE56132_Pm_Si_expression.txt.gz-set-1;anti-conservative;0.57;NA; NA
+GSE56169;GSE56169_normalized_RNASeq_Ctrl_vs_E2a.txt.gz;anti-conservative;0.37;NA; NA
+GSE56284;GSE56284_gene_exp.txt.gz;bimodal;0.87;NA; NA
+GSE56346;GSE56346_wtNplus_vs_wtNminus_DESeq_output.txt.gz;anti-conservative;0.36;anti-conservative;0.23
+GSE56575;GSE56575_cds_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE56966;GSE56966_IL6Ra_WT.xlsx.gz-sheet-gene_exp;other;1.00;NA; NA
+GSE56966;GSE56966_IL6Ra_WT.xlsx.gz-sheet-gene_notest;conservative;1.00;NA; NA
+GSE56966;GSE56966_MyD88_WT.xlsx.gz-sheet-gene_exp;other;1.00;NA; NA
+GSE56966;GSE56966_MyD88_WT.xlsx.gz-sheet-gene_notest;conservative;1.00;NA; NA
+GSE57217;GSE57217_bck1wt_geneexp_diff.txt.gz;anti-conservative;0.73;NA; NA
+GSE57217;GSE57217_mkk2wt_geneexp_diff.txt.gz;anti-conservative;0.80;NA; NA
+GSE57217;GSE57217_mpk1wt_geneexp_diff.txt.gz;anti-conservative;0.77;NA; NA
+GSE57227;GSE57227_PHH_GW_vs_DMSO_RNA_seq_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE57254;GSE57254_Control_CELF1KD_abundances.txt.gz;conservative;0.98;NA; NA
+GSE57396;GSE57396_Cuttdiff_cds_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE57397;GSE57397_degexp.KO-REC-REP1-RNA.vs.KO-HS-REP1-RNA.output_score.txt.gz;anti-conservative;0.38;NA; NA
+GSE57397;GSE57397_degexp.KO-REC-REP2-RNA.vs.KO-HS-REP2-RNA.output_score.txt.gz;anti-conservative;0.39;NA; NA
+GSE57397;GSE57397_degexp.WT-REC-REP1-RNA.vs.WT-HS-REP1-RNA.output_score.txt.gz;anti-conservative;0.34;NA; NA
+GSE57397;GSE57397_degexp.WT-REC-REP2-RNA.vs.WT-HS-REP2-RNA.output_score.txt.gz;anti-conservative;0.37;NA; NA
+GSE57482;GSE57482_output_score.txt.gz;anti-conservative;0.25;NA; NA
+GSE57517;GSE57517_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE57680;GSE57680_RPKM_luminal_epithelium.txt.gz;conservative;1.00;NA; NA
+GSE57680;GSE57680_RPKM_stroma.txt.gz;conservative;1.00;NA; NA
+GSE57682;GSE57682_Id2_3_Treg_G42_Cuffdiff.txt.gz;conservative;1.00;NA; NA
+GSE58052;GSE58052_N.europaea_co-culture_over_single-culture.txt.gz;anti-conservative;0.61;NA; NA
+GSE58052;GSE58052_N.winogradskyi_co-culture_over_single-culture.txt.gz;spiky;0.86;NA; NA
+GSE58053;GSE58053_1mm-over-0mm.txt.gz;bimodal;1.00;NA; NA
+GSE58053;GSE58053_25mm-over-0mm.txt.gz;anti-conservative;0.56;NA; NA
+GSE58053;GSE58053_25mm-over-1mm.txt.gz;anti-conservative;0.68;NA; NA
+GSE58082;GSE58082_gene_exp.diff.txt.gz;bimodal;0.90;NA; NA
+GSE58115;GSE58115_4858DM98-3_VS_4858C6_differential_all.txt.gz;bimodal;0.79;NA; NA
+GSE58326;GSE58326_gene_exp.txt.gz;bimodal;0.90;NA; NA
+GSE58359;GSE58359_HOXA9.txt.gz;bimodal;0.93;NA; NA
+GSE58360;GSE58360_Cebpa.txt.gz;conservative;1.00;NA; NA
+GSE58379;GSE58379_RBM47_alternative_splicing.txt.gz;bimodal;0.94;NA; NA
+GSE58405;GSE58405_gene_exp.diff.gz;bimodal;0.74;NA; NA
+GSE58405;GSE58405_isoform_exp.diff.gz;bimodal;0.89;NA; NA
+GSE58464;GSE58464_RNA-seq_tophat_microrazers_results.txt.gz-set-0;conservative;1.00;NA; NA
+GSE58464;GSE58464_RNA-seq_tophat_microrazers_results.txt.gz-set-1;conservative;0.95;NA; NA
+GSE58467;GSE58467_FPKM.txt.gz;bimodal;0.80;NA; NA
+GSE58495;GSE58495_diffexp_LSK.txt.gz-set-0;anti-conservative;0.66;NA; NA
+GSE58495;GSE58495_diffexp_LSK.txt.gz-set-1;anti-conservative;0.58;NA; NA
+GSE58586;GSE58586_RNAseq-PDX-paired-tr-vs-untr_allintensity-filtered.txt.gz;other;0.97;NA; NA
+GSE58609;GSE58609_MEF_WT_DKO.deseq.txt.gz-set-0;conservative;0.94;NA; NA
+GSE58609;GSE58609_MEF_WT_DKO.deseq.txt.gz-set-1;conservative;0.99;NA; NA
+GSE58865;GSE58865_Hyphae_vs_Oidia_DESeq_results.txt.gz;anti-conservative;0.46;NA;0.03
+GSE58910;GSE58910_SenescentAstrocytesDEanalysis_v2.csv.gz;bimodal;0.76;anti-conservative;0.69
+GSE59017;GSE59017_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE59017;GSE59017_isoform_exp.diff.gz;conservative;1.00;NA; NA
+GSE59020;GSE59020_ETS1_gene_exp_all.diff.gz;conservative;1.00;NA; NA
+GSE59020;GSE59020_U0126_gene_exp_all.diff.gz;conservative;0.98;NA; NA
+GSE59290;GSE59290_ANTI_isoform_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE59290;GSE59290_MIR_isoform_exp.diff.txt.gz;conservative;0.96;NA; NA
+GSE59481;GSE59481_PIG_vs_GFP_DE_genes.txt.gz;bimodal;0.91;NA; NA
+GSE59571;GSE59571_S13113_genesdiff.xlsx;anti-conservative;0.70;NA; NA
+GSE59621;GSE59621_gene_exp.diff.txt.gz;conservative;0.98;NA; NA
+GSE59705;GSE59705_DEXseqresultstable.txt.gz;other;0.95;NA; NA
+GSE59715;GSE59715_finalHiCRNAseqTable.csv.gz;anti-conservative;0.73;anti-conservative;0.44
+GSE59781;GSE59781_gene_exp.diff.gz;bimodal;0.82;NA; NA
+GSE59814;GSE59814_processed_data.txt.gz;anti-conservative;0.53;NA; NA
+GSE59850;GSE59850_redgrn_early_cuffdiff_out.diff.txt.gz;bimodal;1.00;NA; NA
+GSE59850;GSE59850_redgrn_late_cuffdiff_out.diff.txt.gz;bimodal;1.00;NA; NA
+GSE59850;GSE59850_redrho_late_cuffdiff_out.diff.txt.gz;bimodal;0.98;NA; NA
+GSE59850;GSE59850_redvio_late_cuffdiff_out.diff.txt.gz;bimodal;1.00;NA; NA
+GSE59850;GSE59850_rhogrn_early_cuffdiff_out.diff.txt.gz;conservative;1.00;NA; NA
+GSE59980;GSE59980_RNA-seq_598-SKD.txt.gz-set-0;spiky;0.67;NA; NA
+GSE59980;GSE59980_RNA-seq_598-SKD.txt.gz-set-1;anti-conservative;0.39;NA; NA
+GSE60171;GSE60171_cuffdiff.FGF-1day.vs.iBET-1day.txt.gz;conservative;0.97;NA; NA
+GSE60171;GSE60171_cuffdiff.FGF-5days.vs.iBET-5days.txt.gz;conservative;0.94;NA; NA
+GSE60177;GSE60177_PseudomonasDESeq.txt.gz;conservative;0.99;NA; NA
+GSE60191;GSE60191_RNA_halflives.xlsx.gz-sheet-Tabelle1;anti-conservative;0.32;NA; NA
+GSE60441;GSE60441_gene_exp.diff.gz;bimodal;0.79;NA; NA
+GSE60630;GSE60630_PDC3_vs_DMSO_gene_exp.diff.gz;bimodal;0.86;NA; NA
+GSE60630;GSE60630_PDC3_vs_DMSO_isoform_exp.diff.gz;bimodal;0.96;NA; NA
+GSE60630;GSE60630_PDC3_vs_DMSO_splicing.diff.gz;conservative;1.00;NA; NA
+GSE60641;GSE60641_AB03_2.xlsx.gz;bimodal;0.79;NA; NA
+GSE60642;GSE60642_AB056_2.xlsx.gz-set-0;bimodal;0.78;NA; NA
+GSE60642;GSE60642_AB056_2.xlsx.gz-set-1;bimodal;0.78;NA; NA
+GSE60642;GSE60642_AB056_2.xlsx.gz-set-2;bimodal;0.85;NA; NA
+GSE60691;GSE60691_processed_data_aso_wild_type.txt.gz;bimodal;0.94;NA; NA
+GSE60691;GSE60691_processed_data_krkr_sumo_mut.txt.gz;bimodal;0.94;NA; NA
+GSE60701;GSE60701_AL_R_vs_AL_L.diff_expressed_transcripts.tsv.gz;bimodal;0.95;NA; NA
+GSE60701;GSE60701_ChL_R_vs_AL_R.diff_expressed_transcripts.tsv.gz;bimodal;0.90;NA; NA
+GSE60701;GSE60701_ChL_R_vs_ChL_L.diff_expressed_transcripts.tsv.gz;bimodal;0.97;NA; NA
+GSE60756;GSE60756_Richards_092013_B6_vs_Cast_DESeq_Stats-NormSignal_Annotated.txt.gz;uniform;1.00;spiky;0.99
+GSE60822;GSE60822_cuffdiff.control.ablation.tab.gz;conservative;1.00;NA; NA
+GSE60822;GSE60822_cuffdiff.control.induction.tab.gz;conservative;1.00;NA; NA
+GSE60822;GSE60822_cuffdiff.induction.ablation.tab.gz;conservative;1.00;NA; NA
+GSE60825;GSE60825_Differential_Expression.xlsx-sheet-Cntl Normoxia vs ELT-2 Normoxia;conservative;1.00;NA; NA
+GSE60825;GSE60825_Differential_Expression.xlsx-sheet-Cntrl Hypoxia vs ELT-2 Hypoxia;conservative;1.00;NA; NA
+GSE60825;GSE60825_Differential_Expression.xlsx-sheet-Cntrl Hypoxia vs ELT-2 Normoxia;conservative;1.00;NA; NA
+GSE60825;GSE60825_Differential_Expression.xlsx-sheet-Cntrl Normoxia vs Cntrl Hypoxia;conservative;1.00;NA; NA
+GSE60825;GSE60825_Differential_Expression.xlsx-sheet-Cntrl Normoxia vs ELT-2 Hypoxia;conservative;1.00;NA; NA
+GSE60825;GSE60825_Differential_Expression.xlsx-sheet-ELT-Normoxia vs ELT-2 Hypoxia;conservative;1.00;NA; NA
+GSE60968;GSE60968_VEC_vs_CRE_DE.txt.gz;anti-conservative;0.38;NA; NA
+GSE61031;GSE61031_DE_polyaWT_vs_polyaKO.txt.gz;bimodal;0.81;anti-conservative;0.84
+GSE61033;GSE61033_DE_exonWT_vs_exonKOnoRN.txt.gz;bimodal;0.70;anti-conservative;0.71
+GSE61033;GSE61033_DE_intronWT_vs_intronKOnoRN.txt.gz;bimodal;0.86;anti-conservative;0.86
+GSE61202;GSE61202_NICvsMOdifferential_expression.txt.gz;conservative;1.00;NA; NA
+GSE61238;GSE61238_gene_exp.diff.gz;conservative;0.96;NA; NA
+GSE61336;GSE61336_results_167_vs_WTL.txt.gz;bimodal;0.90;anti-conservative;0.42
+GSE61336;GSE61336_results_167_vs_WTZ.txt.gz;bimodal;0.88;anti-conservative;0.41
+GSE61336;GSE61336_results_WTL_vs_WTZ.txt.gz;conservative;1.00;anti-conservative;0.99
+GSE61351;GSE61351_Cont_ComparedTo_PTH_D28_CuffDiffAnalysis1.xls.gz;bimodal;0.78;NA; NA
+GSE61491;GSE61491_CHDKD_differential_expression.txt.gz;anti-conservative;0.95;NA; NA
+GSE61566;GSE61566_cds_exp.diff.gz;bimodal;0.80;NA; NA
+GSE61566;GSE61566_cds.diff.gz;conservative;0.98;NA; NA
+GSE61566;GSE61566_gene_exp.diff.gz;bimodal;0.74;NA; NA
+GSE61566;GSE61566_isoform_exp.diff.gz;bimodal;0.86;NA; NA
+GSE61566;GSE61566_promoters.diff.gz;conservative;1.00;NA; NA
+GSE61566;GSE61566_splicing.diff.gz;conservative;0.99;NA; NA
+GSE61566;GSE61566_tss_group_exp.diff.gz;bimodal;0.80;NA; NA
+GSE61690;GSE61690_DormantvsNondormant_meristems.txt.gz;bimodal;0.97;NA; NA
+GSE61733;GSE61733_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE61796;GSE61796_NG_Induced_transcript_changes.txt.gz;conservative;0.99;NA; NA
+GSE61845;GSE61845_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE61851;GSE61851_genelist-sortedbypadj.txt.gz;bimodal;0.68;NA; NA
+GSE61954;GSE61954_all_genes_expression_values_supp_table.txt.gz;anti-conservative;0.77;anti-conservative;0.59
+GSE61969;GSE61969_gene_exp.diff.gz;conservative;0.96;NA; NA
+GSE62040;GSE62040_gene_exp.diff.gz;conservative;0.97;NA; NA
+GSE62200;GSE62200_Table_S4.xls.gz-sheet-Table S4;bimodal;0.78;NA; NA
+GSE62200;GSE62200_Table_S4.xls.gz-sheet-Table S5 N2Y6-E VS LYP9-E;conservative;1.00;NA; NA
+GSE62200;GSE62200_Table_S4.xls.gz-sheet-Table S5 N2Y6-M VS LYP9-M;anti-conservative;0.81;NA; NA
+GSE62633;GSE62633_Differential_expression_table.txt.gz;conservative;0.98;NA; NA
+GSE62647;GSE62647_Setd8_differential_expression_analyses.txt.gz;conservative;0.99;NA; NA
+GSE62668;GSE62668_Embryo.txt.gz;conservative;1.00;NA; NA
+GSE62668;GSE62668_Sperm.txt.gz;conservative;1.00;NA; NA
+GSE62760;GSE62760_Acute_Cuffdiff_DGE.txt.gz;bimodal;0.94;NA; NA
+GSE62760;GSE62760_Chronic_Cuffdiff_DGE.txt.gz;bimodal;0.95;NA; NA
+GSE62785;GSE62785_Table_S1_Genes_differentially_expressed_in_hns_mutant_in_mid-exponential_phase.xls.gz-sheet-status = OK;anti-conservative;0.86;NA; NA
+GSE62785;GSE62785_Table_S2_Genes_differentially_expressed_in_hns_mutant_in_early_stationary_phase.xls.gz-sheet-status = ok;anti-conservative;0.78;NA; NA
+GSE62909;GSE62909_Differential_gene_exp.diff.gz;bimodal;0.87;NA; NA
+GSE63091;GSE63091_diffana_DESeq_GFP-4A3-Y14_MLN51-UPF1.Ensembl65.tsv.gz-set-0;conservative;0.97;anti-conservative;0.94
+GSE63091;GSE63091_diffana_DESeq_GFP-4A3-Y14_MLN51-UPF1.Ensembl65.tsv.gz-set-1;conservative;0.99;anti-conservative;0.99
+GSE63091;GSE63091_diffana_DESeq_GFP-4A3-Y14_MLN51-UPF1.Ensembl65.tsv.gz-set-2;conservative;1.00;other;1.00
+GSE63091;GSE63091_diffana_DESeq_GFP-4A3-Y14_MLN51-UPF1.Ensembl65.tsv.gz-set-3;conservative;0.99;other;1.00
+GSE63133;GSE63133_D.rerio_SVCV_infected__24K__vs_control__0K_.txt.gz;conservative;1.00;NA; NA
+GSE63133;GSE63133_D.rerio_SVCV_infected__24S__vs_control__0S_.txt.gz;conservative;1.00;NA; NA
+GSE63133;GSE63133_D.rerio_SVCV_infected__6K__vs_control__0K_.txt.gz;conservative;1.00;NA; NA
+GSE63133;GSE63133_D.rerio_SVCV_infected__6S__vs_control__0S_.txt.gz;conservative;1.00;NA; NA
+GSE63141;GSE63141_eTMglc_gene_exp.diff.gz;anti-conservative;0.95;NA; NA
+GSE63141;GSE63141_eTMgly_gene_exp.diff.gz;anti-conservative;0.78;NA; NA
+GSE63161;GSE63161_diff-Gene-list.txt.gz;spiky;0.99;NA; NA
+GSE63224;GSE63224_All_unigene_expression.txt.gz-set-0;other;1.00;NA; NA
+GSE63224;GSE63224_All_unigene_expression.txt.gz-set-1;other;0.98;NA; NA
+GSE63224;GSE63224_All_unigene_expression.txt.gz-set-2;other;1.00;NA; NA
+GSE63224;GSE63224_All_unigene_expression.txt.gz-set-3;other;1.00;NA; NA
+GSE63224;GSE63224_All_unigene_expression.txt.gz-set-4;other;0.99;NA; NA
+GSE63224;GSE63224_All_unigene_expression.txt.gz-set-5;anti-conservative;0.94;NA; NA
+GSE63226;GSE63226_WRR+vsWRR-.xls.gz;conservative;0.99;NA; NA
+GSE63300;GSE63300_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE63485;GSE63485_KS_J1Csh63_vs_KS_CTRL.two_replicates.all_gene_exp.tbl.txt.gz;conservative;1.00;NA; NA
+GSE63485;GSE63485_KS_J1Csh95_vs_KS_CTRL.two_replicates.all_gene_exp.tbl.txt.gz;conservative;1.00;NA; NA
+GSE63485;GSE63485_shAML1_ETO_vs_shControl.all_gene_exp.tbl.txt.gz;conservative;1.00;NA; NA
+GSE63510;GSE63510_ko_vs_wt_fold_changes_p_values.txt.gz;anti-conservative;0.54;anti-conservative;0.29
+GSE63555;GSE63555_Ago2_immunoprecipitation_cuffdiff_fpkm.txt.gz;conservative;1.00;NA; NA
+GSE63555;GSE63555_Gene_expression_cuffdiff_fpkm.txt.gz;conservative;1.00;NA; NA
+GSE63570;GSE63570_Rec_siRNA_RNA-seq.txt.gz;conservative;0.92;NA; NA
+GSE63707;GSE63707_DEXSeqResults_AretIR_03d_vs_IFMWT_03d.txt.gz;anti-conservative;0.67;NA; NA
+GSE63707;GSE63707_DEXSeqResults_AretIR_03d_vs_salm_ko.txt.gz;anti-conservative;0.59;NA; NA
+GSE63707;GSE63707_DEXSeqResults_AretIR_30h_vs_IFMWT_30h.txt.gz;anti-conservative;0.69;NA; NA
+GSE63707;GSE63707_DEXSeqResults_AretIR_72h_vs_IFMWT_72h.txt.gz;anti-conservative;0.67;NA; NA
+GSE63707;GSE63707_DEXSeqResults_IFMWT_03d_vs_jump_0d.txt.gz;bimodal;0.70;NA; NA
+GSE63707;GSE63707_DEXSeqResults_IFMWT_03d_vs_leg_0d.txt.gz;bimodal;0.72;NA; NA
+GSE63707;GSE63707_DEXSeqResults_salm_ko_vs_IFMWT_03d.txt.gz;anti-conservative;0.65;NA; NA
+GSE63748;GSE63748_exp_7d4h_diff.txt.gz;conservative;1.00;NA; NA
+GSE63750;GSE63750_chemhigh-batch-result-using-R-DeSeq.csv.gz;bimodal;0.99;other;0.98
+GSE63750;GSE63750_chemlow-batch-result-using-R-DeSeq.csv.gz;other;1.00;other;0.99
+GSE63758;GSE63758_gene_exp.diff.gz;bimodal;0.86;NA; NA
+GSE63794;GSE63794_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE63810;GSE63810_BCKO_RNASeq_Data.xlsx-sheet-GenesDiffExp;conservative;0.98;NA; NA
+GSE63836;GSE63836_C15Dx_versus_Untr.DESeq.txt.gz;anti-conservative;0.63;anti-conservative;0.42
+GSE63836;GSE63836_Dx_versus_C15Dx.DESeq.txt.gz;bimodal;0.80;anti-conservative;0.83
+GSE63838;GSE63838_cds_exp_diff_2D.txt.gz;conservative;0.99;NA; NA
+GSE63884;GSE63884_gene_exp.diff_cenpk_imx372_aerobic.txt.gz;uniform;1.00;NA; NA
+GSE63889;GSE63889_Diff_0U_120U_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE63889;GSE63889_Diff_120U_120C_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE63948;GSE63948_Supplemental_Table2_DeepSeq_Fanourgakis_etAl.xls.gz-sheet-long 3'UTR transcripts(>1500nt);anti-conservative;0.87;NA; NA
+GSE63948;GSE63948_Supplemental_Table2_DeepSeq_Fanourgakis_etAl.xls.gz-sheet-medium 3'UTR transcripts;anti-conservative;0.95;NA; NA
+GSE63948;GSE63948_Supplemental_Table2_DeepSeq_Fanourgakis_etAl.xls.gz-sheet-short 3'UTR transcripts(<350nt);anti-conservative;0.90;NA; NA
+GSE64025;GSE64025_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE64185;GSE64185_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE64242;GSE64242_cufdiff_isoform_exp.diff.gz;anti-conservative;0.93;NA; NA
+GSE64455;GSE64455_cuffdiff_out.txt.gz;conservative;1.00;NA; NA
+GSE64513;GSE64513_FOXD3_vs_Control_gene_exp_diff_anno.txt.gz;anti-conservative;0.61;NA; NA
+GSE64544;GSE64544_LV_processed.txt.gz;conservative;1.00;NA; NA
+GSE64544;GSE64544_MV_processed.txt.gz;conservative;1.00;NA; NA
+GSE64641;GSE64641_leaf_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE64641;GSE64641_seedling_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE64687;GSE64687_FPKM_and_differential_expression_for_mRNA.txt.gz;conservative;1.00;NA; NA
+GSE64747;GSE64747_deseq_comp_DMSO_minus_TEX_vs_compound59_minus_TEX_with_annot_and_counts.txt.gz;conservative;1.00;NA;NaN
+GSE64757;GSE64757_All_FPKMs_GEO.csv.gz;conservative;1.00;NA; NA
+GSE64840;GSE64840_2N_Ts65Dn_MEFs.gene_exp.diff.gz;conservative;0.97;NA; NA
+GSE64854;GSE64854_cds_exp.diff.gz;conservative;1.00;NA; NA
+GSE64854;GSE64854_cds.diff.gz;conservative;1.00;NA; NA
+GSE64854;GSE64854_gene_exp.diff.gz;conservative;0.98;NA; NA
+GSE64854;GSE64854_isoform_exp.diff.gz;conservative;1.00;NA; NA
+GSE64854;GSE64854_promoters.diff.gz;conservative;1.00;NA; NA
+GSE64854;GSE64854_splicing.diff.gz;conservative;1.00;NA; NA
+GSE64854;GSE64854_tss_group_exp.diff.gz;conservative;0.99;NA; NA
+GSE65022;GSE65022_cuffdiff-WT_CD_gene_exp.diff.gz;bimodal;0.94;NA; NA
+GSE65024;GSE65024_WT-bhlh_gene_exp.diff.gz;bimodal;0.94;NA; NA
+GSE65025;GSE65025_WT-HSF_gene_exp.diff.gz;conservative;0.99;NA; NA
+GSE65039;GSE65039_gene_exp1.txt.gz;conservative;1.00;NA; NA
+GSE65072;GSE65072_DESeq_plusDOX_minusDOX.xlsx;anti-conservative;0.55;NA; NA
+GSE65142;GSE65142_HYBP.txt.gz;bimodal;0.88;NA; NA
+GSE65142;GSE65142_YH.txt.gz;bimodal;0.94;NA; NA
+GSE65321;GSE65321_RNASeqProcessedDESeqData_GSM1631482-GSM1631483.txt.gz;conservative;1.00;NA; NA
+GSE65321;GSE65321_RNASeqProcessedDESeqData.txt.gz;bimodal;0.97;NA; NA
+GSE65328;GSE65328_A17_6V.tab.gz;conservative;0.94;anti-conservative;0.92
+GSE65337;GSE65337_Nfix_KO_vs_WT_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE65406;GSE65406_control_vs_gld1_DESeq.csv.gz;conservative;0.85;anti-conservative’;1.00
+GSE65406;GSE65406_gld1_vs_tumorfast_DESeq.csv.gz;conservative;0.92;other;1.00
+GSE65406;GSE65406_gld1_vs_tumorfed_DESeq.csv.gz;conservative;0.87;other;1.00
+GSE65406;GSE65406_tumorfed_vs_tumorfast_DESeq.csv.gz;conservative;0.90;other;1.00
+GSE65406;GSE65406_youngadults_vs_gld1_DESeq.csv.gz;conservative;0.84;anti-conservative;1.00
+GSE65408;GSE65408_processed_data_file.csv.gz;conservative;1.00;NA; NA
+GSE65487;GSE65487_deseq.rminus_rplus.ensembl.csv.gz;anti-conservative;0.67;anti-conservative;0.32
+GSE65487;GSE65487_deseq.rplus_gplus.ensembl.csv.gz;anti-conservative;0.50;anti-conservative;0.19
+GSE65542;GSE65542_pnky_kd.diff.gz;bimodal;0.98;NA; NA
+GSE65542;GSE65542_ptbp1_kd.diff.gz;bimodal;0.93;NA; NA
+GSE65697;GSE65697_RNA-seq.csv.gz;bimodal;0.78;NA; NA
+GSE65935;GSE65935_DKOrvsDKOnr_diffexp.txt.gz;anti-conservative;0.53;NA; NA
+GSE65935;GSE65935_WTvsDKOnr_diffexp.txt.gz;anti-conservative;0.49;NA; NA
+GSE65935;GSE65935_WTvsDKOr_diffexp.txt.gz;anti-conservative;0.47;NA; NA
+GSE65973;GSE65973_NLS_deseq2_all_alluniq_vs_mmu9htdp43nls.txt.gz;anti-conservative;0.37;anti-conservative;0.31
+GSE65987;GSE65987_FPKM_for_MEFs.txt.gz;conservative;1.00;NA; NA
+GSE66148;GSE66148_NC_v_CNS.txt.gz-set-0;anti-conservative;0.55;NA;0.27
+GSE66148;GSE66148_NC_v_CNS.txt.gz-set-1;anti-conservative;0.52;NA;0.24
+GSE66148;GSE66148_NC_v_CNS.txt.gz-set-2;anti-conservative;0.54;NA;0.28
+GSE66155;GSE66155_regulation.txt.gz;conservative;1.00;NA; NA
+GSE66158;GSE66158_all_genes_FPKM.txt.gz;bimodal;0.97;NA; NA
+GSE66232;GSE66232_B-ALL_Cuffdiff_Trim33.1271_rep1.txt.gz;conservative;1.00;NA; NA
+GSE66232;GSE66232_B-ALL_Cuffdiff_Trim33.1271_rep2.txt.gz;conservative;1.00;NA; NA
+GSE66445;GSE66445_M._a.-pES1-MATmcr3_methane_vs._M.a.-pES1-MATmcr3_methanol_GEO_Processed_data.xlsx-sheet-Sheet1;conservative;1.00;NA; NA
+GSE66478;GSE66478_gene_exp.txt.gz;bimodal;0.78;NA; NA
+GSE66478;GSE66478_isoform_exp.txt.gz;conservative;1.00;NA; NA
+GSE66506;GSE66506_DE_analysis_010714.xlsx-sheet-All_Genes;bimodal;0.93;NA; NA
+GSE66547;GSE66547_20150828-oocyteMut_vs_oocyteWt-deResults.xlsx-sheet-Genes;conservative;1.00;NA; NA
+GSE66575;GSE66575_RNAseq_genes_expression.xlsx-sheet-control_vs_comparison.gene_exp;conservative;1.00;NA; NA
+GSE66575;GSE66575_RNAseq_genes_expression.xlsx-sheet-control_vs_comparison.isoform_e;conservative;1.00;NA; NA
+GSE66619;GSE66619_Dorsal_Cord_Ipsi_vs_Con_mrna_gene_exp.diff.txt.gz;bimodal;0.91;NA; NA
+GSE66619;GSE66619_DRG_Con_vs_Ips_mrna_gene_exp.diff.txt.gz;bimodal;0.95;NA; NA
+GSE66652;GSE66652_AS13-C_differential_expression.txt.gz;bimodal;0.92;NA; NA
+GSE66652;GSE66652_S4-C_differential_expression.txt.gz;bimodal;0.91;NA; NA
+GSE66716;GSE66716_Lim_et_al_14-3-3zKOWAT_Processed_data_Cuffdiff.xlsx;conservative;1.00;NA; NA
+GSE66767;GSE66767_CD34_cord_blood.EET.txt.gz;spiky;1.00;NA; NA
+GSE66767;GSE66767_U937.EET.txt.gz;spiky;1.00;NA; NA
+GSE66793;GSE66793_cmp1-3-geo-gene.tsv.gz;anti-conservative;0.86;NA; NA
+GSE66822;GSE66822_PRMT5-vs-WT_SC-mrna_counts.txt.gz;anti-conservative;0.83;anti-conservative;0.74
+GSE67001;GSE67001_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE67029;GSE67029_cuffdiff_mh_h8.txt.gz;bimodal;0.93;NA; NA
+GSE67063;GSE67063_gene_exp.diff.gz;bimodal;0.89;NA; NA
+GSE67334;GSE67334_TFH.Vs.TH1.DESeq_Analysis_DE_Genes.txt.gz;anti-conservative;0.79;anti-conservative;0.56
+GSE67335;GSE67335_LEF1_Th1.Vs.pMIG_Th1.DESeq_Analysis_DE_Genes.txt.gz;other;1.00;other;1.00
+GSE67437;GSE67437_KO-ILC2-mLN_021815_vs_WT-ILC2-mLN_021815.txt.gz;conservative;1.00;NA; NA
+GSE67554;GSE67554_TAG5_Cuffdiff_gene_differential_expression_testing.txt.gz;bimodal;0.87;NA; NA
+GSE67554;GSE67554_ZG14_Cuffdiff_gene_differential_expression_testing.txt.gz;bimodal;0.88;NA; NA
+GSE67646;GSE67646_DESeq_1.10.1.txt.gz;anti-conservative;0.67;anti-conservative;0.25
+GSE67654;GSE67654_RNA-seq.xlsx.gz-sheet-Sheet1-set-0;other;0.62;NA; NA
+GSE67654;GSE67654_RNA-seq.xlsx.gz-sheet-Sheet1-set-1;other;0.61;NA; NA
+GSE67674;GSE67674_RNA-seq_analysis_AADMSOvsAAGSK-J4.txt.gz;bimodal;0.97;NA; NA
+GSE67674;GSE67674_RNA-seq_analysis_PBSDMSOvsPBSGSK-J4.txt.gz;anti-conservative;0.95;NA; NA
+GSE67756;GSE67756_LA2A-vs-LC2A.compare.txt.gz;anti-conservative;0.42;NA; NA
+GSE67756;GSE67756_LB2A-vs-LA2A.compare.txt.gz;anti-conservative;0.44;NA; NA
+GSE67756;GSE67756_LB2A-vs-LC2A.compare.txt.gz;anti-conservative;0.53;NA; NA
+GSE67756;GSE67756_LB2A-vs-LF1A.compare.txt.gz;anti-conservative;0.49;NA; NA
+GSE67787;GSE67787_con_bps_wex_RNAseq_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE67834;GSE67834_DESeq2_genes_diffexp_by_fc_mTECs_vs_sp-DCs.csv.gz;anti-conservative;0.29;anti-conservative;0.13
+GSE67834;GSE67834_DESeq2_genes_diffexp_by_fc_mTECs_vs_t-DCs.csv.gz;anti-conservative;0.27;anti-conservative;0.11
+GSE67834;GSE67834_DESeq2_genes_diffexp_by_fc_sp-DCs_vs_mTECs.csv.gz;anti-conservative;0.29;anti-conservative;0.13
+GSE67834;GSE67834_DESeq2_genes_diffexp_by_fc_sp-DCs_vs_t-DCs.csv.gz;anti-conservative;0.52;anti-conservative;0.22
+GSE67834;GSE67834_DESeq2_genes_diffexp_by_fc_t-DCs_vs_mTECs.csv.gz;anti-conservative;0.27;anti-conservative;0.11
+GSE67834;GSE67834_DESeq2_genes_diffexp_by_fc_t-DCs_vs_sp-DCs.csv.gz;anti-conservative;0.52;anti-conservative;0.22
+GSE67954;GSE67954_CSR1_RNAi_DESeq_output.txt.gz;bimodal;0.75;other;1.00
+GSE67954;GSE67954_P_granule_RNAi_DESeq_output.txt.gz;conservative;0.83;other;1.00
+GSE68102;GSE68102_gene_exp.diff.gz;conservative;0.96;NA; NA
+GSE68160;GSE68160_GRdim-RNASeq.xlsx;bimodal;0.89;NA; NA
+GSE68176;GSE68176_Camfl1.gene_exp.diff.gz;spiky;0.97;NA; NA
+GSE68176;GSE68176_Ophio1_1.gene_exp.diff.gz;anti-conservative;0.56;NA; NA
+GSE68229;GSE68229_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE68229;GSE68229_isoform_exp.diff.gz;conservative;1.00;NA; NA
+GSE68360;GSE68360_cds_exp.diff.gz;bimodal;1.00;NA; NA
+GSE68360;GSE68360_cds.diff.gz;conservative;0.83;NA; NA
+GSE68360;GSE68360_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE68360;GSE68360_isoform_exp.diff.gz;bimodal;1.00;NA; NA
+GSE68360;GSE68360_promoters.diff.gz;bimodal;0.79;NA; NA
+GSE68360;GSE68360_splicing.diff.gz;conservative;0.77;NA; NA
+GSE68460;GSE68460_gene_exp.xls.gz-sheet-Sheet1;conservative;1.00;NA; NA
+GSE68460;GSE68460_WSVSBS_gene_diff.xls.gz-sheet-Sheet1;conservative;1.00;NA; NA
+GSE68470;GSE68470_xue_etal_edgeR.txt.gz;bimodal;0.89;NA; NA
+GSE68736;GSE68736_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE68806;GSE68806_Galaxy_data_Cuffdiff.txt.gz;conservative;1.00;NA; NA
+GSE68813;GSE68813_Woolnough2015_CuffDiff_RNA-seq.xlsx-sheet-rep1 CuffDiff Mock vs AGO2-KD;conservative;1.00;NA; NA
+GSE68813;GSE68813_Woolnough2015_CuffDiff_RNA-seq.xlsx-sheet-rep2 CuffDiff Mock vs AGO2-KD;conservative;1.00;NA; NA
+GSE68998;GSE68998_DiffExpDeseq2_mdx2_NOut_3.6.14.csv.gz;anti-conservative;0.59;anti-conservative;0.47
+GSE69001;GSE69001_DE_list_planktonic_v_biolfim.txt.gz;anti-conservative;0.44;NA; NA
+GSE69001;GSE69001_DE_list_planktonic_v_plate.txt.gz;anti-conservative;0.33;NA; NA
+GSE69001;GSE69001_DE_list_plate_v_biofilm.txt.gz;anti-conservative;0.38;NA; NA
+GSE69110;GSE69110_d2GFP_vs_d2Sox9OE.deseq.res.csv.gz;anti-conservative;0.58;anti-conservative;0.28
+GSE69113;GSE69113_AIPVUIP_differential_expression.txt.gz;other;0.91;NA; NA
+GSE69113;GSE69113_BIPVUIP_differential_expression.txt.gz;other;0.86;NA; NA
+GSE69125;GSE69125_10408_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE69175;GSE69175_gene_exp.txt.gz;conservative;0.99;NA; NA
+GSE69205;GSE69205_gene_exp.txt.gz;conservative;0.99;NA; NA
+GSE69311;GSE69311_deseq_diff_genes.csv.gz;bimodal;0.98;anti-conservative;0.79
+GSE69556;GSE69556_cds_exp.diff.gz;bimodal;0.97;NA; NA
+GSE69721;GSE69721_UP-_and_Down-regulated_genes.txt.gz;bimodal;0.98;NA; NA
+GSE69855;GSE69855_gene_exp_ResvResVag.txt.gz;conservative;0.99;NA; NA
+GSE69855;GSE69855_gene_exp_ResvSham.txt.gz;conservative;1.00;NA; NA
+GSE69900;GSE69900_control-CBD16H.txt.gz;bimodal;0.79;NA; NA
+GSE69900;GSE69900_control-tamoxifen48H.txt.gz;bimodal;0.85;NA; NA
+GSE70068;GSE70068_GM_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE70068;GSE70068_TNF_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE70068;GSE70068_UT_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE70108;GSE70108_G263_CuffDiff_WTvsDDX5Tko.tabular.txt.gz;conservative;1.00;NA; NA
+GSE70108;GSE70108_G340_CuffDiff_WTvsRORgko.tabular.txt.gz;conservative;1.00;NA; NA
+GSE70141;GSE70141_Ax2_0H_1_2_Ax2_10H_1_2_DESeq.results.genenames.txt.gz;anti-conservative;0.22;anti-conservative;0.06
+GSE70141;GSE70141_Ax2_0H_1+2_ChdC_0H_1+2_DESeq.results.genenames.txt.gz;anti-conservative;0.61;anti-conservative;0.38
+GSE70141;GSE70141_Ax2_10H_1_2_ChdC_12H_1_2_DESeq.results.genenames.txt.gz;anti-conservative;0.30;anti-conservative;0.15
+GSE70283;GSE70283_cuffdiff_gene_exp.diff.gz;bimodal;0.96;NA; NA
+GSE70314;GSE70314_Gal474_cuffdiff_sictrl.1_siAtad2.1_gene_differential_expression_testing.txt.gz;bimodal;0.92;NA; NA
+GSE70314;GSE70314_Gal476_cuffdiff_sictrl.1_siAtad2.1_transcript_differential_expression_testing.txt.gz;bimodal;0.92;NA; NA
+GSE70314;GSE70314_Gal485_cuffdiff_sictrl.2_siAtad2.2_gene_differential_expression_testing.txt.gz;bimodal;0.95;NA; NA
+GSE70314;GSE70314_Gal487_cuffdiff_sictrl.2_siAtad2.2_transcript_differential_expression_testing.txt.gz;bimodal;0.95;NA; NA
+GSE70382;GSE70382_DESeq_allresp_vs_nonresp.xlsx-sheet-Blad1;conservative;0.96;uniform;1.00
+GSE70488;GSE70488_Day_vs_Night_sSeq.txt.gz;anti-conservative;0.35;NA; NA
+GSE70544;GSE70544_Normoxia_vs_Hypoxia_Gencode_gene_exp.diff.txt.gz;conservative;0.97;NA; NA
+GSE70544;GSE70544_Normoxia_vs_Hypoxia_Rinn_gene_exp.diff.txt.gz;conservative;0.96;NA; NA
+GSE70544;GSE70544_Vehicle_vs_Cytokine_Gencode_gene_exp.diff.txt.gz;conservative;0.96;NA; NA
+GSE70544;GSE70544_Vehicle_vs_Cytokine_Rinn_gene_exp.diff.txt.gz;conservative;0.95;NA; NA
+GSE70584;GSE70584_Liberman2015_sorted_CUFFLINKS_gene_exp.txt.gz;bimodal;0.80;NA; NA
+GSE70584;GSE70584_Liberman2015_Wholeroot_CUFFLINKS_gene_exp.txt.gz;conservative;1.00;NA; NA
+GSE70668;GSE70668_DD_gene_exp.diff.csv.gz;conservative;1.00;NA; NA
+GSE70699;GSE70699_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE70711;GSE70711_IRF4hi.vs.IRF8hi.gene_exp.diff.gz;conservative;0.97;NA; NA
+GSE70711;GSE70711_IRF8cKO_GCBCell_RPKM_exp_1.csv.gz;conservative;1.00;NA; NA
+GSE70711;GSE70711_IRF8cKO_GCBCell_RPKM_exp_2.csv.gz;conservative;1.00;NA; NA
+GSE70728;GSE70728_KDM2B_RNAseq_DEG.diff.gz;conservative;1.00;NA; NA
+GSE70766;GSE70766_Differential_expression.txt.gz;bimodal;0.90;NA; NA
+GSE70785;GSE70785_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE70806;GSE70806_rf6a_matrix.txt.gz;conservative;0.96;NA; NA
+GSE70815;GSE70815_gene_exp.diff.gz;bimodal;0.95;NA; NA
+GSE70833;GSE70833_Rennoll_et_al_processed_data.xlsx-sheet-Cuffdiff;conservative;1.00;NA; NA
+GSE70860;GSE70860_DEaxons.csv.gz;spiky;0.96;anti-conservative;0.21
+GSE70860;GSE70860_DEsoma.csv.gz;other;1.00;other;1.00
+GSE70876;GSE70876_Additional_file_4.xls.gz;anti-conservative;0.32;NA; NA
+GSE71133;GSE71133_Supplementary_Table_2.xlsx-sheet-FC < 0;uniform;1.00;other;1.00
+GSE71133;GSE71133_Supplementary_Table_2.xlsx-sheet-FC > 0;uniform;1.00;other;1.00
+GSE71153;GSE71153_projectLindholmPerry_USDA0001AL_master_list.txt.gz;spiky;0.64;NA; NA
+GSE71159;GSE71159_E3KO_vs_EfCtrl_gene_exp.diff.txt.gz;conservative;0.99;NA; NA
+GSE71159;GSE71159_ECtrl_vs_E3KO_gene_exp.diff.txt.gz;conservative;0.99;NA; NA
+GSE71159;GSE71159_ECtrl_vs_EfCtrl_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE71164;GSE71164_SCR-static_vs_SCR-FSS.tabular.txt.gz;bimodal;0.91;NA; NA
+GSE71164;GSE71164_SCR-static_vs_SH-EZH2-static.tabular.txt.gz;conservative;0.92;NA; NA
+GSE71185;GSE71185_CHD8_CRISPR_RNASeq_Cuffdiff_PolyA.txt.gz;anti-conservative;0.38;NA; NA
+GSE71185;GSE71185_CHD8_Knockdown_RNASeq_Cuffdiff_PolyA.txt.gz;anti-conservative;0.47;NA; NA
+GSE71185;GSE71185_NSD3_Knockdown_RNASeq_Cuffdiff_NSR.txt.gz;anti-conservative;0.90;NA; NA
+GSE71185;GSE71185_NSD3_Knockdown_RNASeq_Cuffdiff_PolyA.txt.gz;anti-conservative;0.77;NA; NA
+GSE71252;GSE71252_Akdogan_RNASeq_Cuffdiff_JUL232015.xlsx-sheet-geneExpDiffData;bimodal;0.98;NA; NA
+GSE71252;GSE71252_Akdogan_RNASeq_Cuffdiff_JUL232015.xlsx-sheet-isoformExpDiffData;bimodal;0.98;NA; NA
+GSE71281;GSE71281_G53_veh_vs_SAA_Th17_CuffDiff_Gene_Differential.txt.gz;conservative;0.99;NA; NA
+GSE71284;GSE71284_control_WT2_WT3_C1_C2_vs_truncation_3kb1_3kb2_100kb1_100kb2_CUFFDIFF_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE71295;GSE71295_gene_exp.diff.gz;conservative;0.98;NA; NA
+GSE71369;GSE71369_Processed_data_GRO_seq.xlsx-sheet-untethered_vs_tethered_RPM;bimodal;1.00;NA; NA
+GSE71527;GSE71527_KO_naive_vs_KO_SNI_Sal.xlsx;conservative;1.00;NA; NA
+GSE71527;GSE71527_KO_SNI_Sal_vs_KO_SNI_DMI.xlsx;conservative;1.00;NA; NA
+GSE71527;GSE71527_WT_naive_vs_KO_naive.xlsx;conservative;1.00;NA; NA
+GSE71527;GSE71527_WT_naive_vs_WT_SNI_Sal.xlsx;conservative;1.00;NA; NA
+GSE71527;GSE71527_WT_SNI_DMI_vs_KO_SNI_DMI.xlsx;conservative;1.00;NA; NA
+GSE71527;GSE71527_WT_SNI_Sal_vs_KO_SNI_Sal.xlsx;conservative;1.00;NA; NA
+GSE71527;GSE71527_WT_SNI_Sal_vs_WT_SNI_DMI.xlsx;conservative;1.00;NA; NA
+GSE71539;GSE71539_TP0vsTP23_gene_results.txt.gz;anti-conservative;0.86;NA; NA
+GSE71539;GSE71539_TP0vsTP23_tag_results.txt.gz;anti-conservative;0.85;NA; NA
+GSE71609;GSE71609_2015_MZT.txt.gz-set-0;bimodal;0.84;NA; NA
+GSE71609;GSE71609_2015_MZT.txt.gz-set-1;conservative;0.96;NA; NA
+GSE71609;GSE71609_2015_MZT.txt.gz-set-2;conservative;0.98;NA; NA
+GSE71609;GSE71609_2015_MZT.txt.gz-set-3;bimodal;0.85;NA; NA
+GSE71609;GSE71609_2015_MZT.txt.gz-set-4;bimodal;0.89;NA; NA
+GSE71710;GSE71710_siDGCR8_v_siSCR_DESeq_gencode.all.symbol.txt.gz;anti-conservative;0.84;anti-conservative;0.79
+GSE71862;GSE71862_DeSeq2_MCF7_vs_MCF10A_foldchange.txt.gz;anti-conservative;0.46;anti-conservative;0.45
+GSE71902;GSE71902_WILD-vs-CPH2.txt.gz;anti-conservative;0.83;NA; NA
+GSE71916;GSE71916_Expression_Cufflinks_siRbfox1_3+EGFP_compared_to_siNT+EGFP.txt.gz;anti-conservative;0.96;NA; NA
+GSE71916;GSE71916_Expression_Cufflinks_siRbfox1_3+Flag-Rbfox1_C_compared_to_siRbfox1_3+EGFP.txt.gz;other;1.00;NA; NA
+GSE71916;GSE71916_Expression_Cufflinks_siRbfox1_3+Flag-Rbfox1_N_compared_to_siRbfox1_3+EGFP.txt.gz;other;1.00;NA; NA
+GSE71943;GSE71943_KO_vs_WT_diffGenes.txt.gz;bimodal;0.83;NA; NA
+GSE71948;GSE71948_RNASeqProcessedDESeqData.txt.gz;conservative;1.00;other;1.00
+GSE71988;GSE71988_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE72059;GSE72059_21_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE72105;GSE72105_Differential_Gene_Expression_Summary_D0.txt.gz;bimodal;1.00;NA; NA
+GSE72105;GSE72105_Differential_Gene_Expression_Summary_D6.txt.gz;bimodal;0.92;NA; NA
+GSE72105;GSE72105_Differential_Gene_Expression_Summary_myotubes.txt.gz;conservative;0.92;NA; NA
+GSE72105;GSE72105_Differential_Gene_Expression_Summary_usp10.txt.gz;conservative;1.00;NA; NA
+GSE72172;GSE72172_S2_vs_SIN3_187.txt.gz;bimodal;0.89;NA; NA
+GSE72178;GSE72178_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE72321;GSE72321_annotated_diffana_6-OHDA-6-OHDA_En.xlsx;conservative;0.94;other;1.00
+GSE72321;GSE72321_annotated_diffana_gain-of-function_En1-ipsi-contra.xlsx;conservative;1.00;spiky;0.98
+GSE72321;GSE72321_annotated_diffana_loss-of-function_En1LacZ-WT.xlsx;conservative;1.00;spiky;1.00
+GSE72341;GSE72341_DEseq_results.xlsx;bimodal;0.94;spiky;0.69
+GSE72390;GSE72390_DiffExpr_Location_7-12_vs_1-6_Oncorhynchus_keta_de_novo.xlsx;anti-conservative;0.90;anti-conservative;0.79
+GSE72491;GSE72491_PCBP2_KO_v_WT_DESeq_gencode.all.name.txt.gz;anti-conservative;0.72;anti-conservative;0.68
+GSE72560;GSE72560_Enteric_Glia.txt.gz;conservative;1.00;NA; NA
+GSE72712;GSE72712_ESCd_40-70_over_ESCd_lt40.cuffdiff.xlsx-sheet-EST-d_40-70_over_EST-d_lt40;conservative;1.00;NA; NA
+GSE72712;GSE72712_ESCd_40-70_over_ESCu.cuffdiff.xlsx-sheet-EST-d_40-70_over_EST-u.cuffdiff;conservative;0.98;NA; NA
+GSE72712;GSE72712_ESCd_gt70_over_ESCd_40-70.cuffdiff.xlsx-sheet-EST-d_gt70_over_EST-d_40-70;conservative;1.00;NA; NA
+GSE72712;GSE72712_ESCd_gt70_over_ESCd_lt40.cuffdiff.xlsx-sheet-EST-d_gt70_over_EST-d_lt40;conservative;1.00;NA; NA
+GSE72712;GSE72712_ESCd_gt70_over_ESCu.cuffdiff.xlsx-sheet-EST-d_gt70_over_EST-u.cuffdiff;conservative;0.98;NA; NA
+GSE72712;GSE72712_ESCd_lt40_over_ESCu.cuffdiff.xlsx-sheet-EST-d_lt40_over_EST-u.cuffdiff;conservative;0.97;NA; NA
+GSE72761;GSE72761_DESeq_LS007-LS008-LS010_LS015-LS016-LS018_DEG_list.txt.gz;conservative;0.98;other;1.00
+GSE72762;GSE72762_DEseq_LS023-LS024-LS025_LS030-LS031-LS032_DEG_list.txt.gz;conservative;0.99;other;1.00
+GSE72764;GSE72764_DEseq_LS39-LS40-LS42_LS44-LS45-LS48_DEG_list.csv.gz;conservative;0.97;other;1.00
+GSE72787;GSE72787_deseq2_closed_vs_open.tsv.gz;spiky;0.94;NA; NA
+GSE72806;GSE72806_CUFFDIFF_CONTROL_vs_HEAT_gene_exp.diff.gz;bimodal;0.81;NA; NA
+GSE72806;GSE72806_CUFFDIFF_CONTROL_vs_SALT_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE72806;GSE72806_CUFFDIFF_CONTROL_vs_SALT_HEAT_gene_exp.diff.gz;bimodal;0.80;NA; NA
+GSE72820;GSE72820_MDA1N-1P_RPKM.xlsx.gz;conservative;1.00;NA; NA
+GSE72820;GSE72820_MDA27N-27P_RPKM.xlsx.gz;conservative;1.00;NA; NA
+GSE72820;GSE72820_MDA2N-2P_RPKM.xlsx.gz;conservative;1.00;NA; NA
+GSE72820;GSE72820_MDA31N-31P_RPKM.xlsx.gz;conservative;1.00;NA; NA
+GSE72820;GSE72820_MDA33N-33P_RPKM.xlsx.gz;conservative;1.00;NA; NA
+GSE72820;GSE72820_MDA34N-34P_RPKM.xlsx.gz;conservative;1.00;NA; NA
+GSE72820;GSE72820_MDA3N-3P_RPKM.xlsx.gz;conservative;1.00;NA; NA
+GSE72830;GSE72830_gene_exp.diff.gz;bimodal;0.97;NA; NA
+GSE72830;GSE72830_tss_group_exp.diff.gz;conservative;0.99;NA; NA
+GSE72860;GSE72860_RNA-seq_log2fdc.txt.gz;spiky;0.72;anti-conservative;0.64
+GSE72860;GSE72860_RRBS_CpG_methylation_call.txt.gz;bimodal;0.84;NA; NA
+GSE72917;GSE72917_DP1_WTvKO.txt.gz;conservative;0.96;NA; NA
+GSE72917;GSE72917_DP2_WTvKO.txt.gz;conservative;0.99;NA; NA
+GSE72917;GSE72917_KO_DP1vDP2.txt.gz;conservative;1.00;NA; NA
+GSE72917;GSE72917_WT_DP1vDP2.txt.gz;conservative;0.96;NA; NA
+GSE72947;GSE72947_Dm_sir2_RNA-seq.xlsx-sheet-Analyzed Genes;conservative;1.00;NA; NA
+GSE72994;GSE72994_cds_exp.diff.gz;conservative;1.00;NA; NA
+GSE72994;GSE72994_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE72994;GSE72994_isoform_exp.diff.gz;conservative;1.00;NA; NA
+GSE72994;GSE72994_promoters.diff.gz;conservative;1.00;NA; NA
+GSE72994;GSE72994_tss_group_exp.diff.gz;conservative;1.00;NA; NA
+GSE73077;GSE73077_fpkm_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE73082;GSE73082_F_Sp5_PlusversusMinusDOX_ProcessedFiles.txt.gz;bimodal;0.96;NA; NA
+GSE73083;GSE73083_3F_Lef1_PlusversusMinusDOX_ProcessedFiles.txt.gz;bimodal;0.98;NA; NA
+GSE73192;GSE73192_cds_chromosome_exp.diff.gz;bimodal;0.99;NA; NA
+GSE73289;GSE73289_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE73321;GSE73321_FW_VS_BW_expression_diff.txt.gz;other;1.00;NA; NA
+GSE73376;GSE73376_full_list_edgeR_annotated_DGCR8.txt.gz;anti-conservative;0.80;NA; NA
+GSE73376;GSE73376_full_list_edgeR_annotated_RRP6.txt.gz;anti-conservative;0.82;NA; NA
+GSE73678;GSE73678_Differential_gene_expression.xlsx.gz;conservative;0.97;NA; NA
+GSE73893;GSE73893_Results_DEXseq.txt.gz;uniform;0.85;NA; NA
+GSE73940;GSE73940_cuffdiff.gene_exp.diff.gz;conservative;0.99;NA; NA
+GSE73940;GSE73940_cuffdiff.isoform_exp.diff.gz;conservative;1.00;NA; NA
+GSE73972;GSE73972_atxvsWT_gene_exp_diff.txt.gz;bimodal;0.96;NA; NA
+GSE74103;GSE74103_Tobacco_FS_v_WT_DESeq_refGene.all.annotated.txt.gz;anti-conservative;0.62;anti-conservative;0.53
+GSE74103;GSE74103_Tobacco_G1_v_WT_DESeq_refGene.all.annotated.txt.gz;anti-conservative;0.42;anti-conservative;0.27
+GSE74103;GSE74103_Tobacco_GS_v_WT_DESeq_refGene.all.annotated.txt.gz;anti-conservative;0.29;anti-conservative;0.23
+GSE74131;GSE74131_gene_exp.diff.gz;conservative;0.99;NA; NA
+GSE74148;GSE74148_RNA-seq0415.xlsx-set-0;conservative;1.00;NA; NA
+GSE74148;GSE74148_RNA-seq0415.xlsx-set-1;conservative;1.00;NA; NA
+GSE74148;GSE74148_RNA-seq0415.xlsx-set-2;conservative;0.95;NA; NA
+GSE74148;GSE74148_RNA-seq0415.xlsx-set-3;bimodal;0.88;NA; NA
+GSE74148;GSE74148_RNA-seq0415.xlsx-set-4;bimodal;0.99;NA; NA
+GSE74148;GSE74148_RNA-seq0415.xlsx-set-5;conservative;1.00;NA; NA
+GSE74168;GSE74168_expressed_transcripts_RNAseq_GLIrnai_posterior_midgut_EC.txt.gz;anti-conservative;0.44;NA; NA
+GSE74171;GSE74171_expressed_transcript_aging_RNAseq_posterior_midgut.txt.gz;anti-conservative;0.51;NA; NA
+GSE74196;GSE74196_SnapC_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE74220;GSE74220_Expression_of_Protein_Coding_Genes_in_Control_and_IL1b_treated_human_chondrocytes.txt.gz;conservative;1.00;NA; NA
+GSE74381;GSE74381_gene_exp_control2vsZeb2cKO2diff.xlsx;bimodal;0.78;NA; NA
+GSE74868;GSE74868_ETS2_T72D_OE_Epi_RNAseq.txt.gz;conservative;0.94;NA; NA
+GSE74886;GSE74886_processedFPKMS.xlsx;bimodal;0.81;NA; NA
+GSE74893;GSE74893_ctrl_and_Tsc1ckO_gene_exp.txt.gz;conservative;1.00;NA; NA
+GSE74920;GSE74920_SupplementalTable1.xlsx.gz;anti-conservative;0.50;anti-conservative;0.33
+GSE74920;GSE74920_SupplementalTable3.xlsx.gz;anti-conservative;0.68;anti-conservative;0.46
+GSE74929;GSE74929_ANOVA_gene_rpkm.txt.gz-set-0;other;1.00;NA; NA
+GSE74929;GSE74929_ANOVA_gene_rpkm.txt.gz-set-1;other;1.00;NA; NA
+GSE74929;GSE74929_Diff_Exp.txt.gz-set-1;anti-conservative;0.22;NA; NA
+GSE74993;GSE74993_SupplementalTables.xlsx-sheet-Table S1;anti-conservative;0.50;anti-conservative;0.33
+GSE74993;GSE74993_SupplementalTables.xlsx-sheet-Table S3;anti-conservative;0.68;anti-conservative;0.46
+GSE75247;GSE75247_processed_data.txt.gz-set-0;spiky;0.64;NA; NA
+GSE75247;GSE75247_processed_data.txt.gz-set-1;spiky;0.70;NA; NA
+GSE75332;GSE75332_Ad_AGGF1vsAd_NC.Differential_analysis_results.txt.gz;other;0.88;NA; NA
+GSE75510;GSE75510_diffExonExprZH1vsB6.txt.gz;anti-conservative;0.94;NA; NA
+GSE75510;GSE75510_diffExonExprZH3vsB6.txt.gz;anti-conservative;0.91;NA; NA
+GSE75614;GSE75614_processed_data_mrna-seq_differential_expression.xlsx;conservative;1.00;NA; NA
+GSE75640;GSE75640_HR1_vs_control_1_gene_exp.diff.gz;bimodal;0.83;NA; NA
+GSE75640;GSE75640_HR2_vs_control_2_gene_exp.diff.gz;conservative;0.97;NA; NA
+GSE75731;GSE75731_ckvsd119a_gene_exp_diff.txt.gz;anti-conservative;0.49;NA; NA
+GSE75731;GSE75731_ckvsdrug_gene_exp_diff.txt.gz;anti-conservative;0.64;NA; NA
+GSE75731;GSE75731_ckvsv149a_gene_exp_diff.txt.gz;anti-conservative;0.73;NA; NA
+GSE75787;GSE75787_gene_exp.diff.txt.gz;bimodal;1.00;NA; NA
+GSE75832;GSE75832_DifferentialExpression_groupwise_comparisons.xlsx-sheet-P14_P2_gene_exp_down;anti-conservative;0.76;NA; NA
+GSE75832;GSE75832_DifferentialExpression_groupwise_comparisons.xlsx-sheet-P14_P2_gene_exp_up;conservative;0.99;NA; NA
+GSE75832;GSE75832_DifferentialExpression_groupwise_comparisons.xlsx-sheet-P14_P7_gene_exp_down;bimodal;0.88;NA; NA
+GSE75832;GSE75832_DifferentialExpression_groupwise_comparisons.xlsx-sheet-P14_P7_gene_exp_up;conservative;1.00;NA; NA
+GSE75832;GSE75832_DifferentialExpression_groupwise_comparisons.xlsx-sheet-P7_P2_gene_exp_down;bimodal;0.94;NA; NA
+GSE75832;GSE75832_DifferentialExpression_groupwise_comparisons.xlsx-sheet-P7_P2_gene_exp_up;conservative;1.00;NA; NA
+GSE75832;GSE75832_DifferentialExpression_withingroup.xlsx-sheet-P14_2_P14_3_gene_exp_down;conservative;1.00;NA; NA
+GSE75832;GSE75832_DifferentialExpression_withingroup.xlsx-sheet-P14_2_P14_3_gene_exp_up;conservative;1.00;NA; NA
+GSE75832;GSE75832_DifferentialExpression_withingroup.xlsx-sheet-P2_1_P2_3_gene_exp_down;conservative;1.00;NA; NA
+GSE75832;GSE75832_DifferentialExpression_withingroup.xlsx-sheet-P2_1_P2_3_gene_exp_up;conservative;1.00;NA; NA
+GSE75832;GSE75832_DifferentialExpression_withingroup.xlsx-sheet-P7_1_P7_2_gene_exp_down;conservative;1.00;NA; NA
+GSE75832;GSE75832_DifferentialExpression_withingroup.xlsx-sheet-P7_1_P7_2_gene_exp_up;conservative;1.00;NA; NA
+GSE75833;GSE75833_DESeq-processed_FB.control_vs_BR.txt.gz;anti-conservative;0.60;anti-conservative;0.14
+GSE75833;GSE75833_DESeq-processed_FB.control_vs_FB.25mkM.4HT.txt.gz;conservative;1.00;NA;1.00
+GSE75878;GSE75878_cds_exp.diff.gz;conservative;1.00;NA; NA
+GSE75878;GSE75878_cds.diff.gz;bimodal;0.59;NA; NA
+GSE75878;GSE75878_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE75878;GSE75878_isoform_exp.diff.gz;conservative;1.00;NA; NA
+GSE75878;GSE75878_promoters.diff.gz;anti-conservative;0.44;NA; NA
+GSE75878;GSE75878_splicing.diff.gz;anti-conservative;0.38;NA; NA
+GSE75878;GSE75878_tss_group_exp.diff.gz;conservative;1.00;NA; NA
+GSE75962;GSE75962_control_vs_H2O2.DEseq.txt.gz;anti-conservative;0.77;anti-conservative;0.69
+GSE75993;GSE75993_processed_data.xls.gz-sheet-1_WT_vs_KO_DESeq_All;anti-conservative;0.94;NA; NA
+GSE76125;GSE76125_SenesUntreated_vs_SenesTreated_gene_exp.diff.gz;conservative;0.97;NA; NA
+GSE76151;GSE76151_A1_isoform_exp.diff.gz;conservative;1.00;NA; NA
+GSE76151;GSE76151_A2B1_isoform_exp.diff.gz;conservative;1.00;NA; NA
+GSE76151;GSE76151_A2B1A1_isoform_exp.diff.gz;conservative;0.99;NA; NA
+GSE76190;GSE76190_OtA8535_vs_OtA8538_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE76190;GSE76190_OtA8536_vs_OtA8539_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE76190;GSE76190_OtA8537_vs_OtA8540_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE76190;GSE76190_OtA8538_vs_OtA8541_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE76190;GSE76190_OtA8539_vs_OtA8542_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE76190;GSE76190_OtA8540_vs_OtA8543_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE76232;GSE76232_isoforms.diff_exp_ann_result.xls.gz;conservative;1.00;NA; NA
+GSE76257;GSE76257_O-VG_OGS2.csv.gz;bimodal;0.63;anti-conservative;0.21
+GSE76287;GSE76287_rosettes_col0vdko_tair.txt.gz;conservative;0.96;NA; NA
+GSE76287;GSE76287_seedling_col0vdko_tair.txt.gz;bimodal;0.96;NA; NA
+GSE76304;GSE76304_gene_exp.diff.gz;bimodal;0.81;NA; NA
+GSE76396;GSE76396_isoform_exp.diff.gz;conservative;1.00;NA; NA
+GSE76453;GSE76453_cuffdiff_E2.diff.gz;conservative;0.99;NA; NA
+GSE76453;GSE76453_cuffdiff_siCtl.diff.gz;conservative;1.00;NA; NA
+GSE76453;GSE76453_cuffdiff_siZNF143.diff.gz;conservative;1.00;NA; NA
+GSE76453;GSE76453_cuffdiff_veh.diff.gz;conservative;1.00;NA; NA
+GSE76487;GSE76487_shMBNL1_gene_exp_diff.txt.gz;bimodal;0.95;NA; NA
+GSE76533;GSE76533_leaf.gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE76533;GSE76533_seedling.gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE76627;GSE76627_CNBP-cuffdif.xlsx.gz;conservative;1.00;NA; NA
+GSE76682;GSE76682_EB_AM580gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE76683;GSE76683_shHOXA7gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE76771;GSE76771_ALL_gene_expression.txt.gz;conservative;0.98;NA; NA
+GSE76864;GSE76864_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE76865;GSE76865_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE76868;GSE76868_Table_S1_RNA-seq.xlsx;bimodal;0.95;NA; NA
+GSE76992;GSE76992_GFP_vs_p16.txt.gz;bimodal;0.99;NA; NA
+GSE77025;GSE77025_gene_exp.diff.gz;anti-conservative;0.35;NA; NA
+GSE77032;GSE77032_aza_vs_PBS.gene_exp.tsv.gz;conservative;1.00;NA; NA
+GSE77032;GSE77032_aza_vs_vc.gene_exp.tsv.gz;conservative;1.00;NA; NA
+GSE77032;GSE77032_combo_vs_aza.gene_exp.tsv.gz;conservative;1.00;NA; NA
+GSE77032;GSE77032_combo_vs_PBS.gene_exp.tsv.gz;conservative;1.00;NA; NA
+GSE77032;GSE77032_combo_vs_vc.gene_exp.tsv.gz;conservative;1.00;NA; NA
+GSE77032;GSE77032_vc_vs_PBS.gene_exp.tsv.gz;conservative;1.00;NA; NA
+GSE77034;GSE77034_aza_vs_PBS.gene_exp.tsv.gz;conservative;0.99;NA; NA
+GSE77034;GSE77034_aza_vs_vc.gene_exp.tsv.gz;conservative;1.00;NA; NA
+GSE77034;GSE77034_combo_vs_aza.gene_exp.tsv.gz;conservative;1.00;NA; NA
+GSE77034;GSE77034_combo_vs_PBS.gene_exp.tsv.gz;conservative;0.99;NA; NA
+GSE77034;GSE77034_combo_vs_vc.gene_exp.tsv.gz;conservative;0.99;NA; NA
+GSE77034;GSE77034_vc_vs_PBS.gene_exp.tsv.gz;conservative;1.00;NA; NA
+GSE77037;GSE77037_gene_exp.diff.gz;bimodal;0.91;NA; NA
+GSE77044;GSE77044_comparison2.xls.gz;anti-conservative;0.69;anti-conservative;0.66
+GSE77077;GSE77077_HT_data_36hpf.xls.gz;anti-conservative;0.43;NA; NA
+GSE77113;GSE77113_GC_WT_vs_Hdac3KO.diff.gz;conservative;1.00;NA; NA
+GSE77113;GSE77113_Hdac3KO_non-GC_vs_GC.diff.gz;conservative;0.96;NA; NA
+GSE77113;GSE77113_non-GC_WT_vs_Hdac3KO.diff.gz;conservative;1.00;NA; NA
+GSE77113;GSE77113_WT_non-GC_vs_GC.diff.gz;bimodal;0.90;NA; NA
+GSE77185;GSE77185_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE77218;GSE77218_A3_A2.xlsx-sheet-express;bimodal;0.59;NA; NA
+GSE77218;GSE77218_A4_A2.xlsx-sheet-express;bimodal;0.60;NA; NA
+GSE77218;GSE77218_A4_A3.xlsx-sheet-express;bimodal;0.69;NA; NA
+GSE77229;GSE77229_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE77256;GSE77256_Cuffdiff_all_HFSCs.txt.gz;bimodal;0.91;NA; NA
+GSE77256;GSE77256_Cuffdiff_Anagen_HFSCs.txt.gz;bimodal;0.98;NA; NA
+GSE77256;GSE77256_Cuffdiff_Telogen_HFSCs.txt.gz;conservative;0.99;NA; NA
+GSE77303;GSE77303_gene_exp.diff.gz;conservative;0.96;NA; NA
+GSE77304;GSE77304_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE77351;GSE77351_Farshchian.txt.gz;spiky;0.85;anti-conservative;0.89
+GSE77395;GSE77395_A_OE_air_vs_Col_air.diff.gz;conservative;0.61;NA; NA
+GSE77395;GSE77395_col_air_vs_ethylene.diff.gz;bimodal;0.82;NA; NA
+GSE77398;GSE77398_mal_all6_cuffdiff_genes.xls.gz;anti-conservative;0.76;NA; NA
+GSE77398;GSE77398_ribo_cuffdiff_genes.xls.gz;bimodal;0.96;NA; NA
+GSE77422;GSE77422_H358_Control-GNF5.xlsx-sheet-Sheet1;conservative;1.00;NA; NA
+GSE77422;GSE77422_PC9_Control-GNF5.xlsx;conservative;1.00;NA; NA
+GSE77422;GSE77422_PC9_SCR-AA.xlsx;conservative;1.00;NA; NA
+GSE77422;GSE77422_PC9M_Control-GNF5.xlsx;conservative;1.00;NA; NA
+GSE77422;GSE77422_PC9M_SCR-AA.xlsx;conservative;1.00;NA; NA
+GSE77471;GSE77471_RNASEQ_differential_expression.txt.gz;conservative;1.00;NA; NA
+GSE77499;GSE77499_Dd2CQ_Dd2_3D7_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE77499;GSE77499_Dd2CQ_Dd2_3D7_isoform_exp.diff.gz;conservative;1.00;NA; NA
+GSE77675;GSE77675_Old_vs_Young_isoforms_expression.txt.gz;bimodal;0.95;NA; NA
+GSE77693;GSE77693_deseq.comparison.csv.gz;spiky;0.78;anti-conservative;1.00
+GSE77769;GSE77769_RNA_diff_final.txt.gz;spiky;0.97;NA; NA
+GSE77793;GSE77793_gene_exp_diff_fc_hepatocytes_DMSO_GL_TamerSallam_122012.txt.gz;conservative;1.00;NA; NA
+GSE77862;GSE77862_nhay_-_Alb-Cre.xlsx;conservative;1.00;NA; NA
+GSE77901;GSE77901_SLNCR1_vs_vector.deseq.txt.gz;conservative;0.88;anti-conservative;0.65
+GSE77901;GSE77901_SLNCR1cons_vs_vector.deseq.txt.gz;conservative;0.94;anti-conservative;0.92
+GSE77901;GSE77901_SLNCR1deltacons_vs_vector.deseq.txt.gz;bimodal;0.88;anti-conservative;0.57
+GSE77902;GSE77902_WM1976_siRNA1_vs_control.deseq.txt.gz;conservative;0.87;anti-conservative;0.78
+GSE78199;GSE78199_Marsh_Cuffdiff_differential_gene_expression.txt.gz-set-0;conservative;1.00;NA; NA
+GSE78199;GSE78199_Marsh_Cuffdiff_differential_gene_expression.txt.gz-set-1;conservative;1.00;NA; NA
+GSE78199;GSE78199_Marsh_Cuffdiff_differential_gene_expression.txt.gz-set-2;conservative;1.00;NA; NA
+GSE78199;GSE78199_Marsh_Cuffdiff_differential_gene_expression.txt.gz-set-3;conservative;1.00;NA; NA
+GSE78199;GSE78199_Marsh_Cuffdiff_differential_gene_expression.txt.gz-set-4;conservative;1.00;NA; NA
+GSE78199;GSE78199_Marsh_Cuffdiff_differential_gene_expression.txt.gz-set-5;conservative;1.00;NA; NA
+GSE78240;GSE78240_DESeq_Output.txt.gz;anti-conservative;0.66;anti-conservative;0.59
+GSE78506;GSE78506_dmso_vs_ca_24Hour_geneExp.diff.gz;bimodal;0.95;NA; NA
+GSE78527;GSE78527_siSNRNP40_siControl_processed.txt.gz;conservative;1.00;NA; NA
+GSE78711;GSE78711_gene.exp.all.txt.gz;spiky;0.82;NA; NA
+GSE78824;GSE78824_Cuffdiff_transcript_differential_expression_testing.tab.gz;anti-conservative;0.78;NA; NA
+GSE78834;GSE78834_gene_expression_profiles.txt.gz;bimodal;0.81;NA; NA
+GSE78878;GSE78878_30Cvs30P_score.txt.gz;bimodal;0.49;NA; NA
+GSE78878;GSE78878_30CvsN2C_score.txt.gz;bimodal;0.57;NA; NA
+GSE78878;GSE78878_30PvsN2P_score.txt.gz;bimodal;0.54;NA; NA
+GSE78878;GSE78878_N2CvsN2P_score.txt.gz;spiky;0.54;NA; NA
+GSE78902;GSE78902_DEseq_DB001-DB004_DB002-DB003_DEG_list.csv.gz;other;1.00;other;1.00
+GSE78965;GSE78965_C57Bl6_MCS_vs_FST_acute_gene_differential_expression_testing.txt.gz;conservative;1.00;NA; NA
+GSE78965;GSE78965_C57Bl6_MCS_vs_FST_chronic_gene_differential_expression_testing.txt.gz;conservative;0.96;NA; NA
+GSE78967;GSE78967_Deseq_Analysis.xlsx;anti-conservative;0.47;anti-conservative;0.38
+GSE78996;GSE78996_CTR_vs_EAE_Cuffdiff_analysis.xlsx;bimodal;0.97;NA; NA
+GSE79039;GSE79039_Feske_Tcon_DKO_vs_WT_norm_counts_DE_expression_all.txt.gz;anti-conservative;0.62;anti-conservative;0.41
+GSE79039;GSE79039_Feske_Tfh_DKO_vs_WT_norm_counts_DE_expression_all.txt.gz;anti-conservative;0.73;anti-conservative;0.52
+GSE79143;GSE79143_SNPCountsTable.txt.gz;anti-conservative;0.49;NA; NA
+GSE79286;GSE79286_CYC2vsWT_Conj-2.5hr_RNA-Seq.xlsx-sheet-gene_exp;bimodal;0.78;NA; NA
+GSE79286;GSE79286_CYC2vsWT_Conj-2hr_RNA-Seq.xlsx-sheet-C2vWT-2hr genes;bimodal;0.81;NA; NA
+GSE79286;GSE79286_CYC2vsWT_Conj-3.5hr_RNA-Seq.xlsx-sheet-gene_exp;bimodal;0.79;NA; NA
+GSE79286;GSE79286_CYC2vsWT_Conj-3hr_RNA-Seq.xlsx;bimodal;0.80;NA; NA
+GSE79408;GSE79408_gene_exp.diff.gz;conservative;0.99;NA; NA
+GSE79412;GSE79412_amiFPSa_gene_exp_diff.xlsx-sheet-Hoja1;conservative;1.00;NA; NA
+GSE79416;GSE79416_new-lncRNA_transcript_output.xls.gz;bimodal;0.87;NA; NA
+GSE79507;GSE79507_minipig.txt.gz;bimodal;0.68;NA; NA
+GSE79633;GSE79633_DESeq2_out_FO_GFP_vs_WT.txt.gz;spiky;0.72;anti-conservative;0.77
+GSE79677;GSE79677_Crossbred_vs._Purebred_comparison_group.tabular.txt.gz;conservative;1.00;NA; NA
+GSE79677;GSE79677_One_by_one_comparisons.tabular.txt.gz;conservative;1.00;NA; NA
+GSE79680;GSE79680_Heat_shock_table.csv.gz;conservative;0.99;NA; NA
+GSE79723;GSE79723_DEseq_LG1401-LG437-LG8736_LG1405-LG435-LG8737_DEG_list.csv.gz;conservative;0.95;anti-conservative;0.89
+GSE79724;GSE79724_DEseq_LG3-LG6-LG9_LG2-LG5-LG8_DEG_list.csv.gz;conservative;0.95;other;1.00
+GSE79758;GSE79758_gene_exp.diff.gz;conservative;0.98;NA; NA
+GSE79779;GSE79779_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE79822;GSE79822_cuffdiffs_mRNA.txt.gz;conservative;0.99;NA; NA
+GSE79822;GSE79822_Deseq_totalRNA.txt.gz;bimodal;0.95;anti-conservative;0.46
+GSE79830;GSE79830_Sp2_Wdr70del_vs_Sp1_Wt.Differential_analysis_results.txt.gz;anti-conservative;0.72;NA; NA
+GSE79916;GSE79916_Dataset_S1-JUM_output_for_differential_AS_analyses_of_PSIdeltaAB_and_full-length_PSI_male_fly_heads.xls.gz;anti-conservative;0.13;NA; NA
+GSE80068;GSE80068_col_dms3_gene_exp.diff.gz;conservative;0.99;NA; NA
+GSE80068;GSE80068_col_h2h9_gene_exp.diff.gz;conservative;0.98;NA; NA
+GSE80068;GSE80068_col_nrpe1_gene_exp.diff.gz;conservative;0.99;NA; NA
+GSE80128;GSE80128_P035_DESeq_KO-WT_pathway.txt.gz;bimodal;0.87;anti-conservative;0.80
+GSE80135;GSE80135_Lipo_siProx_SC_results.csv.gz;anti-conservative;0.95;anti-conservative;0.82
+GSE80135;GSE80135_Lipo_siProx_sig_results.csv.gz;spiky;0.98;anti-conservative;0.73
+GSE80135;GSE80135_siNeg_Lipo_results.csv.gz;spiky;0.94;anti-conservative;0.77
+GSE80135;GSE80135_siNeg_siProx_SC_results.csv.gz;spiky;0.92;anti-conservative;0.78
+GSE80135;GSE80135_siNeg_siProx_sig_results.csv.gz;anti-conservative;0.79;anti-conservative;0.50
+GSE80237;GSE80237_Supplementary_Data_1.txt.gz;bimodal;0.83;NA; NA
+GSE80264;GSE80264_Group_2_vs._Group_1_Ensembl.gene.rpkm_more0.5_log2p1_qn.txt.gz-set-3;anti-conservative;0.56;NA; NA
+GSE80264;GSE80264_Group_3_vs._Group_1_Ensembl.gene.rpkm_more0.5_log2p1_qn.txt.gz-set-3;anti-conservative;0.54;NA; NA
+GSE80301;GSE80301_col_rep1_mom1_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE80301;GSE80301_col_rep1_nrpe1_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE80301;GSE80301_col_rep1_pial1pial2_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE80301;GSE80301_col_rep2_mom1_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE80301;GSE80301_col_rep2_mom1pial2_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE80301;GSE80301_col_rep2_pial2_gene_exp.diff.txt.gz;conservative;0.99;NA; NA
+GSE80348;GSE80348_20160316_6h_wt_vs_mu.xlsx;anti-conservative;0.52;NA; NA
+GSE80349;GSE80349_results.txt.gz-set-0;anti-conservative;0.07;NA; NA
+GSE80349;GSE80349_results.txt.gz-set-1;conservative;1.00;NA; NA
+GSE80354;GSE80354_Gata6_DEseq2_res.csv.gz;anti-conservative;0.78;anti-conservative;0.87
+GSE80370;GSE80370_col_morc6_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE80370;GSE80370_col_suvh2suvh9_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE80433;GSE80433_gene_exp.diff.gz;conservative;0.97;NA; NA
+GSE80503;GSE80503_RNASeqProcessedDESeqData.xlsx;conservative;1.00;NA; NA
+GSE80597;GSE80597_Processed_data_cuffdiff_output.txt.gz;conservative;0.95;NA; NA
+GSE80707;GSE80707_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE80718;GSE80718_gene_exp.diff.gz;bimodal;0.73;NA; NA
+GSE80972;GSE80972_frm_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE81007;GSE81007_cds_exp.diff.gz;conservative;0.99;NA; NA
+GSE81007;GSE81007_cds.diff.gz;conservative;1.00;NA; NA
+GSE81007;GSE81007_gene_exp.diff.gz;conservative;0.98;NA; NA
+GSE81007;GSE81007_isoform_exp.diff.gz;conservative;1.00;NA; NA
+GSE81007;GSE81007_promoters.diff.gz;conservative;1.00;NA; NA
+GSE81007;GSE81007_splicing.diff.gz;conservative;1.00;NA; NA
+GSE81007;GSE81007_tss_group_exp.diff.gz;conservative;0.99;NA; NA
+GSE81043;GSE81043_sh109_final_unique_DESeq_InfFixed_DiffExp.xlsx.gz;anti-conservative;0.48;anti-conservative;0.14
+GSE81055;GSE81055_gene_exp.diff_bias.txt.gz;conservative;1.00;NA; NA
+GSE81055;GSE81055_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE81059;GSE81059_cns-control_vs_cns-hh.csv.gz;conservative;1.00;other;1.00
+GSE81059;GSE81059_cns-control_vs_cns-ptc.csv.gz;conservative;1.00;other;1.00
+GSE81059;GSE81059_cns-control_vs_head-control.csv.gz;anti-conservative;0.51;anti-conservative;0.13
+GSE81100;GSE81100_old_ARSER_output.txt.gz;bimodal;0.81;NA; NA
+GSE81100;GSE81100_youngARSER_output.txt.gz;bimodal;0.81;NA; NA
+GSE81114;GSE81114_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE81123;GSE81123_Poplar_RNAseq_data.ods.txt.gz;conservative;1.00;NA; NA
+GSE81128;GSE81128_DESeq2_Results.txt.gz;anti-conservative;0.32;anti-conservative;0.14
+GSE81191;GSE81191_Cuffdiff_Isoform.txt.gz;conservative;1.00;NA; NA
+GSE81191;GSE81191_Cuffdiff_transcript.txt.gz;conservative;1.00;NA; NA
+GSE81237;GSE81237_DE_RNAseqseq_analysis_DESeq_TTP-AAvsGFP.csv.gz;anti-conservative;0.66;anti-conservative;0.59
+GSE81237;GSE81237_DE_RNAseqseq_analysis_DESeq_TTP-AAvsTTP.csv.gz;anti-conservative;0.56;anti-conservative;0.48
+GSE81237;GSE81237_DE_RNAseqseq_analysis_DESeq_TTPvsGFP.csv.gz;anti-conservative;0.75;anti-conservative;0.69
+GSE81251;GSE81251_Kdm6a_def_mouse_expression_value.xlsx;spiky;0.82;uniform;0.98
+GSE81437;GSE81437_polyA_differential_gene_expression.txt.gz;conservative;0.99;NA; NA
+GSE81493;GSE81493_Differential_gene_expression_analysis.diff.gz;bimodal;0.88;NA; NA
+GSE81522;GSE81522_N2_vs_ok600_gene_differential_expression_testing.txt.gz;conservative;0.97;NA; NA
+GSE81575;GSE81575_gene_exp.diff.gz;conservative;0.99;NA; NA
+GSE81593;GSE81593_1.Mcf10A_p53delVec_and_p53delHras.xlsx;bimodal;0.57;anti-conservative;0.36
+GSE81593;GSE81593_2.Mcf10A_Vec_and_Hras.xlsx;bimodal;0.70;anti-conservative;0.63
+GSE81707;GSE81707_N2_HC125_RNA-seq_PairedEnd_gene_exp_diff.xlsx;conservative;1.00;NA; NA
+GSE81707;GSE81707_N2_HC125_RNA-seq_SingleEnd_gene_exp_diff.xlsx;conservative;1.00;NA; NA
+GSE81858;GSE81858_AA_ABBB_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE81865;GSE81865_RNAseq_uninjured-14dpi.txt.gz;bimodal;0.79;anti-conservative;0.46
+GSE81913;GSE81913_iRed_over_disGran_foldchange.xlsx.gz-sheet-4-5-2016_gran_v_iRed.csv;anti-conservative;0.61;anti-conservative;0.43
+GSE81913;GSE81913_iRed_over_disGran_foldchange.xlsx.gz-sheet-Down;anti-conservative;0.58;anti-conservative;0.48
+GSE81913;GSE81913_iRed_over_disGran_foldchange.xlsx.gz-sheet-Up;anti-conservative;0.46;NA;NaN
+GSE82134;GSE82134_NCBI_res_root_deseq_full.xlsx;anti-conservative;0.61;NA;NaN
+GSE82164;GSE82164_Cuffdiff_gene_differential_expression_testing.tabular.txt.gz;conservative;0.99;NA; NA
+GSE82164;GSE82164_Cuffdiff_transcript_differential_expression_testing.tabular.txt.gz;conservative;1.00;NA; NA
+GSE82210;GSE82210_cuffdiff_lncOL1KO_vs_Ctrl.gene.fpkm.txt.gz;conservative;1.00;NA; NA
+GSE83134;GSE83134_RYBPfl.DESeq2.Output.txt.gz-set-0;anti-conservative;0.92;anti-conservative;0.99
+GSE83137;GSE83137_H2_vs_Lanact_pval.csv.gz;other;1.00;other;1.00
+GSE83217;GSE83217_Processed_Matrix_FPKM.xlsx-sheet-siScramble_vs_siBdnf;conservative;1.00;NA; NA
+GSE83217;GSE83217_Processed_Matrix_FPKM.xlsx-sheet-siScramble_vs_siHdac4;conservative;1.00;NA; NA
+GSE83218;GSE83218_HSC.txt.gz;anti-conservative;0.88;anti-conservative;0.77
+GSE83265;GSE83265_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE83375;GSE83375_GB_glia.FPKM.txt.gz;anti-conservative;0.66;NA; NA
+GSE83405;GSE83405_geneExpDiffData_E14_cells_pnldc1_silencing.xlsx-sheet-Φύλλο1;conservative;1.00;NA; NA
+GSE83406;GSE83406_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE83541;GSE83541_All_Genes_ZnfTG_Muscle_DESeq2_38.txt.gz;anti-conservative;0.82;anti-conservative;0.70
+GSE83555;GSE83555_WT-KO-mm9-gene_exp.txt.gz;conservative;1.00;NA; NA
+GSE83560;GSE83560_degTest_byCuffdiff.xlsx-sheet-T_11_12_P-T_11_12_C;conservative;1.00;NA; NA
+GSE83560;GSE83560_degTest_byCuffdiff.xlsx-sheet-T_11_19_1_P-T_11_19_1_C;conservative;1.00;NA; NA
+GSE83560;GSE83560_degTest_byCuffdiff.xlsx-sheet-T_72_P-T_72_C;conservative;1.00;NA; NA
+GSE83567;GSE83567_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE83584;GSE83584_processed_data_Day0.txt.gz;conservative;1.00;NA; NA
+GSE83584;GSE83584_processed_data_Day3_5.txt.gz;conservative;1.00;NA; NA
+GSE83601;GSE83601_All_genes_in_controls_and_PTSD.txt.gz;conservative;1.00;NA; NA
+GSE83664;GSE83664_NS_M_vs_Input.isoform_exp.diff.gz;conservative;1.00;NA; NA
+GSE83664;GSE83664_NS_vs_Input.isoform_exp.diff.gz;conservative;1.00;NA; NA
+GSE83717;GSE83717_FPKMs_pvalue_matrices.txt.gz;bimodal;0.89;NA; NA
+GSE83736;GSE83736_DESeq2.Vav.KO.C_vs_Vav.WT.C.txt.gz;anti-conservative;0.52;anti-conservative;0.30
+GSE83736;GSE83736_DESeq2.Vav.WTvsKO.StimulatedInteractions.txt.gz;anti-conservative;0.56;anti-conservative;0.32
+GSE83819;GSE83819_gene_exp.diff.gz;bimodal;0.67;NA; NA
+GSE83827;GSE83827_WT_vs_tf5.xlsx-sheet-gene_exp_diff;bimodal;0.99;NA; NA
+GSE83828;GSE83828_Gene_expression_data.xlsx;bimodal;0.58;NA; NA
+GSE83887;GSE83887_gene_exp_Hyl-2_vs_Hyl-2-G.diff.gz;bimodal;0.87;NA; NA
+GSE83887;GSE83887_gene_exp_N2_vs_Hyl-2.diff.gz;bimodal;0.99;NA; NA
+GSE83887;GSE83887_gene_exp_N2_vs_N2G.diff.gz;bimodal;0.86;NA; NA
+GSE84145;GSE84145_E12.5RET_WT_NULL.txt.gz;bimodal;0.98;NA; NA
+GSE84158;GSE84158_gene_exp.diff.gz;bimodal;0.93;NA; NA
+GSE84249;GSE84249_cuffdiff_gene_differential_expression_testing.tab.gz;conservative;1.00;NA; NA
+GSE84301;GSE84301_Pub_vs_Prepub.Differential_analysis_results.txt.gz;conservative;1.00;NA; NA
+GSE84308;GSE84308_RNA.txt.gz;spiky;0.97;NA; NA
+GSE84370;GSE84370_APC_0h_vs_1h_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE84370;GSE84370_APC_0h_vs_2h_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE84450;GSE84450_WT_UTvsKO_DTT_gene_exp.diff.gz;conservative;0.99;NA; NA
+GSE84450;GSE84450_WT_UTvsKO_UT_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE84450;GSE84450_WT_UTvsWT_DTT_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE84450;GSE84450_WT_UTvsWT_DTT_splicing.diff.gz;conservative;1.00;NA; NA
+GSE84450;GSE84450_WT_UTvsX_DTT_gene_exp.diff.gz;conservative;0.98;NA; NA
+GSE84450;GSE84450_WT_UTvsX_UT_gene_exp.diff.gz;conservative;0.99;NA; NA
+GSE84481;GSE84481_3xTg.txt.gz;anti-conservative;0.05;NA; NA
+GSE84529;GSE84529_Paired_comparison_of_three_sections_Cuffdiff.xlsx-sheet-Comparison_0-5_mm_vs_15-20_mm;bimodal;0.75;NA; NA
+GSE84529;GSE84529_Paired_comparison_of_three_sections_Cuffdiff.xlsx-sheet-Comparison_0-5_mm_vs_30-35_mm;bimodal;0.71;NA; NA
+GSE84529;GSE84529_Paired_comparison_of_three_sections_Cuffdiff.xlsx-sheet-Comparison_30-35_mm_vs_15-20_mm;conservative;1.00;NA; NA
+GSE84606;GSE84606_gene_exp.diff.gz;bimodal;0.71;NA; NA
+GSE84737;GSE84737_All_genes_unfiltered_DE.txt.gz;anti-conservative;0.45;NA; NA
+GSE84737;GSE84737_Genes_filtered_DE.txt.gz;anti-conservative;0.47;NA; NA
+GSE84786;GSE84786_isoform_exp.xlsx-sheet-Fold change;conservative;1.00;NA; NA
+GSE84786;GSE84786_isoform_exp.xlsx-sheet-isoform_exp;conservative;1.00;NA; NA
+GSE84798;GSE84798_gene_exp.diff.gz;conservative;0.96;NA; NA
+GSE84875;GSE84875_human_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE84875;GSE84875_mouse_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE85308;GSE85308_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE85308;GSE85308_processed_data.txt.gz;conservative;1.00;NA; NA
+GSE85321;GSE85321_Supplemental_Table_2_YAD_RNA_seq_.xls.gz-sheet-YAD_Diff analysis;bimodal;0.82;NA; NA
+GSE85321;GSE85321_Supplemental_Table_3_YGD_RNA_seq_.xls.gz-sheet-YGD_Diff analysis;bimodal;0.93;NA; NA
+GSE85321;GSE85321_Supplemental_Table_4_YAR_vs_YAD_RNA_seq_.xls.gz-sheet-EV_YAD_YAR_isoformexp;anti-conservative;0.46;NA; NA
+GSE85321;GSE85321_Supplemental_Table_5_YAR_RNA_seq_.xls.gz-sheet-YAR diff. analysis;bimodal;0.80;NA; NA
+GSE85321;GSE85321_Supplemental_Table_6_JHD2_OE_YAD_.xls.gz-sheet-OE_EV_YAD_Diff analysis;conservative;1.00;NA; NA
+GSE85321;GSE85321_Supplemental_Table_7_JHD2_OE_YAR_.xls.gz-sheet-OE_EV_YAR_Diff analysis;conservative;0.73;NA; NA
+GSE85328;GSE85328_Leukaemia_MLL-AF9_RingKO.txt.gz;bimodal;0.95;anti-conservative;0.76
+GSE85329;GSE85329_IGF_project_IGF_results.txt.gz;anti-conservative;0.69;anti-conservative;0.55
+GSE85385;GSE85385_RNA-seq_Mouse_Cell_Lines.xlsx-sheet-H3WT_DMSO_x_H3WT_EPZ;anti-conservative;0.84;NA; NA
+GSE85385;GSE85385_RNA-seq_Mouse_Cell_Lines.xlsx-sheet-H3WT_DMSO_x_K27M_DMSO;anti-conservative;0.78;NA; NA
+GSE85385;GSE85385_RNA-seq_Mouse_Cell_Lines.xlsx-sheet-H3WT_EPZ_x_K27M_EPZ;other;1.00;NA; NA
+GSE85385;GSE85385_RNA-seq_Mouse_Cell_Lines.xlsx-sheet-K27M_DMSO_x_K27M_EPZ;anti-conservative;0.85;NA; NA
+GSE85402;GSE85402_gene_exp.diff.gz;conservative;0.99;NA; NA
+GSE85416;GSE85416_isoform_exp.diff.gz;conservative;0.98;NA; NA
+GSE85442;GSE85442_cuffdiff.gene_exp_diff.allg.txt.gz;conservative;0.99;NA; NA
+GSE85442;GSE85442_cuffdiff.isoform_exp.diff.txt.gz;conservative;0.99;NA; NA
+GSE85442;GSE85442_cuffdiff.tss_group_exp.diff.txt.gz;conservative;0.99;NA; NA
+GSE85554;GSE85554_deg_and_counts_table_new_read_counts.txt.gz;spiky;0.87;other;0.89
+GSE85565;GSE85565_Result_Table.csv.gz;spiky;0.85;anti-conservative;0.55
+GSE85576;GSE85576_Supplementary_Table_1.xlsx-sheet-MagohMos2_vs_Control;conservative;1.00;NA; NA
+GSE85627;GSE85627_mDUX-mESC.xlsx.gz-sheet-Sorted;anti-conservative;0.53;anti-conservative;0.18
+GSE85627;GSE85627_mDUX-mESC.xlsx.gz-sheet-Transient;spiky;1.00;other;1.00
+GSE85627;GSE85627_mDUX-mESC.xlsx.gz-sheet-Unsorted;anti-conservative;0.62;anti-conservative;0.16
+GSE85847;GSE85847_matrix_rnaseq_GEO_submission_jsantos20160817.txt.gz;anti-conservative;0.66;anti-conservative;0.57
+GSE85863;GSE85863_Galaxy238-_Cuffdiff_on_data_40__data_35__and_others_gene_differential_expression_testing_.txt.gz;conservative;0.98;NA; NA
+GSE85950;GSE85950_EHEC_plusminus_Symbioflor.xlsx;spiky;1.00;NA; NA
+GSE86054;GSE86054_gene_expression.txt.gz;anti-conservative;0.95;anti-conservative;0.89
+GSE86077;GSE86077_glp-1_EVvs28_D4.diff.gz;conservative;1.00;NA; NA
+GSE86077;GSE86077_N2_EVvs28_D4.diff.gz;conservative;1.00;NA; NA
+GSE86159;GSE86159_significance_calls_genes_overexpression.txt.gz;conservative;1.00;NA; NA
+GSE86159;GSE86159_significance_calls_genes_tam_timecourse.txt.gz;conservative;0.99;NA; NA
+GSE86187;GSE86187_p0wt-ko-gene_exp.diff.gz;bimodal;0.86;NA; NA
+GSE86187;GSE86187_p6wt-ko_gene_exp.diff.gz;bimodal;0.88;NA; NA
+GSE86202;GSE86202_1_TreatVSControl_circRNA_differential_expression.xlsx;spiky;0.73;NA; NA
+GSE86202;GSE86202_Gene_differential_expression.xlsx;conservative;1.00;NA; NA
+GSE86211;GSE86211_CmrA_transcriptome_Expression_of_all_genes.xlsx-sheet-PA14vsPJ01;anti-conservative;0.93;NA; NA
+GSE86211;GSE86211_CmrA_transcriptome_Expression_of_all_genes.xlsx-sheet-PA14vsPJ01dT;other;1.00;NA; NA
+GSE86211;GSE86211_CmrA_transcriptome_Expression_of_all_genes.xlsx-sheet-PJ01vsPJ01dT;anti-conservative;0.96;NA; NA
+GSE86239;GSE86239_ETS2shRNA_gene_exp.diff.gz;spiky;0.92;NA; NA
+GSE86248;GSE86248_shControl-vs-shPaf1-gene_exp.diff.gz;bimodal;0.90;NA; NA
+GSE86248;GSE86248_shControl-vs-shPhf5a-gene_exp_1_.diff.gz;bimodal;0.88;NA; NA
+GSE86323;GSE86323_gene_exp.diff.txt.gz;conservative;1.00;NA; NA
+GSE86442;GSE86442_gene_differential_expression.txt.gz;conservative;1.00;NA; NA
+GSE86521;GSE86521_DESeq_out_KO_vs_WT.txt.gz;bimodal;0.75;anti-conservative;0.74
+GSE86837;GSE86837_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE87167;GSE87167_all_genes.txt.gz;anti-conservative;0.38;NA; NA
+GSE87168;GSE87168_Watson_et_al_TOXSCI-16-0457_Diff_Gen_Exp.csv.gz;conservative;1.00;NA; NA
+GSE87240;GSE87240_gene_expnorliver.diff.gz;conservative;0.99;NA; NA
+GSE87240;GSE87240_gene_expsk.diff.gz;conservative;0.98;NA; NA
+GSE87240;GSE87240_hep_gene_exphep.diff.gz;conservative;0.98;NA; NA
+GSE87307;GSE87307_mRNA_processed_results.xlsx;bimodal;0.78;NA; NA
+GSE87315;GSE87315_CuffDiff_RNA-seq.csv.gz;bimodal;0.95;NA; NA
+GSE87398;GSE87398_gene_exp.diff.gz;anti-conservative;0.83;NA; NA
+GSE87398;GSE87398_genes_group_exp.diff.gz;anti-conservative;0.83;NA; NA
+GSE87448;GSE87448_AKT_vs_CTRL_at_2fold-p005-4433_genes.txt.gz-set-0;anti-conservative;0.07;NA; NA
+GSE87448;GSE87448_AKT_vs_CTRL_at_2fold-p005-4433_genes.txt.gz-set-2;anti-conservative;0.25;NA; NA
+GSE87448;GSE87448_AKT_vs_CTRL_at_2fold-p005-4433_genes.txt.gz-set-3;anti-conservative;0.23;NA; NA
+GSE87448;GSE87448_KRAS_vs_CTRL_at_2fold-p005-4238_genes.txt.gz-set-0;anti-conservative;0.08;NA; NA
+GSE87448;GSE87448_KRAS_vs_CTRL_at_2fold-p005-4238_genes.txt.gz-set-1;anti-conservative;0.15;NA; NA
+GSE87448;GSE87448_KRAS_vs_CTRL_at_2fold-p005-4238_genes.txt.gz-set-3;anti-conservative;0.22;NA; NA
+GSE87448;GSE87448_MYC_vs_CTRL_at_2fold-p005-3502_genes_Myc_Only.txt.gz-set-0;anti-conservative;0.07;NA; NA
+GSE87495;GSE87495_results_dds_gencode22.csv.gz;anti-conservative;0.34;anti-conservative;0.15
+GSE87532;GSE87532_gene_exp.diff.name.txt.gz;bimodal;0.93;NA; NA
+GSE87626;GSE87626_nc_vs_19_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE87635;GSE87635_CNOT3KO-WT.txt.gz;conservative;0.99;NA; NA
+GSE87706;GSE87706_SM_vs_RODI.txt.gz;anti-conservative;0.27;anti-conservative;0.13
+GSE87808;GSE87808_diffExp_Slc7a5_Cerebellum_allGenes.txt.gz;spiky;0.74;anti-conservative;0.83
+GSE87824;GSE87824_processed_data.xlsx;bimodal;0.81;NA; NA
+GSE87862;GSE87862_gene_exp.diff.gz;conservative;0.99;NA; NA
+GSE87890;GSE87890_vgat1_csv.csv.gz;conservative;1.00;NA; NA
+GSE87890;GSE87890_vgat2_csv.csv.gz;conservative;1.00;NA; NA
+GSE87890;GSE87890_vglut1_csv.csv.gz;conservative;1.00;NA; NA
+GSE87890;GSE87890_vglut2_csv.csv.gz;conservative;1.00;NA; NA
+GSE87890;GSE87890_vglut3_csv.csv.gz;conservative;1.00;NA; NA
+GSE88700;GSE88700_gene_exp.diff.gz;conservative;0.99;NA; NA
+GSE88970;GSE88970_Whsc1_proB_DE.xlsx-sheet-4P_05_WT_vs_KO_results;spiky;0.71;anti-conservative;0.88
+GSE89004;GSE89004_ppGpp0_vs_H78_differential_all.xls.gz;anti-conservative;0.44;anti-conservative;0.21
+GSE89110;GSE89110_RNAseq_shPFKB4_p53_logFC.txt.gz-set-0;bimodal;0.76;NA; NA
+GSE89110;GSE89110_RNAseq_shPFKB4_p53_logFC.txt.gz-set-1;bimodal;0.93;NA; NA
+GSE89110;GSE89110_RNAseq_shPFKB4_p53_logFC.txt.gz-set-2;bimodal;0.93;NA; NA
+GSE89110;GSE89110_RNAseq_shPFKB4_p53_logFC.txt.gz-set-3;bimodal;0.84;NA; NA
+GSE89168;GSE89168_36hpupalCNS_WT_dStimKD_CuffDiff.txt.gz;conservative;1.00;NA; NA
+GSE89168;GSE89168_72hpupalCNS_WT_dStimKD+Recovery_CuffDiff.txt.gz;conservative;1.00;NA; NA
+GSE89238;GSE89238_SET2_KO_DESeq2_output.txt.gz;anti-conservative;0.63;anti-conservative;0.67
+GSE89364;GSE89364_mav_RNASeq_exp_deqiangs.xlsx;conservative;1.00;NA; NA
+GSE89504;GSE89504_gene_exp.tabular.txt.gz;bimodal;1.00;NA; NA
+GSE89504;GSE89504_TSS_groups_exp.tabular.txt.gz;bimodal;1.00;NA; NA
+GSE89572;GSE89572_24h_DEGs.txt.gz;conservative;1.00;NA; NA
+GSE89572;GSE89572_2h_DEGs.txt.gz;conservative;1.00;NA; NA
+GSE89572;GSE89572_7d_DEGs.txt.gz;conservative;1.00;NA; NA
+GSE89773;GSE89773_combined_expression_table.txt.gz-set-0;anti-conservative;0.41;anti-conservative;0.21
+GSE89773;GSE89773_combined_expression_table.txt.gz-set-1;anti-conservative;0.50;anti-conservative;0.26
+GSE90615;GSE90615_DifferentialExpression.xlsx-sheet-1dP-MI_vs_Pre-MI;anti-conservative;0.68;NA; NA
+GSE90615;GSE90615_DifferentialExpression.xlsx-sheet-1dP-MI_vs_Sfrp2_12dP-MI;uniform;0.97;NA; NA
+GSE90615;GSE90615_DifferentialExpression.xlsx-sheet-1dP-MI_vs_Vehicle_12dP-MI;uniform;1.00;NA; NA
+GSE90615;GSE90615_DifferentialExpression.xlsx-sheet-Sfrp2_12dP-MI_v Vehicle_12dP-MI;other;1.00;NA; NA
+GSE90615;GSE90615_DifferentialExpression.xlsx-sheet-Sfrp2_12dP-MI_vs_Pre-MI;anti-conservative;0.43;NA; NA
+GSE90615;GSE90615_DifferentialExpression.xlsx-sheet-Vehicle_12dP-MI_vs_Pre-MI;anti-conservative;0.48;NA; NA
+GSE90712;GSE90712_Thy1_positive_E_Cad_positive_vs_Thy1_positive_E_Cad_negative.DESeq2_Results.tsv.gz;anti-conservative;0.60;anti-conservative;0.36
+GSE90876;GSE90876_Cuffdiff_PSM_vs_SM.txt.gz;conservative;1.00;NA; NA
+GSE90876;GSE90876_Cuffdiff_SM_vs_SM_Dev.txt.gz;conservative;1.00;NA; NA
+GSE90889;GSE90889_geo_hiPSC-RPE_Vehicle_vs_NAM.xlsx;anti-conservative;0.69;anti-conservative;0.65
+GSE90974;GSE90974_Cuffdiff_Gene_Rb_24v36.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_Rb_24v48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_Rb_36v48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_RbvRv_24.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_RbvRv_36.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_RbvRv_48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_RbvRv_Global.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_Rv_24v36.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_Rv_24v48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_Rv_36v48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_Sb_24v36.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_Sb_24v48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_Sb_36v48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_SbvSv_24.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_SbvSv_36.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_SbvSv_48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_SbvSv_Global.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_Sv_24v36.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_Sv_24v48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_Sv_36v48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_SvvRv_24.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_SvvRv_36.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_SvvRv_48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Gene_SvvRv_Global.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_Rb_24v36.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_Rb_24v48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_Rb_36v48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_RbvRv_24.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_RbvRv_36.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_RbvRv_48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_RbvRv_Global.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_Rv_24v36.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_Rv_24v48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_Rv_36v48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_Sb_24v36.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_Sb_24v48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_Sb_36v48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_SbvSv_24.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_SbvSv_36.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_SbvSv_48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_SbvSv_Global.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_Sv_24v36.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_Sv_24v48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_Sv_36v48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_SvvRv_24.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_SvvRv_36.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_SvvRv_48.txt.gz;conservative;1.00;NA; NA
+GSE90974;GSE90974_Cuffdiff_Transcript_SvvRv_Global.txt.gz;conservative;1.00;NA; NA
+GSE90977;GSE90977_RNA_seq_COMPLETE_4_4_SETS_DEFINITIVE.xlsx.gz-sheet-120 dpi;anti-conservative;0.54;anti-conservative;0.37
+GSE90977;GSE90977_RNA_seq_COMPLETE_4_4_SETS_DEFINITIVE.xlsx.gz-sheet-180 dpi;anti-conservative;0.82;anti-conservative;0.83
+GSE90977;GSE90977_RNA-seq_COMPLETE_4Con-4CJD_SETS_DEFINITIVE_log2FC_0.5.xlsx.gz-sheet-120 dpi;anti-conservative;0.06;anti-conservative;0.01
+GSE90977;GSE90977_RNA-seq_COMPLETE_4Con-4CJD_SETS_DEFINITIVE_log2FC_0.5.xlsx.gz-sheet-180 dpi;anti-conservative;0.10;anti-conservative;0.05
+GSE91001;GSE91001_Galaxy255-AveragedPerCRNAseqData.tabular.txt.gz;spiky;0.98;NA; NA
+GSE91001;GSE91001_PerC_RNAseq_averageddata.xls.gz-sheet-diffexp_rerun;spiky;0.98;NA; NA
+GSE91060;GSE91060_E11_vs._E16.xls.gz;bimodal;0.87;NA; NA
+GSE91060;GSE91060_E11_vs._P1.xlsx;bimodal;0.82;NA; NA
+GSE91060;GSE91060_E16_vs._P1.xlsx;bimodal;0.95;NA; NA
+GSE91075;GSE91075_gene_exp_WT1_KO1.txt.gz;conservative;1.00;NA; NA
+GSE91075;GSE91075_gene_exp_WT2_KO2.txt.gz;conservative;1.00;NA; NA
+GSE92246;GSE92246_gene_exp.diff.gz;bimodal;0.98;NA; NA
+GSE92345;GSE92345_H9_I_pqvalues.poisson.txt.gz;conservative;1.00;NA; NA
+GSE92345;GSE92345_H9_P_pqvalues.poisson.txt.gz;bimodal;0.98;NA; NA
+GSE92345;GSE92345_HEK_I_pqvalues.poisson.txt.gz;conservative;1.00;NA; NA
+GSE92345;GSE92345_HEK_P_pqvalues.poisson.txt.gz;bimodal;0.96;NA; NA
+GSE92506;GSE92506_DEseq2_wholeTable.txt.gz;anti-conservative;0.64;anti-conservative;0.42
+GSE92874;GSE92874_RNA.txt.gz;bimodal;0.97;NA; NA
+GSE92989;GSE92989_Drought_2_days.txt.gz;conservative;0.83;NA; NA
+GSE92989;GSE92989_Drought_3_days.txt.gz;conservative;0.98;NA; NA
+GSE93021;GSE93021_DSP-TP_LL-YY_FPKM.xlsx-sheet-DSP-TP;conservative;1.00;NA; NA
+GSE93021;GSE93021_DSP-TP_LL-YY_FPKM.xlsx-sheet-DSP-TP_VS_LL-YY;conservative;1.00;NA; NA
+GSE93021;GSE93021_DSP-TP_LL-YY_FPKM.xlsx-sheet-LL-YY;conservative;1.00;NA; NA
+GSE93206;GSE93206_Processed_data_files.xlsx-set-0;conservative;1.00;NA; NA
+GSE93206;GSE93206_Processed_data_files.xlsx-set-1;spiky;0.99;NA; NA
+GSE93280;GSE93280_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE93280;GSE93280_isoform_exp.diff.gz;conservative;1.00;NA; NA
+GSE93313;GSE93313_DESeq_2Dvs3D.txt.gz;anti-conservative;0.77;anti-conservative;0.42
+GSE93313;GSE93313_DESeq_2DvsTranswell.txt.gz;anti-conservative;0.67;anti-conservative;0.34
+GSE93313;GSE93313_DESeq_3DvsTranswell.txt.gz;anti-conservative;0.79;anti-conservative;0.55
+GSE93339;GSE93339_e125_Yap-mt_lung_all_genes.txt.gz;conservative;0.99;NA; NA
+GSE93547;GSE93547_LMvsWTM_cleaned_deseq2.csv.gz;anti-conservative;0.51;anti-conservative;0.32
+GSE93620;GSE93620_gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE93684;GSE93684_S1-1A-vs-R1-1A.compare.txt.gz;anti-conservative;0.30;NA; NA
+GSE93748;GSE93748_shTAZ_in_DU145_proceeded_data.xlsx;spiky;1.00;anti-conservative;0.91
+GSE93774;GSE93774_Full_gene_list-Control_vs_KO.csv.gz;anti-conservative;0.61;NA;NaN
+GSE93827;GSE93827_LMP1_2a_vs_GFP.txt.gz;anti-conservative;0.51;anti-conservative;0.27
+GSE93866;GSE93866_IDOE_GENE_EXPRESSION.xlsx;conservative;0.98;NA; NA
+GSE93870;GSE93870_processed_file.xlsx-sheet-293FT_ZIKV.Vs.293FT_Control.DES;spiky;1.00;anti-conservative;0.88
+GSE93870;GSE93870_processed_file.xlsx-sheet-BJ_ZIKV.Vs.BJ_Control.DESeq_Ana;spiky;1.00;anti-conservative;0.96
+GSE93870;GSE93870_processed_file.xlsx-sheet-CHME_ZIKV.Vs.CHME_Control.DESeq;spiky;1.00;anti-conservative;0.81
+GSE93870;GSE93870_processed_file.xlsx-sheet-THP1_ZIKV.Vs.THP1_Control.DESeq;spiky;0.99;anti-conservative;0.48
+GSE93870;GSE93870_processed_file.xlsx-sheet-ZIKV.Vs.Control.DESeq_Analysis_;spiky;1.00;spiky;0.92
+GSE93877;GSE93877_NB4_RNASeq_ATRA.txt.gz;anti-conservative;0.84;anti-conservative;0.75
+GSE93877;GSE93877_NB4_RNASeq_DMSO.txt.gz;anti-conservative;0.95;anti-conservative;0.93
+GSE94120;GSE94120_K562pos_rel_abundance_1x1.txt.gz;conservative;1.00;NA; NA
+GSE94120;GSE94120_SKNSHpos_rel_abundance_1x1.txt.gz;conservative;1.00;NA; NA
+GSE94120;GSE94120_U2OS-PcTF_rel_abundance_1x3.txt.gz;bimodal;0.88;NA; NA
+GSE94120;GSE94120_U2OSpos_rel_abundance_1x1.txt.gz;conservative;1.00;NA; NA
+GSE94280;GSE94280_DESeq2_results_Y_vs_O.txt.gz;anti-conservative;0.61;anti-conservative;0.33
+GSE94512;GSE94512_NaPi_vs_Lys.txt.gz;anti-conservative;0.95;anti-conservative;0.98
+GSE94587;GSE94587_DESEQ_Female_WT_vs_Female_del.txt.gz;bimodal;0.85;anti-conservative;0.83
+GSE94587;GSE94587_DESEQ_Male_WT_vs_Female_WT.txt.gz;bimodal;0.76;anti-conservative;0.60
+GSE94587;GSE94587_DESEQ_Male_WT_vs_Male_del.txt.gz;bimodal;0.83;anti-conservative;0.80
+GSE94783;GSE94783_rnaseq_process_cuffdiff_global_DMSO_Flut_genes_diff.tsv.gz;conservative;1.00;NA; NA
+GSE94783;GSE94783_rnaseq_process_cuffdiff_global_DMSO_Flut_PPC_genes_diff.tsv.gz;conservative;1.00;NA; NA
+GSE94783;GSE94783_rnaseq_process_cuffdiff_global_DMSO_PPC_genes_diff.tsv.gz;conservative;1.00;NA; NA
+GSE94821;GSE94821_cuffdiff_mock_vs_12hpi.txt.gz;conservative;1.00;NA; NA
+GSE94821;GSE94821_cuffdiff_mock_vs_16hpi.txt.gz;conservative;1.00;NA; NA
+GSE94821;GSE94821_cuffdiff_mock_vs_20hpi.txt.gz;conservative;1.00;NA; NA
+GSE94821;GSE94821_cuffdiff_mock_vs_4hpi.txt.gz;conservative;1.00;NA; NA
+GSE94821;GSE94821_cuffdiff_mock_vs_8hpi.txt.gz;conservative;1.00;NA; NA
+GSE94840;GSE94840_Alox5_vs_Control.all.gene.result.txt.gz;other;1.00;other;1.00
+GSE94843;GSE94843_cuffdiff_mock_vs_lox.txt.gz;conservative;0.96;NA; NA
+GSE94843;GSE94843_cuffdiff_mock_vs_mnv.txt.gz;conservative;0.98;NA; NA
+GSE94967;GSE94967_cds_exp.diff_A_B_CDS.diff.gz;conservative;1.00;NA; NA
+GSE94967;GSE94967_gene_exp.diff_A_B_GENE.diff.gz;conservative;1.00;NA; NA
+GSE94967;GSE94967_isoform_exp.diff_A_B_ISOFORM.diff.gz;conservative;1.00;NA; NA
+GSE94967;GSE94967_tss_group_exp.diff_A_B_TSS.diff.gz;conservative;1.00;NA; NA
+GSE95006;GSE95006_RNA-seq_Summary.xls.gz-sheet-Trip_delta_vs_J-set-0;other;1.00;NA; NA
+GSE95006;GSE95006_RNA-seq_Summary.xls.gz-sheet-Trip_delta_vs_J-set-1;other;1.00;NA; NA
+GSE95108;GSE95108_DEtest_wo_wt1.xlsx-sheet-DEtest;anti-conservative;0.76;NA; NA
+GSE95181;GSE95181_HNS_counts_and_DGE.txt.gz;bimodal;0.99;NA; NA
+GSE95234;GSE95234_IPInputFPKM.xlsx;conservative;0.97;NA; NA
+GSE95234;GSE95234_NotInfectedInfectedFPKM.xlsx-set-0;conservative;0.96;NA; NA
+GSE95234;GSE95234_NotInfectedInfectedFPKM.xlsx-set-1;conservative;0.95;NA; NA
+GSE95337;GSE95337_DESeq_EH_Control.vs.dKO.res.txt.gz;anti-conservative;0.56;anti-conservative;0.38
+GSE95481;GSE95481_GCN5_RNAi_vs_WT_root_tip_gene_exp.diff.gz;conservative;0.98;NA; NA
+GSE95481;GSE95481_GCN5_RNAi_vs_WT_whole_root_gene_exp.diff.gz;conservative;0.98;NA; NA
+GSE95679;GSE95679_Mishima_2017_Dcp2.txt.gz;conservative;0.96;NA; NA
+GSE95687;GSE95687_sleuthResults.txt.gz;anti-conservative;0.71;NA; NA
+GSE95850;GSE95850_RUCA-I_WT_vs_miR-203_KO_gene_expression.csv.gz;other;1.00;NA; NA
+GSE96072;GSE96072_Galaxy106-_Cuffdiff_on_data_40__data_39__and_others_transcript_differential_expression_testing_.tabular.txt.gz;bimodal;0.92;NA; NA
+GSE96072;GSE96072_Galaxy24-_Cuffdiff_on_data_7__data_6__and_others_transcript_differential_expression_testing_.tabular.txt.gz;bimodal;0.79;NA; NA
+GSE96072;GSE96072_Galaxy55-_Cuffdiff_on_data_2__data_4__and_others_transcript_differential_expression_testing_.tabular.txt.gz;bimodal;0.71;NA; NA
+GSE96626;GSE96626_DE_TrtVsVeh.xlsx;anti-conservative;0.89;anti-conservative;0.87
+GSE96814;GSE96814_Deseq_TotRNA.xlsx-sheet-Feuil1;other;1.00;other;1.00
+GSE96814;GSE96814_Deseq2_MS2RsaA.xlsx-sheet-Feuil1;other;1.00;other;1.00
+GSE96999;GSE96999_DESeq2_miseq_output.txt.gz;anti-conservative;0.25;anti-conservative;0.23
+GSE96999;GSE96999_DESeq2_nextseq_output.txt.gz;anti-conservative;0.41;anti-conservative;0.09
+GSE97060;GSE97060_122KOMouse_SleuthOutput.txt.gz;anti-conservative;0.46;NA; NA
+GSE97129;GSE97129_Can_vs_WT_CuffDiff_Output_BDGP5.txt.gz;bimodal;0.83;NA; NA
+GSE97129;GSE97129_CG9879_vs_WT_CuffDiff_Output_BDGP5.txt.gz;conservative;1.00;NA; NA
+GSE97129;GSE97129_Comr_vs_WT_CuffDiff_Output_BDGP5.txt.gz;bimodal;0.83;NA; NA
+GSE97129;GSE97129_Mip40_vs_WT_CuffDiff_Output_BDGP5.txt.gz;bimodal;0.82;NA; NA
+GSE97256;GSE97256_Y1differentialGenes.tab.gz;conservative;1.00;NA; NA
+GSE97258;GSE97258_differential_expression.xls.gz-sheet-Sheet1;bimodal;0.95;NA; NA
+GSE97395;GSE97395_Treat_vs_control_diff.txt.gz;spiky;0.90;anti-conservative;0.60
+GSE97421;GSE97421_GFP_RFP.txt.gz;anti-conservative;0.57;anti-conservative;0.31
+GSE97421;GSE97421_GFP_Whole.txt.gz;anti-conservative;0.34;anti-conservative;0.04
+GSE97525;GSE97525_Dm_AKHR_F2_RNA-seq.xlsx-sheet-PM vs WT;other;1.00;other;1.00
+GSE97525;GSE97525_Dm_AKHR_F2_RNA-seq.xlsx-sheet-PP vs PM;other;1.00;other;1.00
+GSE97525;GSE97525_Dm_AKHR_F2_RNA-seq.xlsx-sheet-PP vs WT;other;1.00;other;1.00
+GSE98387;GSE98387_gene_exp.txt.gz;other;1.00;other;1.00
+GSE98526;GSE98526_A1_vs_UA159T5.txt.gz;anti-conservative;0.80;NA; NA
+GSE98526;GSE98526_A12_vs_UA159T5.txt.gz;anti-conservative;0.58;NA; NA
+GSE98526;GSE98526_A2_vs_UA159T5.txt.gz;other;1.00;NA; NA
+GSE98526;GSE98526_UA159T5_vs_UA159T0.txt.gz;anti-conservative;0.93;NA; NA
+GSE98541;GSE98541_RPE1_diff_expression_WT_SAFA.xlsx;conservative;1.00;NA; NA
+GSE98650;GSE98650_mb1_hdac3_cuffdiff_out.txt.gz;conservative;0.99;NA; NA
+GSE98739;GSE98739_Q111SST_vs_Q111DOP_DEGs_with_fpkm.diff.gz;bimodal;0.92;NA; NA
+GSE98739;GSE98739_Q7SST_vs_Q111DOP_DEGs_with_fpkm.diff.gz;bimodal;0.80;NA; NA
+GSE98739;GSE98739_Q7SST_vs_Q111SST_DEGs_with_fpkm.diff.gz;bimodal;0.82;NA; NA
+GSE98759;GSE98759_gene_exp.txt.gz;other;1.00;other;1.00
+GSE98869;GSE98869_diffexp.tsv.gz;spiky;0.78;other;1.00
+GSE98875;GSE98875_Diff.summary.xlsx-sheet-all_genes;conservative;1.00;NA; NA
+GSE99096;GSE99096_Yang_Processed_data_Oxidative_Stress.xlsx;anti-conservative;0.31;NA; NA
+GSE99347;GSE99347_H2AfZKO_WT.anno.txt.gz;bimodal;0.79;NA; NA
+GSE99397;GSE99397_CreNeg-MHCPos_vs_Control.CuffDiff.gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE99397;GSE99397_CreNeg-MHCPos_vs_CrePos-MHCNeg.CuffDiff.gene_exp.diff.gz;conservative;1.00;NA; NA
+GSE99397;GSE99397_CrePos-MHCNeg_vs_Control.CuffDiff.gene_exp.diff.gz;conservative;0.99;NA; NA
+GSE99944;GSE99944_Digo_expression_SD-T50nM_SD-Ctrl.csv.gz;anti-conservative;0.48;anti-conservative;0.34
