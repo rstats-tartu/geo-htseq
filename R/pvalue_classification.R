@@ -6,13 +6,6 @@ library(recipes)
 library(parsnip)
 library(yardstick)
 
-#' Histogram types summary table
-types_legend <- read_csv(here("data/pvalue_hist_types.csv"))
-
-#' Remove comments
-types_legend <- types_legend %>%
-  select(type, typetext)
-
 #' READ IN CLASSIFICATIONS --------------------------------------------
 #' Load manually assigned classes
 # his_all <- read_delim(here("data/pvalue_hist_UM_190121.csv"), 
