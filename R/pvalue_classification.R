@@ -11,28 +11,15 @@ library(yardstick)
 his_all <- read_csv2(here("data/pvalue_sets_classes.csv"))
 
 #' Split manualy assigned classes to filtered and non filtered
-#' 
-# his_all <- his_all %>% 
-#   select(Accession, suppdata_id = `Supplementary file name`, starts_with("Type")) %>% 
-#   gather(key = Filter, value = Type, Type, `Type filtered`) %>%
-#   na.omit() %>% 
-#   mutate(Filter = case_when(
-#     Filter == "Type" ~ "raw",
-#     TRUE ~ "basemean"
-#   ))
 his_all <- his_all %>% 
-  mutate(suppdata_id = case_when(
-    is.na(set) ~ suppdata_id,
-    !is.na(set) ~ str_c(suppdata_id, "-set-", set)
-  )) %>% 
-  select(Accession, suppdata_id, starts_with("type")) %>% 
-  rename(Type = type, `Type filtered` = type_filt) %>% 
-  gather(key = Filter, value = Type, Type, `Type filtered`) %>%
+  gather(key = Filter, value = Type, type, type_filtered) %>%
+  select(-starts_with("pi0")) %>% 
   na.omit() %>% 
   mutate(Filter = case_when(
-    Filter == "Type" ~ "raw",
+    Filter == "type" ~ "raw",
     TRUE ~ "basemean"
-  ))
+  )) %>% 
+  mutate_at("Type", str_replace, "[:punct:]$", "") # Ülo introduced "anti-conservative'" class
 
 # READ IN DATASET WITH PVALUE BINS ----------------------------------
 
@@ -78,15 +65,9 @@ test <- testing(data_split)
 pvalue_train <- recipe(Type ~ ., data = train) %>%
   prep(training = train, retain = TRUE)
 
-# Maximum or near maximum mtry seems to work well in most of the times. Sometimes the maximum is at 10-20 mtry,
-# and it seams to depend from the random nature of creation of training set.
-# Probable reason seams to be the (difficult and therefore non stable) classification of spiky histograms. 
-# As there are not many spiky histograms (and many of them are not correctly assigned) they tend to be distributed
-# between training and validation sets differently in different runs. 
-# It Will continue with near maximum mtry. This migth allowe more better to replace the wrong classification
-# of filtered datasets later.
+#' Fit nnet model
 nn_fit <- 
-  mlp(mode = "classification", penalty = 0.01, epochs = 3000) %>% 
+  mlp(mode = "classification", penalty = 0.3, epochs = 4000) %>% 
   set_engine("nnet", MaxNWts = 2000) %>% 
   fit(Type ~ ., data = juice(pvalue_train))
 test_results <- test %>%
