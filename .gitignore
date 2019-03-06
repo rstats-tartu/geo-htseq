@@ -10,3 +10,4 @@ _main.*
 R/.snakemake*
 render*
 bookdown*
+*.simg
