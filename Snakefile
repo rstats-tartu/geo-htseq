@@ -1,12 +1,12 @@
 
+singularity: "shub://tpall/geo-rnaseq"
+
 rule all:
   input: "output/gsem.rds", "output/suppdata.rds", "_main.html"
 
 rule geo_query:
   output: 
     "output/document_summaries.rds"
-  conda:
-    "envs/r.yaml"
   script:
     "R/01_geo_query.R"
 
@@ -17,8 +17,6 @@ rule download_suppfilenames:
     "output/suppfilenames.rds"
   params: 
     last_date = "2017-06-19"
-  conda:
-    "envs/r.yaml"
   script:
     "R/02_download_suppfilenames.R"
 
@@ -27,8 +25,6 @@ rule filter_suppfilenames:
     rules.download_suppfilenames.output
   output: 
     "output/suppfilenames_filtered.rds"
-  conda:
-    "envs/r.yaml"
   script:
     "R/03_filter_suppfilenames.R"
 
@@ -37,8 +33,6 @@ rule download_suppfiles:
     rules.filter_suppfilenames.output
   output: 
     touch("output/downloading_suppfiles.done")
-  conda:
-    "envs/r.yaml"
   script:
     "R/04_download_suppfiles.R"
 
@@ -47,8 +41,6 @@ rule series_matrixfiles:
     rules.download_suppfiles.output
   output: 
     "output/gsem.rds"
-  conda:
-    "envs/r.yaml"
   script:
     "R/05_series_matrixfiles.R"
 
@@ -60,8 +52,6 @@ rule split_suppfiles:
     gsem = rules.series_matrixfiles.output
   output: 
     temp(expand("output/tmp/supptabs_{n}.rds", n = n_files))
-  conda:
-    "envs/r.yaml"
   script:
     "R/06_split_suppfiles.R"
 
@@ -70,8 +60,6 @@ rule import_suppfiles:
     "output/tmp/supptabs_{n}.rds"
   output: 
     temp("output/tmp/suppdata_{n}.rds")
-  conda:
-    "envs/r.yaml"
   script:
     "R/06_import_suppfiles.R"
   
@@ -79,24 +67,18 @@ rule merge_suppdata:
   input: 
     expand("output/tmp/suppdata_{n}.rds", n = n_files)
   output: "output/suppdata.rds"
-  conda:
-    "envs/r.yaml"
   script:
     "R/07_merge_suppdata.R"
 
 rule download_publications:
   input: rules.geo_query.output
   output: "output/publications.rds"
-  conda:
-    "envs/r.yaml"
   script:
     "R/07_download_publications.R"
 
 rule report:
   input: "index.Rmd", "01_introduction.Rmd", "02_methods.Rmd", "03_results.Rmd", "04_discussion.Rmd", "05_references.Rmd", "output/document_summaries.rds", "output/suppfilenames.rds", "output/suppfilenames_filtered.rds", "output/gsem.rds", "output/suppdata.rds", "output/publications.rds"
   output: "_main.html"
-  conda:
-    "envs/r.yaml"
   shell:
     """
     chmod +x ./_build.sh
