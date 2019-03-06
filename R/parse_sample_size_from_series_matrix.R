@@ -58,8 +58,17 @@ sample_n <- gsem %>%
 #+
 sample_n %>%
     group_by(Accession, series_matrix_file) %>%
-    summarise(sample_size = mean(sample_size)) %>%
+    summarise(n_mean = mean(sample_size),
+              n_min = min(sample_size),
+              n_max = max(sample_size),
+              n_groups = n()) %>%
+    mutate(n_groups = case_when(
+        n_groups >= 10 ~ "10+",
+        TRUE ~ as.character(n_groups)
+    ),
+    n_groups = factor(n_groups, , levels = c(as.character(1:9), "10+"))) %>% 
     ggplot() +
-    geom_histogram(mapping = aes(x = sample_size), bins = 30) +
+    geom_histogram(mapping = aes(x = n_mean), bins = 30) +
+    facet_wrap(~ n_groups, scales = "free") +
     scale_x_log10() +
     labs(x = "Mean sample size", caption = "All sets!")
