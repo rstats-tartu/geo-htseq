@@ -30,6 +30,9 @@ pvalues_bm <- read_rds(here("output/pvalues_bm.rds"))
 #' Pool raw and basemean corrected data.
 pvalues_pool <- bind_rows(raw = pvalues, basemean = pvalues_bm, .id = "Filter")
 
+#' Number of features to sample from
+features <- pvalues_pool$features
+
 #' Prepare variables for classification. Keep only sets with at least 
 #' nrowthreshold pvalues.
 pvalues_pool <- pvalues_pool %>% 
@@ -49,8 +52,35 @@ pvalues_bins <- pvalues_pool %>%
 pvalues_coded <- pvalues_bins %>%
   left_join(his_all) %>%
   filter(!is.na(Type)) %>% 
-  mutate_at("Type", as.factor) %>% 
   select(-Accession)
+
+#' Generate synthetic p-value distributions
+set.seed(11)
+uni <- replicate(100, runif(sample(features, 1)), simplify = FALSE)
+aco <- replicate(10, 
+                 replicate(sample(features, 1), t.test(rnorm(3, sample(c(0, 0.5, 1, 1.5), 1, prob = c(0.8, rep(0.2 / 3, 3))), 0.3))$p.value),
+                 simplify = TRUE)
+
+#' create anti-conservative sets with fdr adjustment
+con <- map(c(uni, aco), p.adjust, method = "fdr")
+bim <- map2(aco, con[101:110], ~ sample(c(.x, .y, sample(features, 1))))
+synt <- bind_rows(tibble(Type = "uniform", pvalues = uni),
+                  tibble(Type = "anti-conservative", pvalues = aco),
+                  tibble(Type = "conservative", pvalues = con),
+                  tibble(Type = "bimodal", pvalues = bim),
+                  
+)
+
+synt <- synt %>% 
+  filter(map_lgl(pvalues, ~ length(.x) >= nrowthreshold)) %>% 
+  mutate(eCDF = map(pvalues, ecdf),
+         values = map(eCDF, function(Fn) Fn(seq(0, 1, 3/nrowthreshold))))
+
+synt <- synt %>% 
+  mutate(values = map(values, matrix, nrow = 1),
+         values = map(values, as.tibble)) %>% 
+  unnest(values) %>% 
+  select(starts_with("V"), Type)
 
 # RANDOM FOREST ---- CREATE CLASSIFICATION MODEL -----------------------------
 
@@ -58,6 +88,8 @@ pvalues_coded <- pvalues_bins %>%
 set.seed(11)
 data_split <- pvalues_coded %>% 
   select(Type, starts_with("V")) %>% 
+  bind_rows(synt) %>% 
+  mutate_at("Type", as.factor) %>% 
   initial_split(p = 0.8)
 train <- training(data_split)
 test <- testing(data_split)
