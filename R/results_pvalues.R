@@ -168,6 +168,7 @@ add_set_to_suppdata_id <- function(pvalue_dataset) {
 p_values <- p_values %>% add_set_to_suppdata_id
 p_values_bm <- p_values_bm %>% add_set_to_suppdata_id
 
+## ---- pi0hist -----
 #' ## Calculate retrospective power (SRP - shitty retrospective power)
 #' Filter out one dataset with pvalue threshold info column? (logical)
 #' and datasets where number of features is less than nrowthreshold
@@ -192,8 +193,6 @@ p_values <- p_values %>%
 
 p_values_bm <- p_values_bm %>% 
   filter(features > nrowthreshold)
-
-## ---- pi0hist -----
 
 #' Calculate bins for building a histogram. 
 p_values <- p_values %>%
