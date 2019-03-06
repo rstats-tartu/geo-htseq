@@ -140,6 +140,25 @@ knitr::include_graphics("figures/diagram.svg")
 
 ```
 
+```{r histtypes-tab}
+
+```
+
+
+```{r histtypesbm-tab}
+
+```
+
+```{r typeconversion-tab}
+
+```
+
+
+```{r pvaluespark-tab}
+
+```
+
+
 ```{r, include=FALSE}
 # Way to add sparkline dependencies
 mtcars %>%
