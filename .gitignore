@@ -11,3 +11,4 @@ R/.snakemake*
 render*
 bookdown*
 *.simg
+packages.bib
