@@ -168,6 +168,66 @@ add_set_to_suppdata_id <- function(pvalue_dataset) {
 p_values <- p_values %>% add_set_to_suppdata_id
 p_values_bm <- p_values_bm %>% add_set_to_suppdata_id
 
+## ---- pi0histends -----
+
+#' Curated p value histogram classes ---------------------------------------
+#' ## Read in classifications
+nnet_classes <- read_csv(here("output/pvalue_histogram_nnet_classification.csv")) 
+
+#' Pool raw and basemean corrected data.
+pvalues_pool <- bind_rows(raw = p_values, basemean = p_values_bm, .id = "Filter")
+
+#' ## Calculate ecdf and cluster histograms
+#' Prepare variables for classification. Keep only sets with at least 
+#' nrowthreshold pvalues.
+pvalues_pool <- pvalues_pool %>% 
+  filter(map_lgl(pvalues, ~ length(.x) >= nrowthreshold)) %>% 
+  mutate(eCDF = map(pvalues, ecdf),
+         values = map(eCDF, function(Fn) Fn(seq(0, 1, 3/nrowthreshold))))
+
+#' Rearrange pvalue probs to columns.
+pvalues_bins <- pvalues_pool %>% 
+  mutate(values = map(values, matrix, nrow = 1),
+         values = map(values, as.tibble)) %>% 
+  unnest(values) %>% 
+  select(Filter, suppdata_id, starts_with("v"))
+
+#' Create formula for pca and run pca.
+fo <- formula(paste("~", paste(grep("V", colnames(pvalues_bins), value = TRUE), 
+                               collapse = "+")))
+pca <- prcomp(fo, data = pvalues_bins)
+plot(pca)
+
+#' Plot pca results 2D.
+pca_tb <- as_tibble(pca$x)
+pc12 <- pvalues_pool %>% 
+  bind_cols(pca_tb) %>% 
+  select(Filter, suppdata_id, PC1, PC2) %>% 
+  left_join(select(nnet_classes, -starts_with("v")))
+
+barcolors <- viridis::viridis(6)
+ggplot(pc12) +
+  geom_point(aes(x = PC1, y = PC2, color = Type), size = 0.7) +
+  scale_color_manual(values = barcolors)
+
+#' Use default euclidean distance 
+hc <- pca$x[,1:3] %>% dist() %>% hclust(method = "complete")
+treecut <- cutree(hc, k = 6)
+hc_phylo <- ape::as.phylo(hc)
+types <- as.numeric(factor(pc12$Type))
+
+ggt <- hc_phylo %>%
+  ggtree::ggtree(linetype = 2, 
+                 color = "steelblue",
+                 layout = "slanted") + 
+  ggtree::geom_tippoint(color = barcolors[types]) +
+  ggtree::geom_tiplab(aes(angle = angle), size = 1.1, hjust = -0.2)
+
+ggt
+
+
+
+
 ## ---- pi0hist -----
 #' ## Calculate retrospective power (SRP - shitty retrospective power)
 #' Filter out one dataset with pvalue threshold info column? (logical)
@@ -248,40 +308,14 @@ pga <- arrangeGrob(pga, legend,
 #' Draw pi0 plot.
 grid.draw(pga)
 
-## ---- pi0histends -----
-
-#' Save pvalue datasets for classification using machine learning
-write_rds(p_values, here("output/pvalues.rds"))
-write_rds(p_values_bm, here("output/pvalues_bm.rds"))
-
-#' ## Calculate ecdf and cluster histograms
-p_values <- p_values %>%
-  mutate(eCDF = map(pvalues, ecdf))
-
-p_values <- p_values %>% 
-  mutate(probs = map(eCDF, function(Fn) Fn(seq(0, 1, 1/40))))
-probs_mtrx <- p_values$probs %>% 
-  unlist %>% 
-  matrix(nrow = nrow(p_values), byrow = T)
-rownames(probs_mtrx) <- p_values$Accession
-
-#' Use default euclidean distance 
-# barcolors <- c("#070d0d", "#feb308", "#9b5fc0", "#6ecb3c", "#1d5dec", "#fe4b03")
-hc <- probs_mtrx %>% dist(method = "euclidean") %>% hclust() 
-treecut <- hc %>% cutree(k = 6)
-hc_phylo <- hc %>% ape::as.phylo()
-
-barcolors <- viridis::viridis(6)
-ggt <- hc_phylo %>%
-  ggtree::ggtree(linetype = 2, 
-                 color = "steelblue",
-                 layout = "circular") + 
-  ggtree::geom_tippoint(color = barcolors[treecut], size = 1) +
-  ggtree::geom_tiplab(aes(angle = angle), size = 1.1, hjust = -0.2)
-
-ggt
 
 ## ---- sparklines -----
+
+
+#' Rearrange nnet classes.
+nnet_classes_spread <- nnet_classes %>% 
+  spread(Filter, Type) %>% 
+  select(suppdata_id, Type = raw, `Type filtered` = basemean, Method)
 
 #' ## Merge clusters to p value dataframe and create sparklines
 treecut <- tibble(histclus = map_chr(treecut, ~ barcolors[.x]))
@@ -306,14 +340,6 @@ spark_table_bm <- p_values_bm %>%
                                 chartRangeMin = 0,
                                 type = "bar"))
 
-#' Curated p value histogram classes ---------------------------------------
-
-
-#' ## Read in classifications
-nnet_classes <- read_csv(here("output/pvalue_histogram_nnet_classification.csv")) 
-nnet_classes_spread <- nnet_classes %>% 
-  spread(Filter, Type) %>% 
-  select(suppdata_id, Type = raw, `Type filtered` = basemean, Method)
 
 #' Merge with classes and generate output table
 spark_table <- spark_table %>%

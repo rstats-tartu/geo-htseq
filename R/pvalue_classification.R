@@ -36,7 +36,7 @@ features <- pvalues_pool$features
 #' Prepare variables for classification. Keep only sets with at least 
 #' nrowthreshold pvalues.
 pvalues_pool <- pvalues_pool %>% 
-  select(Filter, suppdata_id, pi0, pvalues) %>% 
+  select(Filter, suppdata_id, pvalues) %>% 
   filter(map_lgl(pvalues, ~ length(.x) >= nrowthreshold)) %>% 
   mutate(eCDF = map(pvalues, ecdf),
          values = map(eCDF, function(Fn) Fn(seq(0, 1, 3/nrowthreshold))))
@@ -46,7 +46,7 @@ pvalues_bins <- pvalues_pool %>%
   mutate(values = map(values, matrix, nrow = 1),
          values = map(values, as.tibble)) %>% 
   unnest(values) %>% 
-  select(Filter, suppdata_id, pi0, starts_with("V"))
+  select(Filter, suppdata_id, starts_with("V"))
 
 #' ADD MANUAL HISTOGRAM CODING ----------------------------------------------------
 pvalues_coded <- pvalues_bins %>%
@@ -114,13 +114,11 @@ test_results %>% conf_mat(Type, class)
 
 # PREDICT AND ADD CLASSIFICATION -----------------------------------------------------
 
-#' Get set without manual classification and exclude
-#' sets with bad pi0.
+#' Get sets without manual classification.
+pvalues_coded <- select(pvalues_coded, Filter, suppdata_id, starts_with("V"))
 pvalues_bins_unclass <- pvalues_bins %>% 
-  select(Filter, suppdata_id, pi0, starts_with("V")) %>% 
-  anti_join(select(pvalues_coded, Filter, suppdata_id, pi0, starts_with("V")), 
-            by = c("Filter", "suppdata_id")) %>% 
-  filter(pi0 > pi0threshold)
+  select(Filter, suppdata_id, starts_with("V")) %>% 
+  anti_join(pvalues_coded, by = c("Filter", "suppdata_id"))
 
 #' Get bins only.
 pvalues_bins_only <- pvalues_bins_unclass %>% 
@@ -131,11 +129,11 @@ pred_all <- predict_class(nn_fit, pvalues_bins_only)
 
 #' Add predicted classification
 pvalues_bins_classes <- pvalues_bins_unclass %>%
-  mutate(Type = pred_all) %>%
+  mutate(Type = as.character(pred_all)) %>%
   select(Filter, suppdata_id, Type)
 
-#' Merge model and human classified data and write result to file. 
-bind_rows(human = select(pvalues_coded, Filter, suppdata_id, Type),
+#' Merge model and human classified data and write result to a file. 
+bind_rows(human = select(his_all, -Accession),
           nnet = pvalues_bins_classes, .id = "Method") %>% 
   arrange(suppdata_id) %>% 
   write_csv(here("output/pvalue_histogram_nnet_classification.csv"))
