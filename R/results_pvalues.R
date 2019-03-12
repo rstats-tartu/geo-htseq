@@ -212,7 +212,6 @@ ggplot(pc12) +
 
 #' Use default euclidean distance 
 hc <- pca$x[,1:3] %>% dist() %>% hclust(method = "complete")
-treecut <- cutree(hc, k = 6)
 hc_phylo <- ape::as.phylo(hc)
 types <- as.numeric(factor(pc12$Type))
 
@@ -220,12 +219,8 @@ ggt <- hc_phylo %>%
   ggtree::ggtree(linetype = 2, 
                  color = "steelblue",
                  layout = "slanted") + 
-  ggtree::geom_tippoint(color = barcolors[types]) +
-  ggtree::geom_tiplab(aes(angle = angle), size = 1.1, hjust = -0.2)
-
+  ggtree::geom_tippoint(color = barcolors[types])
 ggt
-
-
 
 
 ## ---- pi0hist -----
