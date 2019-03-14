@@ -193,11 +193,22 @@ pvalues_bins <- pvalues_pool %>%
   select(Filter, suppdata_id, starts_with("v"))
 
 #' Create formula for pca and run pca.
-fo <- formula(paste("~", paste(grep("V", colnames(pvalues_bins), value = TRUE), 
-                               collapse = "+")))
+vars <- paste(grep("V", colnames(pvalues_bins), value = TRUE), collapse = "+")
+fo <- formula(paste("~", vars))
 pca <- prcomp(fo, data = pvalues_bins)
-plot(pca)
-
+pca_sum <- summary(pca)
+pca_sum$importance %>% 
+  as_tibble(rownames = "var") %>% 
+  filter(str_detect(var, "Prop")) %>% 
+  select(1:5) %>% 
+  gather(key, value, PC1:PC4) %>% 
+  ggplot(aes(key, value)) +
+  geom_point() +
+  geom_line(aes(group = 1)) +
+  facet_wrap(~ var) +
+  labs(x = "",
+       y = "Proportion")
+  
 #' Plot pca results 2D.
 pca_tb <- as_tibble(pca$x)
 pc12 <- pvalues_pool %>% 
@@ -221,7 +232,6 @@ ggt <- hc_phylo %>%
                  layout = "slanted") + 
   ggtree::geom_tippoint(color = barcolors[types])
 ggt
-
 
 ## ---- pi0hist -----
 #' ## Calculate retrospective power (SRP - shitty retrospective power)
