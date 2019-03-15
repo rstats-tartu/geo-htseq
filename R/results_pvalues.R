@@ -197,7 +197,7 @@ vars <- paste(grep("V", colnames(pvalues_bins), value = TRUE), collapse = "+")
 fo <- formula(paste("~", vars))
 pca <- prcomp(fo, data = pvalues_bins)
 pca_sum <- summary(pca)
-pca_sum$importance %>% 
+pca_screeplot <- pca_sum$importance %>% 
   as_tibble(rownames = "var") %>% 
   filter(str_detect(var, "Prop")) %>% 
   select(1:5) %>% 
@@ -208,20 +208,28 @@ pca_sum$importance %>%
   facet_wrap(~ var) +
   labs(x = "",
        y = "Proportion")
-  
-#' Plot pca results 2D.
+
+#' Plot pca results 2D. Use histogram classes, when human assigned class is 
+#' missing use nnet.
+#+ merge-pca-nnet
 pca_tb <- as_tibble(pca$x)
 pc12 <- pvalues_pool %>% 
   bind_cols(pca_tb) %>% 
   select(Filter, suppdata_id, PC1, PC2) %>% 
-  left_join(select(nnet_classes, -starts_with("v")))
+  left_join(nnet_classes) %>% 
+  mutate(Type = case_when(
+    is.na(human) ~ nnet,
+    TRUE ~ human
+  ))
 
 barcolors <- viridis::viridis(6)
-ggplot(pc12) +
+pca_plot <- ggplot(pc12) +
   geom_point(aes(x = PC1, y = PC2, color = Type), size = 0.7) +
   scale_color_manual(values = barcolors)
 
-#' Use default euclidean distance 
+#' Cluster histograms based on PCA first three components. 
+#' Use default euclidean distance.
+#+
 hc <- pca$x[,1:3] %>% dist() %>% hclust(method = "complete")
 hc_phylo <- ape::as.phylo(hc)
 types <- as.numeric(factor(pc12$Type))
@@ -231,10 +239,22 @@ ggt <- hc_phylo %>%
                  color = "steelblue",
                  layout = "slanted") + 
   ggtree::geom_tippoint(color = barcolors[types])
-ggt
+
+#' Compose clusters plot. Needs further tweaking!
+#+
+pg <- lapply(list(pca_screeplot, pca_plot, ggt), ggplotGrob)
+pg <- add_labels(pg, case = panel_label_case)
+pga <- arrangeGrob(grobs = pg, heights = c(1, 2, 2))
+
+#' Draw pi0 plot.
+grid.draw(pga)
 
 ## ---- pi0hist -----
 #' ## Calculate retrospective power (SRP - shitty retrospective power)
+#' 
+#' Merge pvalues_pool with histogra classes and calculate pi0 and SRP only for
+#' anti-conservative sets.
+#' 
 #' Filter out one dataset with pvalue threshold info column? (logical)
 #' and datasets where number of features is less than nrowthreshold
 # calculate pi0, the proportion of true nulls
