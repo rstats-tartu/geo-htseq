@@ -115,20 +115,20 @@ test_results %>% conf_mat(Type, class)
 # PREDICT AND ADD CLASSIFICATION -----------------------------------------------------
 
 #' Get sets without manual classification.
-pvalues_coded <- select(pvalues_coded, Filter, suppdata_id, starts_with("V"))
-pvalues_bins_unclass <- pvalues_bins %>% 
-  select(Filter, suppdata_id, starts_with("V")) %>% 
-  anti_join(pvalues_coded, by = c("Filter", "suppdata_id"))
+# pvalues_coded <- select(pvalues_coded, Filter, suppdata_id, starts_with("V"))
+# pvalues_bins_unclass <- pvalues_bins %>% 
+#   select(Filter, suppdata_id, starts_with("V")) %>% 
+#   anti_join(pvalues_coded, by = c("Filter", "suppdata_id"))
 
 #' Get bins only.
-pvalues_bins_only <- pvalues_bins_unclass %>% 
+pvalues_bins_only <- pvalues_bins %>% 
   select(starts_with("V"))
 
 #' Predict classes for all unclassified sets sets.
 pred_all <- predict_class(nn_fit, pvalues_bins_only)
 
 #' Add predicted classification
-pvalues_bins_classes <- pvalues_bins_unclass %>%
+pvalues_bins_classes <- pvalues_bins %>%
   mutate(Type = as.character(pred_all)) %>%
   select(Filter, suppdata_id, Type)
 
@@ -136,4 +136,5 @@ pvalues_bins_classes <- pvalues_bins_unclass %>%
 bind_rows(human = select(his_all, -Accession),
           nnet = pvalues_bins_classes, .id = "Method") %>% 
   arrange(suppdata_id) %>% 
+  spread(key = Method, value = Type) %>% 
   write_csv(here("output/pvalue_histogram_nnet_classification.csv"))
