@@ -224,8 +224,12 @@ pc12 <- pvalues_pool %>%
 
 barcolors <- viridis::viridis(6)
 pca_plot <- ggplot(pc12) +
-  geom_point(aes(x = PC1, y = PC2, color = Type), size = 0.7) +
-  scale_color_manual(values = barcolors)
+  geom_point(aes(x = PC1, y = PC2, color = Type)) +
+  scale_color_manual(values = barcolors) +
+  coord_fixed() +
+  theme(legend.position = "bottom",
+        legend.key = element_blank(),
+        legend.title = element_blank())
 
 #' Cluster histograms based on PCA first three components. 
 #' Use default euclidean distance.
@@ -238,13 +242,18 @@ ggt <- hc_phylo %>%
   ggtree::ggtree(linetype = 2, 
                  color = "steelblue",
                  layout = "slanted") + 
-  ggtree::geom_tippoint(color = barcolors[types])
+  ggtree::geom_tippoint(color = barcolors[types]) +
+  coord_flip()
 
 #' Compose clusters plot. Needs further tweaking!
 #+
 pg <- lapply(list(pca_screeplot, pca_plot, ggt), ggplotGrob)
 pg <- add_labels(pg, case = panel_label_case)
-pga <- arrangeGrob(grobs = pg, heights = c(1, 2, 2))
+lay <- rbind(c(1,1,2,2),
+             c(1,1,2,2),
+             c(3,3,3,3),
+             c(3,3,3,3))
+pga <- arrangeGrob(grobs = pg, layout_matrix = lay)
 
 #' Draw pi0 plot.
 grid.draw(pga)
