@@ -173,19 +173,30 @@ p_values_bm <- p_values_bm %>% add_set_to_suppdata_id
 #' Curated p value histogram classes ---------------------------------------
 #' ## Read in classifications
 nnet_classes <- read_csv(here("output/pvalue_histogram_nnet_classification.csv")) 
+nnet_classes <- nnet_classes %>% 
+  mutate(Type = case_when(
+    is.na(human) ~ nnet,
+    TRUE ~ human
+  ))
+
 
 #' Pool raw and basemean corrected data.
-pvalues_pool <- bind_rows(raw = p_values, basemean = p_values_bm, .id = "Filter")
+#+ pvalues-pool
+pvalues_pool <- bind_rows(
+  raw = p_values, 
+  basemean = p_values_bm, 
+  .id = "Filter"
+)
 
 #' ## Calculate ecdf and cluster histograms
-#' Prepare variables for classification. Keep only sets with at least 
-#' nrowthreshold pvalues.
+#+ add-ecdf
 pvalues_pool <- pvalues_pool %>% 
-  filter(map_lgl(pvalues, ~ length(.x) >= nrowthreshold)) %>% 
+  inner_join(nnet_classes) %>% 
   mutate(eCDF = map(pvalues, ecdf),
-         values = map(eCDF, function(Fn) Fn(seq(0, 1, 3/nrowthreshold))))
+         values = map(eCDF, function(Fn) Fn(seq(0, 1, 3 / nrowthreshold))))
 
 #' Rearrange pvalue probs to columns.
+#+ pvalues-bins
 pvalues_bins <- pvalues_pool %>% 
   mutate(values = map(values, matrix, nrow = 1),
          values = map(values, as.tibble)) %>% 
@@ -216,11 +227,7 @@ pca_tb <- as_tibble(pca$x)
 pc12 <- pvalues_pool %>% 
   bind_cols(pca_tb) %>% 
   select(Filter, suppdata_id, PC1, PC2) %>% 
-  left_join(nnet_classes) %>% 
-  mutate(Type = case_when(
-    is.na(human) ~ nnet,
-    TRUE ~ human
-  ))
+  left_join(nnet_classes)
 
 barcolors <- viridis::viridis(6)
 pca_plot <- ggplot(pc12) +
@@ -272,50 +279,42 @@ grid.draw(pga)
 library(SRP)
 safe_srp <- safely(srp)
 calculate_pi0_and_srp <- function(pvalue_dataset) {
-  filter(pvalue_dataset, map_lgl(pvalues, is.numeric)) %>% 
+  pvalue_dataset %>% 
     mutate(pi0 = map_dbl(pvalues, propTrueNull),
            srp = map(pvalues, safe_srp),
            srp = map(srp, "result"))
 }
 
-p_values <- p_values %>% calculate_pi0_and_srp
-p_values_bm <- p_values_bm %>% calculate_pi0_and_srp
+#' Calculate pi0 and srp only for anti-conservative sets.
+#+ pvalues-antic
+p_values_antic <- pvalues_pool %>% 
+  filter(Type == "anti-conservative") %>% 
+  calculate_pi0_and_srp
 
-#' Filter out too small sets of P values.
-p_values <- p_values %>% 
-  filter(features > nrowthreshold)
+#' Bind anti-conservative sets back to pooled dataset.
+#+ merge-antic
+pvalues_pool <- pvalues_pool %>% 
+  filter(Type == "anti-conservative") %>% 
+  bind_rows(p_values_antic)
 
-p_values_bm <- p_values_bm %>% 
-  filter(features > nrowthreshold)
-
-#' Calculate bins for building a histogram. 
-p_values <- p_values %>%
+#' Calculate bins for table histograms. 
+pvalues_pool <- pvalues_pool %>%
   mutate(bins = map(pvalues, ntile, 60))
 
-p_values_bm <- p_values_bm %>%
-  mutate(bins = map(pvalues, ntile, 60))
-
-# Histogram of pi0 distribution
-pi0hist <- ggplot(data = p_values) +
+# Histogram of pi0 distribution.
+pi0hist <- ggplot(data = p_values_antic) +
   geom_histogram(aes(x = pi0, y = ..count.. / sum(..count..)), bins = 30) +
   labs(x = bquote(Proportion~of~true~nulls~(pi*0)),
-       y = "Fraction of P value sets")
+       y = "Fraction of anti-conservative P value sets")
 
-pi0hist_bm <- pi0hist %+% p_values_bm
-recode_pi0_features <- function(pvalue_dataset) {
-  mutate(pvalue_dataset, 
-         samples = case_when(
-           samples < 4 ~ "2 to 3",
-           samples > 3 & samples < 7 ~ "4 to 6",
-           samples > 6 & samples < 11 ~ "7 to 10",
-           samples > 10 ~ "10+"
-         ))
-}
-
-pi0_features_recoded <- p_values %>% recode_pi0_features()
-pi0_features_recoded_bm <- p_values_bm %>% recode_pi0_features()
-
-pi0_features <- ggplot(pi0_features_recoded, aes(x = pi0, y = log10(features))) +
+pi0_features <- p_values_antic %>% 
+  mutate(samples = case_when(
+    samples < 4 ~ "2 to 3",
+    between(samples, 4, 6) ~ "4 to 6",
+    between(samples, 7, 10) ~ "7 to 10",
+    TRUE ~ "10+"
+  )) %>%
+  ggplot(aes(x = pi0, y = log10(features))) +
   geom_point(aes(color = samples)) +
   geom_smooth(method = 'loess', se = FALSE) +
   scale_color_viridis(discrete = TRUE,
@@ -324,27 +323,15 @@ pi0_features <- ggplot(pi0_features_recoded, aes(x = pi0, y = log10(features))) 
   labs(x = bquote(Proportion~of~true~nulls~(pi*0)),
        y = bquote(N~features~(log[10])))
 
-pi0_features_bm <- pi0_features %+% pi0_features_recoded_bm
-pi0_features_bm <- pi0_features_bm + theme(legend.position = "none")
-
-legend <- g_legend(pi0_features)
-pi0_features <- pi0_features + theme(legend.position = "none")
-
 #' Compose pi0 plot.
 pg <- lapply(list(pi0hist, pi0_features), ggplotGrob)
 pg <- add_labels(pg, case = panel_label_case)
 pga <- arrangeGrob(grobs = pg, ncol = length(pg), widths = c(1, 1))
-lwidth <- sum(legend$widths)
-pga <- arrangeGrob(pga, legend, 
-                   ncol = 2, 
-                   widths = unit.c(unit(1, "npc") - lwidth, lwidth))
 
 #' Draw pi0 plot.
 grid.draw(pga)
 
-
 ## ---- sparklines -----
-
 
 #' Rearrange nnet classes.
 nnet_classes_spread <- nnet_classes %>% 
