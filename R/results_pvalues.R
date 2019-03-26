@@ -6,17 +6,21 @@ source("R/_common.R")
 
 ## ---- loadst -----
 #' Import parsed supplementary files.
+#+
 st <- read_rds(here("output/suppdata.rds"))
 
 #' Imported files object.
+#+
 imported_geos <- select(st, Accession) %>%  n_distinct()
 
 st_unnested <- unnest(st, result)
 
 #' Unnest xls file sheet names.
+#+
 st_unnested <- unnest(st_unnested, sheets)
 
 #' Append sheet names to xls file names for unique table id.
+#+
 st_unnested <- st_unnested %>% 
   mutate(suppdata_id = case_when(
     str_length(sheets) > 0 ~ str_c(suppfiles, "-sheet-", sheets),
@@ -24,14 +28,18 @@ st_unnested <- st_unnested %>%
   ))
 
 #' Import gsem table
+#+
 gsem <- read_rds(here("output/gsem.rds"))
 
 #' Pull out GEO series matrixes.
+#+
 gsem <- mutate(gsem, series_matrix = map(gse, "result"))
 
 #' Remove errored GEO series matrixes.
+#+
 gsem_error <- filter(gsem, map_lgl(series_matrix, is.null))
 
+#+
 gsem <- gsem %>%
   filter(!map_lgl(series_matrix, is.null)) %>% 
   mutate(samples = map_int(series_matrix, ~ ncol(exprs(.x))),
@@ -39,25 +47,39 @@ gsem <- gsem %>%
   select(Accession, annot, series_matrix, samples, everything())
 
 #' Match samples to correct table/assay. 
-dims <- left_join(st_unnested, gsem) %>%
+#+
+dims <- st_unnested %>% 
+  left_join(gsem) %>%
   group_by(suppdata_id) %>%
   mutate(idcols = columns - samples) %>%
   filter(idcols >= 0, min_rank(idcols) == 1) %>%
   ungroup() %>%
   select(-series_matrix_file)
 
-group_by(dims, samples) %>% 
+#+
+dims %>% 
+  group_by(samples) %>% 
   summarise(N = n()) %>% 
   write_csv(here("output/number_of_samples_in_geo.csv"))
 
-n_samples <- summarise_at(dims, 
-                          vars(samples, features), 
-                          list(mean = mean, median = median, Mode = Mode, min = min, max = max))
+#+
+n_samples <- dims %>% 
+  summarise_at( 
+    vars(samples, features), 
+    list(mean = mean, 
+         median = median, 
+         Mode = Mode, 
+         min = min, 
+         max = max)
+  )
 
-#' Filter datasets with p values.
-p_value_dims <- filter(dims, 
-                       !map_lgl(pvalues, is.null), 
-                       !map_lgl(pvalues, inherits, "try-error"))
+#' Filter datasets with p values. Keep only numeric P value sets.
+#+
+p_value_dims <- dims %>% 
+  filter(
+    !map_lgl(pvalues, is.null), 
+    !map_lgl(pvalues, inherits, "try-error")
+  )
 
 ## ---- plotdims -----
 
@@ -126,16 +148,17 @@ p_value_dims <- p_value_dims_suppdata_id %>%
   ungroup()
 
 #'
-#' Plot geo series with p values size distribution over all series.
-#' Ad hoc filter to remove uninformative features with less than 100 counts 
-#' per 1M reads.
+#' Create P values dataset. Filter doubles.
+#+ 
 p_values <- p_value_dims %>% 
   mutate(pvalues = map(pvalues, make_unique_colnames),
          pvalues = map(pvalues, select, matches("pvalue")),
          pvalues = map(pvalues, as.list)) %>% 
   select(Accession, suppfiles, suppdata_id, annot, features, columns, samples, pvalues)
 
-#' Subset of pvalues with basemean.
+#' Subset of pvalues with basemean. 
+#' Ad hoc filter to remove uninformative features with less than 100 counts 
+#' per 1M reads.
 p_values_bm <- p_value_dims %>% 
   mutate(basemean = map(pvalues, "basemean"),
          basemean = map_lgl(basemean, ~ !all(is.na(.x)))) %>% 
@@ -152,7 +175,8 @@ prop_pvalues_with_basemean <- percent(nrow(p_values_bm) / nrow(p_values))
 #' Unnest GSE series with multiple pvalue sets and make unique unique ids 
 #' for each set.
 add_set_to_suppdata_id <- function(pvalue_dataset) {
-  mutate(pvalue_dataset, pvalues = map(pvalues, ~tibble(set = names(.x), pvalues = .x))) %>% 
+  pvalue_dataset %>% 
+    mutate(pvalues = map(pvalues, ~ tibble(set = names(.x), pvalues = .x))) %>% 
     unnest(pvalues) %>% 
     add_count(suppdata_id) %>% 
     mutate(set = str_extract(set, "\\d+"),
@@ -165,8 +189,12 @@ add_set_to_suppdata_id <- function(pvalue_dataset) {
 }
 
 #' Append set id to suppdata_ids
-p_values <- p_values %>% add_set_to_suppdata_id
-p_values_bm <- p_values_bm %>% add_set_to_suppdata_id
+p_values <- p_values %>% 
+  add_set_to_suppdata_id %>% 
+  filter(map_lgl(pvalues, ~typeof(.x) == "double"))
+p_values_bm <- p_values_bm %>% 
+  add_set_to_suppdata_id %>% 
+  filter(map_lgl(pvalues, ~typeof(.x) == "double"))
 
 ## ---- pi0histends -----
 
@@ -294,7 +322,7 @@ p_values_antic <- pvalues_pool %>%
 #' Bind anti-conservative sets back to pooled dataset.
 #+ merge-antic
 pvalues_pool <- pvalues_pool %>% 
-  filter(Type == "anti-conservative") %>% 
+  filter(Type != "anti-conservative") %>% 
   bind_rows(p_values_antic)
 
 #' Calculate bins for table histograms. 
@@ -312,14 +340,14 @@ pi0_features <- p_values_antic %>%
     samples < 4 ~ "2 to 3",
     between(samples, 4, 6) ~ "4 to 6",
     between(samples, 7, 10) ~ "7 to 10",
-    TRUE ~ "10+"
+    TRUE ~ "11+"
   )) %>%
   ggplot(aes(x = pi0, y = log10(features))) +
   geom_point(aes(color = samples)) +
   geom_smooth(method = 'loess', se = FALSE) +
   scale_color_viridis(discrete = TRUE,
                       name = "N samples", 
-                      limits = c("2 to 3", "4 to 6", "7 to 10", "10+")) +
+                      limits = c("2 to 3", "4 to 6", "7 to 10", "11+")) +
   labs(x = bquote(Proportion~of~true~nulls~(pi*0)),
        y = bquote(N~features~(log[10])))
 
@@ -334,15 +362,12 @@ grid.draw(pga)
 ## ---- sparklines -----
 
 #' Rearrange nnet classes.
-nnet_classes_spread <- nnet_classes %>% 
-  spread(Filter, Type) %>% 
-  select(suppdata_id, Type = raw, `Type filtered` = basemean, Method)
+# nnet_classes_spread <- nnet_classes %>% 
+#   select(suppdata_id, Filter, Type) %>% 
+#   spread(Filter, Type) %>% 
+#   select(suppdata_id, Type = raw, `Type filtered` = basemean)
 
-#' ## Merge clusters to p value dataframe and create sparklines
-treecut <- tibble(histclus = map_chr(treecut, ~ barcolors[.x]))
-p_values <- p_values %>% bind_cols(treecut)
-
-spark_table <- p_values %>%
+spark_table <- pvalues_pool %>%
   mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/40), plot = FALSE)$counts),
          pi0 = digits(pi0, 2)) %>%
   unnest(values) %>%
