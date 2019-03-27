@@ -25,6 +25,8 @@ ds_pmids <- ds %>%
   unnest() %>% 
   distinct()
 
-publications <- ds_pmids$PubMedIds %>% entrez_docsums(uid = ., db = "pubmed", wait = 0.33)
-publications <- publications %>% unnest()
-write_rds(publications, "output/publications.rds")
+publications <- ds_pmids$PubMedIds %>% 
+  entrez_docsums(uid = ., db = "pubmed", wait = 0.33)
+publications <- publications %>% 
+  unnest()
+write_csv(publications, "output/publications.csv")
