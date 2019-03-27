@@ -366,66 +366,38 @@ grid.draw(pga)
 #   select(suppdata_id, Filter, Type) %>% 
 #   spread(Filter, Type) %>% 
 #   select(suppdata_id, Type = raw, `Type filtered` = basemean)
+make_spark <- . %>% 
+  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/40), plot = FALSE)$counts),
+         pi0 = digits(pi0, 2)) %>%
+  mutate(Histogram = map_chr(values, ~ spk_chr(.x,
+                                chartRangeMin = 0,
+                                type = "bar"))) %>% 
+  select(Accession, suppdata_id, Histogram, Type, pi0, srp)
 
 spark_table <- pvalues_pool %>%
-  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/40), plot = FALSE)$counts),
-         pi0 = digits(pi0, 2)) %>%
-  unnest(values) %>%
-  group_by(Accession, suppdata_id, pi0, histclus) %>%
-  summarise(Histogram = spk_chr(values,
-                                chartRangeMin = 0,
-                                barColor = histclus,
-                                type = "bar"))
-
-spark_table_bm <- p_values_bm %>%
-  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/40), plot = FALSE)$counts),
-         pi0 = digits(pi0, 2)) %>%
-  unnest(values) %>%
-  group_by(Accession, suppdata_id, pi0) %>%
-  summarise(Histogram = spk_chr(values,
-                                chartRangeMin = 0,
-                                type = "bar"))
-
-
-#' Merge with classes and generate output table
-spark_table <- spark_table %>%
-  ungroup() %>% 
-  left_join(nnet_classes_spread) %>%
-  rename('P value histogram' = Histogram,
-         'True nulls proportion' = pi0,
-         'Supplementary file name' = suppdata_id) %>% 
-  filter(!map_int(Type, is.na)) # if you want to show only classified stuff
-
-#' Save empty table for manual classification. 
-if (!any(str_detect(list.files(here("output")), "pvalue_histogram_classes.csv"))) {
-  spark_table %>% 
-    select(-`P value histogram`) %>% 
-    write_excel_csv(here("output/pvalue_histogram_classes.csv"))
-}
+  filter(Filter == "raw") %>% 
+  make_spark()
+  
+spark_table_bm <- pvalues_pool %>%
+  filter(Filter == "basemean") %>% 
+  make_spark()
 
 #' Original histogram types.
 hist_types <- spark_table %>% 
+  ungroup() %>% 
   count(Type) %>%
   mutate(`%` = percent(n / sum(n), digits = 1))
 
 #' Histogram types in basemean subset
-hist_types_bm <- spark_table %>%
-  filter(complete.cases(.)) %>% 
-  select(`Supplementary file name`, Type, `Type filtered`) %>% 
-  gather(key, value, Type, `Type filtered`) %>% 
-  count(key, value) %>% 
-  spread(key, n) %>% 
-  mutate(`%` = percent(Type / sum(Type, na.rm = TRUE), digits = 1),
-         `% after filter` = percent(`Type filtered` / sum(`Type filtered`, na.rm = TRUE), digits = 1)) %>%
-  select(Type = value, n = Type, `%`, `n after filter` = `Type filtered`, `% after filter`)
-
-#' Replace NA with 0 in case class is not present.
-hist_types_bm[is.na(hist_types_bm)] <- 0
+hist_types_bm <- spark_table_bm %>%
+  ungroup() %>% 
+  count(Type) %>%
+  mutate(`%` = percent(n / sum(n), digits = 1))
 
 #' Recalculated frequencies after basemean filtering.
-type_conversion_rate <- spark_table %>% 
-  filter(complete.cases(.)) %>% 
-  mutate(type_conversion = case_when(
+type_conversion_rate <- select(spark_table, suppdata_id, Type) %>% 
+  inner_join(select(spark_table_bm, suppdata_id, `Type filtered`  = Type)) %>% 
+  mutate(`Type conversion` = case_when(
     `Type filtered` == Type & Type == "anti-conservative" ~ "same good",
     `Type filtered` == Type & Type != "anti-conservative" ~ "same bad",
     `Type filtered` != Type & `Type filtered` == "anti-conservative" ~ "improvement",
@@ -433,15 +405,8 @@ type_conversion_rate <- spark_table %>%
     `Type filtered` == "uniform" & Type == "anti-conservative" ~ "effects were lost",
     TRUE ~ "no improvement"
   )) %>% 
-  count(type_conversion) %>% 
+  count(`Type conversion`) %>% 
   mutate(`%` = percent(n / sum(n), digits = 1))
-
-#' Merge basemean filtered histograms to table.
-spark_table_bm_renamed <- spark_table_bm %>%
-  ungroup() %>% 
-  rename('P value histogram,\nfiltered' = Histogram,
-         'True nulls proportion,\nfiltered' = pi0,
-         'Supplementary file name' = suppdata_id)
 
 ## ---- histtypes-tab ----
 hist_types_caption <- "Summary of histogram types in supplementary files of GEO HT-seq submissions."
@@ -450,60 +415,77 @@ hist_types %>%
   kable_styling(full_width = FALSE)
 
 ## ---- histtypesbm-tab ----
-hist_types_bm_caption <- "Type conversion of histograms by filtering out non-informative features."
+hist_types_bm_caption <- "Histogram types after filtering out non-informative features."
 hist_types_bm %>% 
   knitr::kable("html", escape = FALSE, caption = hist_types_bm_caption) %>%
   kable_styling(full_width = FALSE)
 
 ## ---- typeconversion-tab ----
+type_conversion_cap <- "Proportion of histograms that could be fixed by filtering out non-informative features."
 type_conversion_rate %>% 
-  rename(`Type conversion` = type_conversion) %>% 
   knitr::kable("html", escape = FALSE, 
-               caption = "Fraction of histograms that could be fixed by filtering out non-informative features.") %>%
+               caption = type_conversion_cap) %>%
   kable_styling(full_width = FALSE)
 
 ## ---- pvaluespark-tab ----
 #' Merge basemean filtered results with spark_table   
-pvalue_spark <- left_join(spark_table, spark_table_bm_renamed) %>% 
-  mutate(`Supplementary file name` = cell_spec(`Supplementary file name`, color = ifelse(Method == "human", "black", "gray"))) %>% 
-  select(Accession, 
-         `Supplementary file name\n(with p-value set id)` = `Supplementary file name`, 
-         `P value histogram`, 
-         Type, 
-         `True nulls proportion`,
-         `P value histogram,\nfiltered`,
-         `Type,\nfiltered` = `Type filtered`,
-         `True nulls proportion,\nfiltered`) 
+spark_table_bm_renamed <- spark_table_bm %>% 
+  select(Accession:pi0) %>% 
+  rename_at(vars(Histogram, Type, pi0), str_c, "\nafter filter")
 
-pv_spark_caption <- glue::glue("P value histograms and proportion of true nulls. Histograms are colored according to clustering of their empirical cumulative distribution function outputs. Supplementary file names for tables from xls(x) files might be appended with sheet name. This table contains {nrow(spark_table)} unique P value histograms from {length(unique(spark_table$'Supplementary file name'))} supplementary tables related to {length(unique(spark_table$Accession))} GEO Accessions. Supplementary table names, black, human classified histograms, gray, model based classification.")
+pvalue_spark <- spark_table %>% 
+  select(Accession:pi0) %>% 
+  left_join(spark_table_bm_renamed) %>% 
+  rename(`Supplementary file name\n(with p-value set id)` = suppdata_id) 
+
+pv_spark_caption <- glue::glue("P value histograms and proportion of true nulls. 
+                               Histograms are colored according to clustering of
+                               their empirical cumulative distribution function 
+                               outputs. Supplementary file names for tables 
+                               from xls(x) files might be appended with sheet 
+                               name. This table contains {nrow(spark_table)} 
+                               unique P value histograms from 
+                               {n_distinct(spark_table$Accession)} GEO 
+                               Accessions.") %>% 
+  str_replace_all("\n", "")
+
 pvalue_spark %>%
   knitr::kable("html", escape = FALSE, caption = pv_spark_caption) %>%
   kable_styling(full_width = FALSE)
 
 #' Write table for manual reclassification.
-left_join(spark_table, spark_table_bm_renamed) %>% 
-  select(
-    Accession, 
-    suppdata_id = `Supplementary file name`,
-    type = Type, 
-    pi0 = `True nulls proportion`,
-    type_filtered = `Type filtered`,
-    pi0_filtered = `True nulls proportion,\nfiltered`
-  ) %>% 
+pvalue_spark %>% 
+  select(1, 2, 4, 7) %>% 
   write_csv(here("output/pvalue_sets_classes.csv"))
 
 # srp stats ---------------------------------------------------------------
 
-p_values_srp <- select(p_values, Accession, suppfiles, suppdata_id, annot, features, samples, pi0, srp) %>% 
-  filter(map_lgl(srp, is.data.frame)) %>% 
+spark_table_split <- spark_table %>% 
+  filter(Type == "anti-conservative") %>% 
+  split(map_lgl(.$srp, is.null))
+
+spark_table_srp <- spark_table_split[[1]] %>% 
   unnest(srp) %>% 
-  rename(pi0_raw = pi0, SRP_raw = SRP, pi01_raw = pi01, fp_raw = fp, rs_raw = rs, ud_raw = ud)
+  bind_rows(select(spark_table_split[[2]], -srp)) %>% 
+  arrange(Accession)
 
-p_values_srp_bm <- select(p_values_bm, Accession, suppfiles, suppdata_id, annot, features, samples, pi0, srp) %>% 
-  filter(map_lgl(srp, is.data.frame)) %>% 
+spark_table_bm_split <- spark_table_bm %>% 
+  filter(Type == "anti-conservative") %>% 
+  split(map_lgl(.$srp, is.null))
+
+spark_table_bm_srp <- spark_table_bm_split[[1]] %>% 
   unnest(srp) %>% 
-  rename(pi0_bm = pi0, SRP_bm = SRP, pi01_bm = pi01, fp_bm = fp, rs_bm = rs, ud_bm = ud)
+  bind_rows(select(spark_table_bm_split[[2]], -srp)) %>% 
+  arrange(Accession) %>% 
+  rename_at(vars(Histogram, Type, pi0, SRP, pi01, fp, rs, ud), str_c, "\nafter filter")
 
-srp_stats <- full_join(p_values_srp, p_values_srp_bm)
 
+srp_stats <- full_join(spark_table_srp, spark_table_bm_srp)
 write_csv(srp_stats, here("output/srp_stats.csv"))
+
+srp_stats_caption <- "SRP and related stats for anti-conservative P value histograms."
+srp_stats %>%
+  mutate_if(is.double, digits, 2) %>% 
+  mutate_at(vars(matches("fp|rs|ud")), digits, 0) %>% 
+  knitr::kable("html", escape = FALSE, caption = srp_stats_caption) %>%
+  kable_styling(full_width = FALSE)
