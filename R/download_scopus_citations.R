@@ -5,19 +5,19 @@ if (!"ds_redline" %in% ls()) {
 }
 
 # depend on p_values object
-if (!"p_values" %in% ls()) {
+if (!"pvalues_pool" %in% ls()) {
   source("R/results_pvalues.R")
 }
 
 ## ---- publications ----
 
-pubs <- readRDS("output/publications.rds")
+pubs <- read_csv("output/publications.csv", 
+                 col_types = "cccccccccccccccccccccccccc")
 # jif <- read_csv("data/JIF_incites.csv", skip = 1)
 
-# Drop duplicate Id column
-pubs <- pubs %>% select(-Id)
+pubs <- pubs %>% rename(PubMedIds = Id)
 
-pvals_pub <- p_values %>% 
+pvals_pub <- pvalues_pool %>% 
   select(Accession, suppdata_id, pi0)
 
 pubs <- ds_redline %>% 
@@ -68,4 +68,5 @@ scopcitations <- dois %>%
   select(PubMedIds, DOI, citations, json)
 
 #' Save results to rds
+readr::write_csv(scopcitations, "data/scopus_citedbycount.csv")
 readr::write_rds(scopcitations, "data/scopus_citedbycount.rds")
