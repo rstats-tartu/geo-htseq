@@ -7,7 +7,7 @@ source("R/_common.R")
 ## ---- rna-seq-dynamics ----
 
 # R/A01_GEO_query.R
-ds <- readRDS("output/document_summaries.rds") # GEO HT-seq expr datasets
+ds <- read_rds("output/document_summaries.rds") # GEO HT-seq expr datasets
 
 # Date of the first submission
 first_date <- range(ymd(ds$PDAT))[1]
@@ -22,6 +22,8 @@ ds_redline <- ds %>%
            !str_detect(taxon, "Mus musculus|Homo sapiens") ~ "Other taxa"
          )) %>%
   filter(PDAT <= last_date)
+
+write_csv(ds_redline, "output/ds_redline.csv")
 
 # Count series with publications
 pdat <- ds_redline %>% 
