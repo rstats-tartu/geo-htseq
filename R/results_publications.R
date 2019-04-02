@@ -1,23 +1,22 @@
 
-# depends on ds_redline object
-if (!"ds_redline" %in% ls()) {
-  source("R/results_query.R")
-}
+#' ## Load libs
+source("R/_common.R")
 
-# depend on p_values object
-if (!"p_values" %in% ls()) {
-  source("R/results_pvalues.R")
-}
-  
 ## ---- publications ----
 
-pubs <- read_rds("output/publications.rds")
+pubs <- read_csv("output/publications.csv", 
+                 col_types = "cccccccccccccccccccccccccc")
 
 # Rename Id to PubMedIds
 pubs <- pubs %>% rename(PubMedIds = Id)
 
-pvals_pub <- p_values %>% 
-  select(Accession, suppdata_id, pi0)
+# Import P value stats
+pvals_pub <- read_csv("output/pvalues_pool_pub.csv",
+                      col_types = "cccdddddd")
+
+# Merge pubs with document summaries
+ds_redline <- read_csv("output/ds_redline.csv",
+                       col_types = "ccccccccccccccccccccccccccccc")
 
 pubs <- ds_redline %>% 
   select(Accession, PubMedIds, model) %>% 
@@ -44,8 +43,8 @@ pubsum_other <- pubs %>%
   top_n(20) %>% 
   arrange(desc(N))
 
-pubsum_pval <- pubs %>% 
-  filter(Accession %in% p_values$Accession) %>% 
+pubsum_pval <- pubs %>%
+  inner_join(pvals_pub) %>% 
   pub_fun() %>% 
   top_n(10) %>% 
   arrange(desc(N))
@@ -74,7 +73,13 @@ grid.draw(pga)
 ## ---- citations ----
 
 #' Import citation data
-scopus <- read_rds("data/scopus_citedbycount.rds")
+scopus <- read_csv("output/scopus_citedbycount.csv", 
+                   col_types = "ccdc")
+
+#' Distribution of 
+p_citatins <- ggplot(scopus) +
+  geom_histogram(aes(citations), bins = 30) +
+  scale_x_log10()
 
 # Merge publication data with citations and pvalues
 publications_citations <- left_join(pubs, scopus) %>% 
@@ -86,19 +91,17 @@ pubs_citations <- publications_citations %>%
   left_join(pvals_pub)
 
 #' Correlation between pi0 and number of citations
-p_cit <- pubs_citations %>% 
+pi0_citations <- pubs_citations %>% 
   select(-Accession) %>% 
   distinct() %>% 
-  filter(pi0 > 0.25) %>% 
+  filter(!is.na(pi0))
+p_cit <- pi0_citations %>% 
   ggplot(aes(pi0, log10(1 + citations))) +
   geom_point() +
   geom_smooth(se = FALSE, method = "lm") +
   labs(x = bquote(Proportion~of~true~nulls~(pi*0)))
 
-mod_citations <- pubs_citations %>% 
-  select(-Accession) %>% 
-  distinct() %>% 
-  filter(pi0 > 0.25) %>% 
+mod_citations <- pi0_citations %>% 
   lm(log10(1 + citations) ~ pi0, data = .) %>% 
   broom::tidy()
 
@@ -107,7 +110,15 @@ p_cit_pval <- pubs_citations %>%
   distinct() %>% 
   ggplot(aes(log10(1 + citations), fill = is.na(pi0))) +
   geom_histogram(bins = 60, position = "dodge") +
-  scale_fill_grey(name = "P values\navailable", labels = c("Yes", "No")) +
+  scale_fill_grey(name = "Anti-conservative\nP values", labels = c("Yes", "No")) +
+  labs(y = "N of articles")
+
+pubs_citations %>% 
+  select(-Accession) %>% 
+  distinct() %>% 
+  ggplot() +
+  geom_density(aes(log10(1 + citations), fill = is.na(pi0)), alpha = 0.1) +
+  scale_fill_grey(name = "Anti-conservative\nP values", labels = c("Yes", "No")) +
   labs(y = "N of articles")
 
 pg <- lapply(list(p_cit_pval, p_cit), ggplotGrob)

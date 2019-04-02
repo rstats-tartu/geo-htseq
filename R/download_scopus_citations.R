@@ -1,24 +1,19 @@
 
-# depends on ds_redline object
-if (!"ds_redline" %in% ls()) {
-  source("R/results_query.R")
-}
-
-# depend on p_values object
-if (!"pvalues_pool" %in% ls()) {
-  source("R/results_pvalues.R")
-}
+# Load libs
+source("R/_common.R")
 
 ## ---- publications ----
 
 pubs <- read_csv("output/publications.csv", 
                  col_types = "cccccccccccccccccccccccccc")
 # jif <- read_csv("data/JIF_incites.csv", skip = 1)
-
 pubs <- pubs %>% rename(PubMedIds = Id)
 
-pvals_pub <- pvalues_pool %>% 
-  select(Accession, suppdata_id, pi0)
+pvals_pub <- read_csv("output/pvalues_pool_pub.csv",
+                      col_types = "cccdddddd")
+
+ds_redline <- read_csv("output/ds_redline.csv",
+                       col_types = "ccccccccccccccccccccccccccccc")
 
 pubs <- ds_redline %>% 
   select(Accession, PubMedIds, model) %>% 
@@ -39,34 +34,44 @@ scopus <- crul::HttpClient$new(url = 'https://api.elsevier.com',
                                    Encoding = "UTF-8"))
 
 #' Query function
-scopus_n_citations <- function(doi, con) { 
-  con$get(path = "content/search/scopus", 
+scopus_search <- function(doi, con, sleep = 0.06) { 
+  Sys.sleep(sleep)
+  resp <- con$get(path = "content/search/scopus", 
           query = list(query = glue::glue("doi({doi})"),
-                       apiKey = Sys.getenv("Elsevier_API")))
+                       apiKey = Sys.getenv("Elsevier_geoseq")))
+  message("DOI: ", doi, "; success: ", resp$success())
+  return(resp)
 }
 
 #' Run query
-library(jsonlite)
-dois <- dois %>% 
-  mutate(resp = map(DOI, scopus_n_citations, con = scopus))
-
-dois <- dois %>% 
-  filter(map_lgl(resp, ~ .x$status_code == 200)) %>% 
-  mutate(parsed = map(resp, ~ .x$parse()),
-         json = map(parsed, jsonlite::fromJSON))
+resps <- dois %>% 
+  mutate(resp = map(DOI, scopus_search, con = scopus))
 
 #' Extract citations 
+library(jsonlite)
 extr_citations <- function(x) {
-  citedbycount <- x$`search-results`$entry$`citedby-count`
+  parsed <- x$parse(encoding = "UTF-8")
+  js <- fromJSON(parsed)
+  citedbycount <- js$`search-results`$entry$`citedby-count`
   if (is.null(citedbycount)) return(NA)
   as.numeric(citedbycount[1])
 }
 
-#' Select results for saving
-scopcitations <- dois %>% 
-  mutate(citations = map_dbl(json, extr_citations)) %>% 
-  select(PubMedIds, DOI, citations, json)
+message("Download finished, starting parsing.\n")
+success <- resps %>% 
+  filter(map_lgl(resp, ~ .x$success()))
 
-#' Save results to rds
-readr::write_csv(scopcitations, "data/scopus_citedbycount.csv")
-readr::write_rds(scopcitations, "data/scopus_citedbycount.rds")
+message("Download ok, let's save damn thing.\n")
+
+#' Select results for saving
+scopcitations <- success %>% 
+  mutate(citations = map_dbl(resp, extr_citations))
+
+scopcitations <- scopcitations %>% 
+  select(PubMedIds, DOI, citations, data) %>% 
+  unnest() %>% 
+  group_by(PubMedIds, DOI, citations) %>% 
+  summarise(Accession = str_c(Accession, collapse = ";"))
+
+#' Save results to file
+readr::write_csv(scopcitations, "output/scopus_citedbycount.csv")
