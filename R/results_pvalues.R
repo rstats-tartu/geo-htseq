@@ -192,11 +192,10 @@ add_set_to_suppdata_id <- function(pvalue_dataset) {
 p_values <- p_values %>% 
   add_set_to_suppdata_id %>% 
   filter(map_lgl(pvalues, ~typeof(.x) == "double"))
+
 p_values_bm <- p_values_bm %>% 
   add_set_to_suppdata_id %>% 
   filter(map_lgl(pvalues, ~typeof(.x) == "double"))
-
-## ---- pi0histends -----
 
 #' Curated p value histogram classes ---------------------------------------
 #' ## Read in classifications
@@ -222,6 +221,8 @@ pvalues_pool <- pvalues_pool %>%
   inner_join(nnet_classes) %>% 
   mutate(eCDF = map(pvalues, ecdf),
          values = map(eCDF, function(Fn) Fn(seq(0, 1, 3 / nrowthreshold))))
+
+## ---- pi0histends -----
 
 #' Rearrange pvalue probs to columns.
 #+ pvalues-bins
@@ -328,6 +329,18 @@ pvalues_pool <- pvalues_pool %>%
 #' Calculate bins for table histograms. 
 pvalues_pool <- pvalues_pool %>%
   mutate(bins = map(pvalues, ntile, 60))
+
+# Save set of vars from pvalues_pool for use in results_publication.R
+pvalues_pool_pub <- pvalues_pool %>% 
+  filter(Filter == "raw") %>% 
+  select(Accession, suppdata_id, Type, pi0, srp) %>% 
+  mutate(has_srp = map_lgl(srp, ~!is.null(.x[[1]]))) %>% 
+  split(.$has_srp) %>% 
+  map_if(~all(.$has_srp), unnest) %>% 
+  bind_rows() %>% 
+  select(-srp, -has_srp)
+
+write_csv(pvalues_pool_pub, "output/pvalues_pool_pub.csv")
 
 # Histogram of pi0 distribution.
 pi0hist <- ggplot(data = p_values_antic) +
@@ -489,3 +502,4 @@ srp_stats %>%
   mutate_at(vars(matches("fp|rs|ud")), digits, 0) %>% 
   knitr::kable("html", escape = FALSE, caption = srp_stats_caption) %>%
   kable_styling(full_width = FALSE)
+
