@@ -459,7 +459,7 @@ pv_spark_caption <- glue::glue("P value histograms and proportion of true nulls.
                                name. This table contains {nrow(spark_table)} 
                                unique P value histograms from 
                                {n_distinct(spark_table$Accession)} GEO 
-                               Accessions.") %>% 
+                               Accessions. pi0 was calculated using limma::propTrueNull() function.") %>% 
   str_replace_all("\n", "")
 
 pvalue_spark %>%
@@ -495,8 +495,10 @@ spark_table_bm_srp <- spark_table_bm_split %>%
 srp_stats <- full_join(spark_table_srp, spark_table_bm_srp)
 write_csv(srp_stats, here("output/srp_stats.csv"))
 
-srp_stats_caption <- "SRP and related stats for anti-conservative P value histograms. pi0 was calculated using limma::propTrueNull() function and pi01 was calculated with qvalue::pi0est() function."
+srp_stats_caption <- "SRP and related stats for anti-conservative P value histograms. pi0 was calculated using qvalue::pi0est() function."
 srp_stats %>%
+  select(-pi0, -`pi0\nafter filter`) %>% 
+  rename_all(str_replace, "1", "") %>% 
   mutate_if(is.double, digits, 2) %>% 
   mutate_at(vars(matches("fp|rs|ud")), digits, 0) %>% 
   knitr::kable("html", escape = FALSE, caption = srp_stats_caption) %>%
