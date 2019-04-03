@@ -471,32 +471,31 @@ pvalue_spark %>%
   select(1, 2, 4, 7) %>% 
   write_csv(here("output/pvalue_sets_classes.csv"))
 
-# srp stats ---------------------------------------------------------------
+## ---- srp-stats ----
 
 spark_table_split <- spark_table %>% 
-  filter(Type == "anti-conservative") %>% 
-  split(map_lgl(.$srp, is.null))
-
-spark_table_srp <- spark_table_split[[1]] %>% 
-  unnest(srp) %>% 
-  bind_rows(select(spark_table_split[[2]], -srp)) %>% 
-  arrange(Accession)
+  split(!map_lgl(.$srp, is.null))
 
 spark_table_bm_split <- spark_table_bm %>% 
-  filter(Type == "anti-conservative") %>% 
-  split(map_lgl(.$srp, is.null))
+  split(!map_lgl(.$srp, is.null))
 
-spark_table_bm_srp <- spark_table_bm_split[[1]] %>% 
-  unnest(srp) %>% 
-  bind_rows(select(spark_table_bm_split[[2]], -srp)) %>% 
-  arrange(Accession) %>% 
+anti_conservatives <- which(as.logical(names(spark_table_split)))
+spark_table_srp <- spark_table_split %>% 
+  pluck(anti_conservatives) %>% 
+  unnest() %>% 
+  arrange(Accession)
+
+anti_conservatives <- which(as.logical(names(spark_table_bm_split)))
+spark_table_bm_srp <- spark_table_bm_split %>% 
+  pluck(anti_conservatives) %>% 
+  unnest() %>% 
+  arrange(Accession) %>%
   rename_at(vars(Histogram, Type, pi0, SRP, pi01, fp, rs, ud), str_c, "\nafter filter")
-
 
 srp_stats <- full_join(spark_table_srp, spark_table_bm_srp)
 write_csv(srp_stats, here("output/srp_stats.csv"))
 
-srp_stats_caption <- "SRP and related stats for anti-conservative P value histograms."
+srp_stats_caption <- "SRP and related stats for anti-conservative P value histograms. pi0 was calculated using limma::propTrueNull() function and pi01 was calculated with qvalue::pi0est() function."
 srp_stats %>%
   mutate_if(is.double, digits, 2) %>% 
   mutate_at(vars(matches("fp|rs|ud")), digits, 0) %>% 
