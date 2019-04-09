@@ -2,7 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
-output/
 figures/
 _book/
 _main.*
