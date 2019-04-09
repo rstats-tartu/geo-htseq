@@ -123,7 +123,7 @@ knitr::include_graphics("figures/diagram.svg")
 
 ```
 
-(ref:citations) __Citation of articles featuring HT-seq data.__ (`r ref_labels("A", panel_label_case)`) Distribution of the number of citations and availability of full sets of raw P values in GEO database. (`r ref_labels("B", panel_label_case)`) Relationship between the proportion of true nulls and number of citations. Data with pi0 near zero (< 0.25) were filtered out because these P values are probably not full sets of raw P values. Blue line, linear model fit. Citation data is from Scopus.
+(ref:citations) __Citation of articles featuring HT-seq data.__ (`r ref_labels("A", panel_label_case)`) Distribution of the number of citations and availability of full sets of raw P values in GEO database. (`r ref_labels("B", panel_label_case)`) Relationship between the proportion of true nulls and number of citations. Blue line, linear model fit. Citation data is from Scopus.
 
 ```{r citations, fig.cap='(ref:citations)'}
 
@@ -132,7 +132,7 @@ knitr::include_graphics("figures/diagram.svg")
 
 (ref:pi0histends) __Phylogenetic tree of P value histograms.__ Tree was obtained by clustering of the empirical cumulative distribution function outputs of P value histograms. Colors show groups obtained by cutting the tree at the height giving six clusters.
 
-```{r pi0histends, fig.cap='(ref:pi0histends)'}
+```{r pi0histends, fig.cap='(ref:pi0histends)', fig.height=6}
 
 ```
 

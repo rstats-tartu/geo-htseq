@@ -113,16 +113,8 @@ p_cit_pval <- pubs_citations %>%
   scale_fill_grey(name = "Anti-conservative\nP values", labels = c("Yes", "No")) +
   labs(y = "N of articles")
 
-pubs_citations %>% 
-  select(-Accession) %>% 
-  distinct() %>% 
-  ggplot() +
-  geom_density(aes(log10(1 + citations), fill = is.na(pi0)), alpha = 0.1) +
-  scale_fill_grey(name = "Anti-conservative\nP values", labels = c("Yes", "No")) +
-  labs(y = "N of articles")
-
 pg <- lapply(list(p_cit_pval, p_cit), ggplotGrob)
 pg <- add_labels(pg, case = panel_label_case)
-pga <- arrangeGrob(grobs = pg, ncol = length(pg))
+pga <- arrangeGrob(grobs = pg, ncol = length(pg), widths = c(2, 1))
 grid.draw(pga)
 

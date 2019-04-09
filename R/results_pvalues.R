@@ -46,6 +46,31 @@ gsem <- gsem %>%
          annot = map_chr(series_matrix, annotation)) %>% 
   select(Accession, annot, series_matrix, samples, everything())
 
+#' Get taxon info.
+#+
+get_tax <- function(data) {
+  as_tibble(data) %>% 
+    select(matches("organism|taxid")) %>%
+    distinct() %>%
+    rename_all(str_replace, "_ch1", "") %>% 
+    mutate_all(as.character)
+}
+
+taxons <- gsem %>% 
+  mutate(pd = map(series_matrix, pData),
+         tax = map(pd, get_tax)) %>% 
+  select(Accession, tax) %>% 
+  unnest()
+
+multiple_taxons <- taxons %>% 
+  select(organism_ch2:`organism part:ch1`) %>% 
+  apply(., 1, function(x) !all(is.na(x)))
+
+#' Keep only first taxon.
+taxons <- taxons %>% 
+  select(Accession, organism, taxid)
+write_csv(taxons, here("output/taxons.csv"))
+
 #' Match samples to correct table/assay. 
 #+
 dims <- st_unnested %>% 
