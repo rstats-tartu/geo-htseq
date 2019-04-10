@@ -89,13 +89,14 @@ p_citatins <- ggplot(scopus) +
   scale_x_log10()
 
 # Merge publication data with citations and pvalues
-publications_citations <- left_join(pubs, select(scopus, -Accession)) %>%
+publications_citations <- pubs %>%
+  inner_join(pvals_pub) %>% 
+  left_join(select(scopus, -Accession)) %>%
   select_if(function(x) !is.list(x))
 write_csv(publications_citations, "output/publications_citations.csv")
 
 pubs_citations <- publications_citations %>% 
-  select(Accession, PubMedIds, DOI, citations) %>% 
-  left_join(pvals_pub)
+  select(Accession, PubMedIds, DOI, citations, pi0)
 
 #' Correlation between pi0 and number of citations
 pi0_citations <- pubs_citations %>% 
@@ -116,10 +117,11 @@ p_cit_pval <- pubs_citations %>%
   select(-Accession) %>% 
   distinct() %>%
   filter(!is.na(citations)) %>% 
-  ggplot(aes(log10(1 + citations), fill = is.na(pi0))) +
-  geom_histogram(bins = 60, position = "dodge") +
+  ggplot(aes(citations, fill = is.na(pi0))) +
+  geom_histogram(bins = 20, position = "dodge") +
   scale_fill_grey(name = "Anti-conservative\nP values", labels = c("Yes", "No")) +
-  labs(y = "N of articles")
+  labs(y = "N of articles") +
+  scale_x_log10()
 
 pg <- lapply(list(p_cit_pval, p_cit), ggplotGrob)
 pg <- add_labels(pg, case = panel_label_case)
