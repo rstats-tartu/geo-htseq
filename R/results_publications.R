@@ -14,16 +14,19 @@ pubs <- pubs %>% rename(PubMedIds = Id)
 pvals_pub <- read_csv("output/pvalues_pool_pub.csv",
                       col_types = "cccdddddd")
 
-# Merge pubs with document summaries
+# Merge pubs with document summaries (ds_redline)
 ds_redline <- read_csv("output/ds_redline.csv",
                        col_types = "ccccccccccccccccccccccccccccc")
 
 pubs <- ds_redline %>% 
   select(Accession, PubMedIds, model) %>% 
   inner_join(pubs) %>% 
-  mutate(ISSN = case_when(str_length(ISSN) == 0 ~ ESSN,
-                          str_length(ISSN) != 0 ~ ISSN))
+  mutate(ISSN = case_when(
+    str_length(ISSN) == 0 ~ ESSN,
+    str_length(ISSN) != 0 ~ ISSN)
+  )
 
+# Tally journals publishing NGS DE experiments
 pub_fun <- . %>% 
   select(PubMedIds, Source, ISSN) %>% 
   distinct() %>% 
@@ -31,24 +34,28 @@ pub_fun <- . %>%
   summarise(N = n()) %>% 
   ungroup()
 
+# humans
 pubsum_hs <- pubs %>% 
   filter(str_detect(model, "Human")) %>%
   pub_fun() %>% 
   top_n(20) %>% 
   arrange(desc(N))
 
+# other taxa
 pubsum_other <- pubs %>% 
   filter(!str_detect(model, "Human")) %>% 
   pub_fun() %>% 
   top_n(20) %>% 
   arrange(desc(N))
 
+# Merge publication info with pvalue stats
 pubsum_pval <- pubs %>%
   inner_join(pvals_pub) %>% 
   pub_fun() %>% 
   top_n(10) %>% 
   arrange(desc(N))
 
+# Make a plot
 pubplot <- function(data) {
   ggplot(data, aes(reorder(Source, desc(N)), N)) +
   geom_point() +
