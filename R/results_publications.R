@@ -4,7 +4,7 @@ source("R/_common.R")
 
 ## ---- publications ----
 
-pubs <- read_csv("output/publications.csv", 
+pubs <- read_csv(here("output/publications.csv"), 
                  col_types = "cccccccccccccccccccccccccc")
 
 # Rename Id to PubMedIds
@@ -80,7 +80,7 @@ grid.draw(pga)
 ## ---- citations ----
 
 #' Import citation data
-scopus <- read_csv("output/scopus_citedbycount.csv", 
+scopus <- read_csv(here("output/scopus_citedbycount.csv"), 
                    col_types = "ccdc")
 
 #' Distribution of 
