@@ -3,8 +3,8 @@
 .RData
 .Ruserdata
 figures/
+output/*.rds
 _book/
-_main.*
 .snakemake
 R/.snakemake*
 render*
