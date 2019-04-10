@@ -89,7 +89,7 @@ p_citatins <- ggplot(scopus) +
   scale_x_log10()
 
 # Merge publication data with citations and pvalues
-publications_citations <- left_join(pubs, scopus) %>% 
+publications_citations <- left_join(pubs, select(scopus, -Accession)) %>%
   select_if(function(x) !is.list(x))
 write_csv(publications_citations, "output/publications_citations.csv")
 
@@ -114,7 +114,8 @@ mod_citations <- pi0_citations %>%
 
 p_cit_pval <- pubs_citations %>% 
   select(-Accession) %>% 
-  distinct() %>% 
+  distinct() %>%
+  filter(!is.na(citations)) %>% 
   ggplot(aes(log10(1 + citations), fill = is.na(pi0))) +
   geom_histogram(bins = 60, position = "dodge") +
   scale_fill_grey(name = "Anti-conservative\nP values", labels = c("Yes", "No")) +
