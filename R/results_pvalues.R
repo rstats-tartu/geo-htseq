@@ -68,7 +68,8 @@ multiple_taxons <- taxons %>%
 
 #' Keep only first taxon.
 taxons <- taxons %>% 
-  select(Accession, organism, taxid)
+  select(Accession, organism, taxid) %>% 
+  mutate(multiple_taxons = multiple_taxons)
 write_csv(taxons, here("output/taxons.csv"))
 
 #' Match samples to correct table/assay. 
@@ -475,6 +476,10 @@ pvalue_spark <- spark_table %>%
   select(Accession:pi0) %>% 
   left_join(spark_table_bm_renamed) %>% 
   rename(`Supplementary file name\n(with p-value set id)` = suppdata_id) 
+
+#' Add taxon info to table
+taxons <- rename_all(taxons, str_to_title)
+pvalue_spark <- pvalue_spark %>% left_join(taxons)
 
 pv_spark_caption <- glue::glue("P value histograms and proportion of true nulls. 
                                Histograms are colored according to clustering of
