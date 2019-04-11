@@ -25,10 +25,10 @@ gsem <- select(gsem, -gse)
 
 #' Helper function to find informative columns in experiment metadata.
 #+ infofun
-is_informative <- function(x) {
-    not_all_same <- n_distinct(x) > 1
-    not_all_unique <- n_distinct(x) < length(x)
-    all(not_all_same, not_all_unique)
+is_informative <- function(df) {
+    not_all_same <- n_distinct(df) > 1
+    not_all_different <- n_distinct(df) < length(df)
+    all(not_all_same, not_all_different)
 }
 
 #' Helper function to parse sample sizes.
@@ -48,27 +48,50 @@ gsem <- gsem %>%
     mutate(N = map(pdata, get_treatments_safely),
            N = map(N, "result"))
 
-#+ munge
-sample_n <- gsem %>%
-    mutate(sample_size = map(N, "n")) %>%
-    select(Accession, series_matrix_file, sample_size) %>%
-    unnest()
+#' Unnest sample size data frame and arrange sample size with experiment ids as first three columns. 
+treatments <- gsem %>% 
+    select(Accession, series_matrix_file, N) %>% 
+    unnest() %>%
+    select(Accession, series_matrix_file, n, everything())
+
+#' Variable names defining experiment groups.
+treatments_vars <- colnames(treatments)
+treatments_vars <- x_vars[4:length(x_vars)]
+
+#' Paste together experiment groups whereas removing NAs.
+treatments <- treatments %>% 
+    unite(col = "group", treatments_vars) %>% 
+    mutate_at("group", str_replace_all, "_?NA_?", "")
+write_csv(treatments, here("output/sample_size.csv"))
 
 #' Plot __mean number__ of replicates in treatment arm(s).
 #+
-sample_n %>%
+treatments_summary <- treatments %>%
     group_by(Accession, series_matrix_file) %>%
-    summarise(n_mean = mean(sample_size),
-              n_min = min(sample_size),
-              n_max = max(sample_size),
-              n_groups = n()) %>%
-    mutate(n_groups = case_when(
-        n_groups >= 10 ~ "10+",
-        TRUE ~ as.character(n_groups)
+    summarise_at("n", list("mean", "min", "max", n = "length"))
+
+treatments_summary %>%
+    mutate(n = case_when(
+        n >= 10 ~ "10+",
+        TRUE ~ as.character(n)
     ),
-    n_groups = factor(n_groups, , levels = c(as.character(1:9), "10+"))) %>% 
+    n = factor(n, , levels = c(as.character(1:9), "10+"))) %>% 
     ggplot() +
-    geom_histogram(mapping = aes(x = n_mean), bins = 30) +
-    facet_wrap(~ n_groups, scales = "free") +
+    geom_histogram(mapping = aes(x = mean), bins = 30) +
+    facet_wrap(~ n, scales = "free") +
     scale_x_log10() +
-    labs(x = "Mean sample size", caption = "All sets!")
+    labs(x = "Mean sample size", caption = "All sets! Facet label is number of experimental groups.")
+
+#' Sets with p values.
+# Import P value stats
+pvals_pub <- read_csv("output/pvalues_pool_pub.csv",
+                      col_types = "cccdddddd")
+
+pvals_pub %>% 
+    select(Accession, suppdata_id, Type, pi0) %>% 
+    left_join(treatments_summary) %>% 
+    ggplot(aes(Type, mean)) +
+    geom_jitter(height = 0.1, size = 0.5) +
+    labs(x = "Mean sample size", caption = "Sets with P values!")
+    
+
