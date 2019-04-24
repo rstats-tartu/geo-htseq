@@ -198,11 +198,11 @@ p_values_bm <- p_value_dims %>%
 #' Proportion of pvalue GSE sets with basemean.
 prop_pvalues_with_basemean <- percent(nrow(p_values_bm) / nrow(p_values))
 
-#' Unnest GSE series with multiple pvalue sets and make unique unique ids 
+#' Unnest GSE series with multiple pvalue sets and make unique unique ids, omit NA rows from pvalue sets 
 #' for each set.
 add_set_to_suppdata_id <- function(pvalue_dataset) {
   pvalue_dataset %>% 
-    mutate(pvalues = map(pvalues, ~ tibble(set = names(.x), pvalues = .x))) %>% 
+    mutate(pvalues = map(pvalues, ~ na.omit(tibble(set = names(.x), pvalues = .x)))) %>% 
     unnest(pvalues) %>% 
     add_count(suppdata_id) %>% 
     mutate(set = str_extract(set, "\\d+"),
@@ -525,7 +525,7 @@ spark_table_bm_srp <- spark_table_bm_split %>%
 srp_stats <- full_join(spark_table_srp, spark_table_bm_srp)
 write_csv(srp_stats, here("output/srp_stats.csv"))
 
-srp_stats_caption <- "SRP and related stats for anti-conservative P value histograms. pi0 was calculated using qvalue::pi0est() function."
+srp_stats_caption <- "SRP and related stats for anti-conservative P value histograms. pi0 was calculated using limma::propTrueNull() function."
 srp_stats %>%
   select(-pi0, -`pi0\nafter filter`) %>% 
   rename_all(str_replace, "1", "") %>% 

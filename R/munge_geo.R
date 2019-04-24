@@ -212,7 +212,7 @@ get_pvalues_basemean <- function(x){
   }
   
   # Select only basemean and pvalue columns
-  ## changed regexp as matches does not seam to work with named classes with [], eg [:punct:]
+  ## changed regexp as matches does not seem to work with named classes with [], eg [:punct:]
   pval_regexp2 <- "p( )*(.)*(_)*( )*(.)*(_)*val"
   x <- dplyr::select(x, matches(paste0("bmean|^", pval_regexp2)))
   
