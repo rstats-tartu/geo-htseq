@@ -102,15 +102,17 @@ pubs_citations <- publications_citations %>%
 pi0_citations <- pubs_citations %>% 
   select(-Accession) %>% 
   distinct() %>% 
-  filter(!is.na(pi0))
+  filter(!is.na(pi0), !is.na(citations))
+
 p_cit <- pi0_citations %>% 
-  ggplot(aes(pi0, log10(1 + citations))) +
+  ggplot(aes(pi0, citations)) +
   geom_point() +
   geom_smooth(se = FALSE, method = "lm") +
-  labs(x = bquote(Proportion~of~true~nulls~(pi*0)))
+  labs(x = bquote(Proportion~of~true~nulls~(pi*0))) +
+  scale_y_log10()
 
 mod_citations <- pi0_citations %>% 
-  lm(log10(1 + citations) ~ pi0, data = .) %>% 
+  lm(log10(citations) ~ pi0, data = .) %>% 
   broom::tidy()
 
 p_cit_pval <- pubs_citations %>% 
@@ -127,4 +129,3 @@ pg <- lapply(list(p_cit_pval, p_cit), ggplotGrob)
 pg <- add_labels(pg, case = panel_label_case)
 pga <- arrangeGrob(grobs = pg, ncol = length(pg), widths = c(2, 1))
 grid.draw(pga)
-

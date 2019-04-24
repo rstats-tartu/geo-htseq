@@ -6,6 +6,7 @@ knitr::read_chunk("R/results_query.R")
 knitr::read_chunk("R/results_suppfilenames.R")
 knitr::read_chunk("R/results_publications.R")
 knitr::read_chunk("R/results_pvalues.R")
+knitr::read_chunk("R/parse_sample_size_from_series_matrix.R")
 ```
 
 
@@ -123,7 +124,7 @@ knitr::include_graphics("figures/diagram.svg")
 
 ```
 
-(ref:citations) __Citation of articles featuring HT-seq data.__ (`r ref_labels("A", panel_label_case)`) Distribution of the number of citations and availability of full sets of raw P values in GEO database. (`r ref_labels("B", panel_label_case)`) Relationship between the proportion of true nulls and number of citations. Blue line, linear model fit. Citation data is from Scopus.
+(ref:citations) __Citation of articles featuring HT-seq data.__ (`r ref_labels("A", panel_label_case)`) Distribution of the number of citations in P value sets displaying anti-conservative histogram compared to other histogram types. (`r ref_labels("B", panel_label_case)`) Relationship between the proportion of true nulls and number of citations. Blue line, linear model fit. Citation data is from Scopus database.
 
 ```{r citations, fig.cap='(ref:citations)'}
 
@@ -132,9 +133,23 @@ knitr::include_graphics("figures/diagram.svg")
 
 (ref:pi0histends) __Phylogenetic tree of P value histograms.__ Tree was obtained by clustering of the empirical cumulative distribution function outputs of P value histograms. Colors show groups obtained by cutting the tree at the height giving six clusters.
 
-```{r pi0histends, fig.cap='(ref:pi0histends)', fig.height=6}
+```{r pi0histends, fig.cap='(ref:pi0histends)', fig.asp=1}
 
 ```
+
+
+(ref:p-treatments-summary) __Sample size in HT-seq GEO series.__ Experimental groups were inferred from GEO series matrix files and mean samples size was calculated from experimental group sizes.
+
+```{r p-treatments-summary, fig.cap='(ref:p-treatments-summary)', fig.asp=1}
+
+```
+
+(ref:p-sample-size-pvalues) __Proportion of true nulls versus sample size.__ Proportion of true nulls was calculated for anti-conservative P value sets.
+
+```{r p-sample-size-pvalues, fig.cap='(ref:p-sample-size-pvalues)', fig.asp=1, out.width=3}
+
+```
+
 
 ```{r sparklines}
 

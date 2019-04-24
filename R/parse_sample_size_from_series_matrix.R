@@ -1,8 +1,6 @@
-#' ---
-#'  title: Estimate sample size from GEO series matrix files
-#'  author: Taavi Päll
-#' ---
-#'
+
+## ---- p-treatments-summary ----
+
 #' Loading libraries.
 #+ libs
 library(readr)
@@ -56,7 +54,7 @@ treatments <- gsem %>%
 
 #' Variable names defining experiment groups.
 treatments_vars <- colnames(treatments)
-treatments_vars <- x_vars[4:length(x_vars)]
+treatments_vars <- treatments_vars[4:length(treatments_vars)]
 
 #' Paste together experiment groups whereas removing NAs.
 treatments <- treatments %>% 
@@ -70,7 +68,11 @@ treatments_summary <- treatments %>%
     group_by(Accession, series_matrix_file) %>%
     summarise_at("n", list("mean", "min", "max", n = "length"))
 
-treatments_summary %>%
+n_geo_sets <- treatments %>%
+    select(Accession, series_matrix_file) %>% 
+    n_distinct()
+
+p_treatments_summary <- treatments_summary %>%
     mutate(n = case_when(
         n >= 10 ~ "10+",
         TRUE ~ as.character(n)
@@ -80,18 +82,29 @@ treatments_summary %>%
     geom_histogram(mapping = aes(x = mean), bins = 30) +
     facet_wrap(~ n, scales = "free") +
     scale_x_log10() +
-    labs(x = "Mean sample size", caption = "All sets! Facet label is number of experimental groups.")
+    labs(x = "Sample size in GEO serie\n(mean of experimental groups)", 
+         y = "Number of GEO series",
+         caption = sprintf("%s GEO series. Facet label is the number of experimental groups.", n_geo_sets))
+
+p_treatments_summary
+
+## ---- p-sample-size-pvalues ----
 
 #' Sets with p values.
 # Import P value stats
 pvals_pub <- read_csv("output/pvalues_pool_pub.csv",
                       col_types = "cccdddddd")
 
-pvals_pub %>% 
+sample_size_pvalues <- pvals_pub %>% 
     select(Accession, suppdata_id, Type, pi0) %>% 
-    left_join(treatments_summary) %>% 
-    ggplot(aes(Type, mean)) +
-    geom_jitter(height = 0.1, size = 0.5) +
-    labs(x = "Mean sample size", caption = "Sets with P values!")
-    
+    left_join(treatments_summary)
 
+p_sample_size_pvalues <- sample_size_pvalues %>%
+    filter(Type == "anti-conservative") %>% 
+    ggplot(aes(x = mean, y = pi0)) +
+    geom_hex() +
+    labs(x = "Sample size", 
+         y = bquote(Proportion~of~true~nulls~(pi*0)), 
+         caption = "Sets with anti-conservative P values.")
+
+p_sample_size_pvalues
