@@ -523,7 +523,9 @@ spark_table_bm_srp <- spark_table_bm_split %>%
   rename_at(vars(Histogram, Type, pi0, SRP, pi01, fp, rs, ud), str_c, "\nafter filter")
 
 srp_stats <- full_join(spark_table_srp, spark_table_bm_srp)
-write_csv(srp_stats, here("output/srp_stats.csv"))
+# Save for further analysis, fix-rename cols for importing
+rename_all(srp_stats, str_replace_all, "\\n| ", "_") %>% 
+  write_csv(here("output/srp_stats.csv"))
 
 srp_stats_caption <- "SRP and related stats for anti-conservative P value histograms. pi0 was calculated using limma::propTrueNull() function."
 srp_stats %>%
