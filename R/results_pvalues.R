@@ -59,17 +59,32 @@ get_tax <- function(data) {
 taxons <- gsem %>% 
   mutate(pd = map(series_matrix, pData),
          tax = map(pd, get_tax)) %>% 
-  select(Accession, tax) %>% 
+  select(Accession, annot, tax) %>% 
   unnest()
 
 multiple_taxons <- taxons %>% 
   select(organism_ch2:`organism part:ch1`) %>% 
   apply(., 1, function(x) !all(is.na(x)))
 
-#' Keep only first taxon.
-taxons <- taxons %>% 
-  select(Accession, organism, taxid) %>% 
-  mutate(multiple_taxons = multiple_taxons)
+multitaxa <- taxons %>% 
+  filter(multiple_taxons) %>% 
+  group_by(Accession) %>% 
+  transmute(organism, taxid,
+         organism2 = pmap(list(organism_ch2, organism.1, organism.2, organism.3), ~unique(na.omit(c(..1, ..2, ..3, ..4)))),
+         organism2 = map2(organism2, organism, setdiff),
+         organism2 = map(organism2, str_c, collapse = ","),
+         taxid2 = pmap(list(taxid_ch2, taxid.1, taxid.2, taxid.3), ~unique(na.omit(c(..1, ..2, ..3, ..4)))),
+         taxid2 = map2(taxid2, taxid, setdiff),
+         taxid2 = map(taxid2, str_c, collapse = ",")) %>% 
+  unnest() %>% 
+  ungroup() %>% 
+  distinct()
+  
+taxons <- left_join(taxons, multitaxa) %>% 
+  select(Accession, annot, organism, taxid, organism2, taxid2) %>% 
+  distinct()
+
+#' Save taxons to csv file.
 write_csv(taxons, here("output/taxons.csv"))
 
 #' Match samples to correct table/assay. 
@@ -416,7 +431,7 @@ make_spark <- . %>%
 spark_table <- pvalues_pool %>%
   filter(Filter == "raw") %>% 
   make_spark()
-  
+
 spark_table_bm <- pvalues_pool %>%
   filter(Filter == "basemean") %>% 
   make_spark()
