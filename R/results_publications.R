@@ -140,4 +140,16 @@ jif <- jif %>%
          Source = `JCR Abbreviated Title`,
          IF = `Journal Impact Factor`) %>% 
   filter(!is.na(IF)) %>% 
-  mutate_at(c("FullJournalName", "Source"), str_to_lower)
+  mutate_at("Source", str_to_lower)
+
+#' Publivatons and p value stats
+pp_stats <- pubs %>%
+  inner_join(pvals_pub) %>% 
+  mutate_at("Source", str_to_lower)
+
+pp_if <- inner_join(pp_stats, jif, by = "Source")
+pp_if %>% 
+  ggplot() +
+  geom_histogram(aes(IF)) +
+  facet_wrap(~ Type, scales = "free_y")
+
