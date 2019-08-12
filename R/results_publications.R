@@ -129,3 +129,15 @@ pg <- lapply(list(p_cit_pval, p_cit), ggplotGrob)
 pg <- add_labels(pg, case = panel_label_case)
 pga <- arrangeGrob(grobs = pg, ncol = length(pg), widths = c(2, 1))
 grid.draw(pga)
+
+## ---- impactfactor ----
+
+#' Importing impact factor data 
+jif <- read_csv("data/JIF_incites.csv", skip = 1)
+jif <- jif %>% 
+  select(-starts_with("X")) %>% 
+  rename(FullJournalName = `Full Journal Title`,
+         Source = `JCR Abbreviated Title`,
+         IF = `Journal Impact Factor`) %>% 
+  filter(!is.na(IF)) %>% 
+  mutate_at(c("FullJournalName", "Source"), str_to_lower)
