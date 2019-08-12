@@ -18,7 +18,7 @@ From: tpall/singularity-r:3.5.2
     libfreetype6-dev
   
   # Install CRAN packages
-  Rscript -e "install.packages(c('bookdown','XML','devtools','ggplot2','purrr','tibble','dplyr','tidyr','stringr','readr','lubridate','glue','formattable','gridExtra','gridBase','viridis','knitr','ape','data.table','kableExtra','sparkline','evaluate','hexbin','broom','readxl','digest','tidyverse','BiocManager'), repos = 'https://cloud.r-project.org', dependencies = TRUE)"
+  Rscript -e "install.packages(c('here','bookdown','XML','devtools','ggplot2','purrr','tibble','dplyr','tidyr','stringr','readr','lubridate','glue','formattable','gridExtra','gridBase','viridis','knitr','ape','data.table','kableExtra','sparkline','evaluate','hexbin','broom','readxl','digest','tidyverse','BiocManager'), repos = 'https://cloud.r-project.org', dependencies = TRUE)"
   
   # Install Bioconductor packages
   Rscript -e "BiocManager::install(update=FALSE,ask=FALSE)"
