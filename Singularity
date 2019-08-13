@@ -1,11 +1,11 @@
 BootStrap: shub
-From: tpall/singularity-r:3.5.2
+From: tpall/singularity-tidyverse
 
 %labels
   Maintainer tpall
 
 %help
-  This will run geo-rnaseq workflow.
+  This container will run geo-rnaseq workflow R scripts. Includes Rstudio server.
 
 %post
   # Install dependencies
@@ -18,11 +18,11 @@ From: tpall/singularity-r:3.5.2
     libfreetype6-dev
   
   # Install CRAN packages
-  Rscript -e "install.packages(c('here','bookdown','XML','devtools','ggplot2','purrr','tibble','dplyr','tidyr','stringr','readr','lubridate','glue','formattable','gridExtra','gridBase','viridis','knitr','ape','data.table','kableExtra','sparkline','evaluate','hexbin','broom','readxl','digest','tidyverse','BiocManager'), repos = 'https://cloud.r-project.org', dependencies = TRUE)"
+  Rscript -e "install.packages(c('bookdown','XML','formattable','gridExtra','gridBase','viridis','knitr','ape','data.table','kableExtra','sparkline','evaluate','hexbin','broom','digest'), repos = 'https://cloud.r-project.org', dependencies = TRUE)"
   
   # Install Bioconductor packages
-  Rscript -e "BiocManager::install(update=FALSE,ask=FALSE)"
-  Rscript -e "BiocManager::install(c('GEOquery','Biobase','limma','ggtree'),update=FALSE,ask=FALSE)"
+  Rscript -e "BiocManager::install(update = FALSE, ask = FALSE)"
+  Rscript -e "BiocManager::install(c('GEOquery', 'Biobase', 'limma', 'ggtree'), update = FALSE, ask = FALSE)"
 
   # Install Github packages
   Rscript -e "devtools::install_github('tpall/SRP')"
