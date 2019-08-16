@@ -26,6 +26,7 @@ munge_matrixfiles <- function(out_path) {
   safely_getGEO <- safely(
     function(path) {
       message(path)
+      stopifnot(file.size(path) > 0)
       getGEO(filename = path, getGPL = FALSE)
     }
   )
