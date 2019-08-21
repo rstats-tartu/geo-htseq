@@ -1,8 +1,11 @@
 
 singularity: "shub://tpall/geo-rnaseq"
+last_date = "2018-12-31"
 
 rule all:
   input: "output/gsem.rds", "output/suppdata.rds", "_main.html"
+
+localrules: all, geo_query
 
 rule geo_query:
   output: 
@@ -16,7 +19,7 @@ rule download_suppfilenames:
   output: 
     "output/suppfilenames.rds"
   params: 
-    last_date = "2017-06-19"
+    last_date = last_date
   script:
     "R/02_download_suppfilenames.R"
 
@@ -73,6 +76,8 @@ rule merge_suppdata:
 rule download_publications:
   input: rules.geo_query.output
   output: "output/publications.rds"
+  params: 
+    last_date = last_date
   script:
     "R/07_download_publications.R"
 
