@@ -64,7 +64,7 @@ options(htmltools.dir.version = FALSE,
 panel_label_case <- "upper"
 
 # Load helper functions
-source("R/helpers.R")
+source("scripts/helpers.R")
 
 # Last date to consider geo series and suppfilenames
 last_date <- ymd("2018-12-31")

@@ -1,7 +1,7 @@
 
 # Load libs, local_suppfile_folder, and helper functions
-source("R/_common.R")
-source("R/munge_geo.R")
+source("scripts/_common.R")
+source("scripts/munge_geo.R")
 
 library(digest)
 library(glue)

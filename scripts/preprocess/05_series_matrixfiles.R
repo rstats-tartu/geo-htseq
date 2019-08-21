@@ -1,5 +1,5 @@
 
-source("R/_common.R")
+source("scripts/_common.R")
 library(GEOquery)
 
 munge_matrixfiles <- function(out_path) {

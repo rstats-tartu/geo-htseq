@@ -1,6 +1,6 @@
 
 # Load libs
-source("R/_common.R")
+source("scripts/_common.R")
 library(entrezquery)
 
 download_suppfilenames <- function(data_path, out_path, last_date) {

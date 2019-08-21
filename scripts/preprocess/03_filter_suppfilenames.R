@@ -1,8 +1,8 @@
 
-source("R/_common.R")
+source("scripts/_common.R")
 
 # Load out strings
-source("R/out_strings.R")
+source("scripts/out_strings.R")
 
 filter_suppfilenames <- function(suppfilenames, outpath) {
   

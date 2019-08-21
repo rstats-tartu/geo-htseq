@@ -1,6 +1,6 @@
 
 # Load libs, local_suppfile_folder, and helper function geofile_df
-source("R/_common.R")
+source("scripts/_common.R")
 
 munge_suppfiles <- function(docsums, suppfilenames_filtered, gsem) {
   
