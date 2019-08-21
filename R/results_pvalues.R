@@ -351,7 +351,7 @@ safe_srp <- safely(srp)
 calculate_pi0_and_srp <- function(pvalue_dataset) {
   pvalue_dataset %>% 
     mutate(pi0 = map_dbl(pvalues, propTrueNull),
-           srp = map(pvalues, safe_srp),
+           srp = map(pvalues, safe_srp, method = "hist"),
            srp = map(srp, "result"))
 }
 
@@ -424,7 +424,6 @@ make_spark <- . %>%
   mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/40), plot = FALSE)$counts),
          pi0 = digits(pi0, 2)) %>%
   mutate(Histogram = map_chr(values, ~ spk_chr(.x,
-                                chartRangeMin = 0,
                                 type = "bar"))) %>% 
   select(Accession, suppdata_id, Histogram, Type, pi0, srp)
 
