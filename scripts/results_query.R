@@ -2,7 +2,7 @@
 # For development only, not run during article compilation
 
 # Load libs
-source("R/_common.R")
+source("scripts/_common.R")
 
 ## ---- rna-seq-dynamics ----
 

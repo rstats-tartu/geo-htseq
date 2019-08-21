@@ -1,6 +1,6 @@
 
 #' Load libraries. We are going to use parsnip api.
-source("R/_common.R")
+source("scripts/_common.R")
 library(rsample)
 library(recipes)
 library(parsnip)

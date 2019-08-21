@@ -1,6 +1,6 @@
 
 if (!any(str_detect(ls(), "pubs$"))) {
-  source("R/results_publications.R")
+  source("scripts/results_publications.R")
 }
 
 set.seed(122)

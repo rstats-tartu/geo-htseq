@@ -1,6 +1,6 @@
 
 #' ## Load libs
-source("R/_common.R")
+source("scripts/_common.R")
 
 #' ## Import tabular supplementary files
 

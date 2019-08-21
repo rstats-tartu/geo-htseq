@@ -23,7 +23,7 @@ library(rsample)
 library(recipes)
 library(parsnip)
 library(yardstick)
-source("R/_common.R")
+source("scripts/_common.R")
 
 # Histogram types summary table
 types_legend <- read_csv(here("data/pvalue_hist_types.csv"))

@@ -2,11 +2,11 @@
 ## Results {-}
 
 ```{r}
-knitr::read_chunk("R/results_query.R")
-knitr::read_chunk("R/results_suppfilenames.R")
-knitr::read_chunk("R/results_publications.R")
-knitr::read_chunk("R/results_pvalues.R")
-knitr::read_chunk("R/parse_sample_size_from_series_matrix.R")
+knitr::read_chunk("scripts/results_query.R")
+knitr::read_chunk("scripts/results_suppfilenames.R")
+knitr::read_chunk("scripts/results_publications.R")
+knitr::read_chunk("scripts/results_pvalues.R")
+knitr::read_chunk("scripts/parse_sample_size_from_series_matrix.R")
 ```
 
 
@@ -99,7 +99,7 @@ Resulting dataset consisted of `r nrow(suppfiles_of_interest)` files from `r n_d
 (ref:block) __Retention of HT-seq GEO series and supplementary files in filter for full sets of p values.__ Arrows from left to right, (1) GEO sets with supplementary files, (2) filter out RAW.tar and filelist.txt files from supplementary file names, (3) supplementary files with flat table formats that were downloaded, (4) tables with p values. Number of p value sets is the number of sets with `r glue(">{nrowthreshold}")` features.
 
 ```{r block, fig.cap='(ref:block)'}
-source("R/diagram.R")
+source("scripts/diagram.R")
 knitr::include_graphics("figures/diagram.svg")
 ```
 
