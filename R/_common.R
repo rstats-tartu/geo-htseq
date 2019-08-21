@@ -67,7 +67,7 @@ panel_label_case <- "upper"
 source("R/helpers.R")
 
 # Last date to consider geo series and suppfilenames
-last_date <- ymd("2017-12-31")
+last_date <- ymd("2018-12-31")
 nrowthreshold <- 1000
 pi0threshold <- 0.05
 
