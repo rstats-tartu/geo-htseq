@@ -10,6 +10,7 @@ query <- 'expression profiling by high throughput sequencing[DataSet Type]'
   
 ## ----- run-query -----
 # ds is short of document summaries
+httr::set_config(httr::config(http_version = 0, timeout = 6000))
 ds <- entrez_docsums(query = query, db = "gds", retmax = 30000)
   
 ## ----- save downloaded filenames ----- 
