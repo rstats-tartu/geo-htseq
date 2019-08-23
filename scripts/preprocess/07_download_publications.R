@@ -5,7 +5,7 @@ library(entrezquery)
 
 # Check if document summary table is already loaded
 message("Loading document summaries")
-ds <- read_rds(snakemake@input[[1]])
+ds <- read_csv(snakemake@input[[1]])
 
 # All HT-seq datasets
 # Lump together all non-human and murine taxa
@@ -18,15 +18,15 @@ fix_pmid <- function(x) {
 }
 message("Filtering publications by last date")
 ds_pmids <- ds %>%
-  filter(PDAT <= snakemake@params[["last_date"]], 
-         str_length(PubMedIds) != 0) %>% 
-  select(PubMedIds) %>% 
-  mutate(PubMedIds = map(PubMedIds, fix_pmid)) %>% 
-  unnest() %>% 
-  distinct()
+  filter(PDAT <= "2018-12-31") %>% 
+  drop_na(PubMedIds) %>% 
+  pull(PubMedIds) %>% 
+  str_split(pattern = ";") %>% 
+  unlist() %>% 
+  unique()
 
 message("Downloading publications for all taxa")
-publications <- ds_pmids$PubMedIds %>% 
+publications <- ds_pmids %>% 
   entrez_docsums(uid = ., db = "pubmed", wait = 0.33)
 publications <- publications %>% 
   unnest()

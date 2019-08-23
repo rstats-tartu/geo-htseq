@@ -6,7 +6,7 @@ library(entrezquery)
 download_suppfilenames <- function(data_path, out_path, last_date) {
   
   # Check if document summary table is already loaded
-  ds <- read_rds(data_path)
+  ds <- read_csv(data_path)
   
   # Filter by data
   ds_filtered <- filter(ds, PDAT <= ymd(last_date))

@@ -26,7 +26,7 @@ filter_suppfilenames <- function(suppfilenames, outpath) {
                                              collapse = "|"))) %>% 
     ungroup()
   
-  # 639 series matrix files are downloaded from supplementary files folder, relabel them as matrix files
+  # more than six hundred series matrix files are downloaded from supplementary files folder, relabel them as matrix files
   suppfilenames_filtered  <- mutate(suppfilenames_filtered, 
                                     type = case_when(
                                       str_detect(files, "series_matrix.txt.gz$") ~ "matrix",

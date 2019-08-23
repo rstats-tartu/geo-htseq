@@ -1,5 +1,4 @@
 from Bio import Entrez
-import os
 import pandas as pd
 import json
 
@@ -7,10 +6,13 @@ def chunks(l, n):
     for i in range(0, len(l), n):
         yield l[i:i + n]
 
-Entrez.email = "taavi.pall@ut.ee"
-Entrez.api_key = os.environ["NCBI_APIKEY"]
+Entrez.email = snakemake.params["email"]
+Entrez.api_key = snakemake.params["api_key"]
+
+
 query = 'expression profiling by high throughput sequencing[DataSet Type]'
 db = "gds"
+
 search = Entrez.esearch(db = db, term = query, RetMax = 30000)
 ids = Entrez.read(search)
 chunked_ids = chunks(ids["IdList"], 200)
@@ -19,7 +21,7 @@ columns = ["Id", "Accession", "GDS", "title", "summary", "GPL", "GSE", "taxon", 
 "ptechType", "valType", "SSInfo", "subsetInfo", "PDAT", "suppFile", "Samples", "n_samples","SeriesTitle","PlatformTitle","PlatformTaxa",
 "SamplesTaxa", "PubMedIds", "Projects", "FTPLink"]
 
-with open("output/document_summaries.csv", "a") as f:
+with open(snakemake.output[0], "a") as f:
   for chunk in chunked_ids:
     summary = Entrez.esummary(db = db, id = ",".join(chunk), retmode = "xml")
     records = Entrez.parse(summary)
