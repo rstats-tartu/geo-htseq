@@ -1,6 +1,6 @@
 
 # Load libs
-source("R/_common.R")
+source("scripts/_common.R")
 library(entrezquery)
 
 # Check if document summary table is already loaded
