@@ -97,6 +97,7 @@ dims <- st_unnested %>%
   ungroup() %>%
   select(-series_matrix_file)
 
+#' Number of samples in GEO datasets.
 #+
 dims %>% 
   group_by(samples) %>% 
@@ -114,13 +115,25 @@ n_samples <- dims %>%
          max = max)
   )
 
-#' Filter datasets with p values. Keep only numeric P value sets.
+#' Filter datasets with p values. Keep only numeric P value sets and full sets, 
+#' defined by non-truncation at 0.9 threshold.
 #+
+drop_truncated_pvalue_sets <- function(data, threshold = 0.9) {
+  data <- make_unique_colnames(data)
+  pvalues <- data %>% 
+    select(matches("pvalue")) %>% 
+    select_if(function(x) any(na.omit(x) >= threshold))
+  basemean <- data %>% dplyr::select(matches("basemean"))
+  bind_cols(pvalues, basemean)
+}
+
 p_value_dims <- dims %>% 
   filter(
     !map_lgl(pvalues, is.null), 
     !map_lgl(pvalues, inherits, "try-error")
-  )
+  ) %>% 
+  mutate_at("pvalues", ~map(.x, drop_truncated_pvalue_sets, threshold = 0.9)) %>% 
+  filter(map_lgl(pvalues, ~any(str_detect(colnames(.x), "pvalue"))))
 
 ## ---- plotdims -----
 
@@ -192,8 +205,7 @@ p_value_dims <- p_value_dims_suppdata_id %>%
 #' Create P values dataset. Filter doubles.
 #+ 
 p_values <- p_value_dims %>% 
-  mutate(pvalues = map(pvalues, make_unique_colnames),
-         pvalues = map(pvalues, select, matches("pvalue")),
+  mutate(pvalues = map(pvalues, select, matches("pvalue")),
          pvalues = map(pvalues, as.list)) %>% 
   select(Accession, suppfiles, suppdata_id, annot, features, columns, samples, pvalues)
 
@@ -204,8 +216,7 @@ p_values_bm <- p_value_dims %>%
   mutate(basemean = map(pvalues, "basemean"),
          basemean = map_lgl(basemean, ~ !all(is.na(.x)))) %>% 
   filter(basemean) %>%
-  mutate(pvalues = map(pvalues, make_unique_colnames),
-         pvalues = map(pvalues, filter, basemean / (sum(basemean) / 1e6) > 100),
+  mutate(pvalues = map(pvalues, filter, basemean / (sum(basemean) / 1e6) > 100),
          pvalues = map(pvalues, select, matches("pvalue")),
          pvalues = map(pvalues, as.list)) %>% 
   select(Accession, suppfiles, suppdata_id, annot, features, columns, samples, pvalues)
