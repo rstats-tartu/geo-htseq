@@ -7,13 +7,13 @@ library(digest)
 library(glue)
 library(GEOquery)
 
-import_suppdata <- function(supptab, out_path, bad) {
-  supptab <- read_rds(supptab)
+import_suppdata <- function(supptab, outpath, bad) {
+  supptabs <- read_rds(supptab)
   # Remove 'bad' files
   supptabs <- filter(supptabs, !(suppfiles %in% bad))
-  supptab %>%
+  supptabs %>%
     mutate(result = map(suppfiles, ~ try(munge_geo_pvalue(file.path(local_suppfile_folder, .x))))) %>% 
-    write_rds(path = out_path)
+    write_rds(path = outpath)
 }
 
 import_suppdata(supptab = snakemake@input[[1]], 

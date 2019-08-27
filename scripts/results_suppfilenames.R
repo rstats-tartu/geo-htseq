@@ -1,6 +1,6 @@
 
 # Load libs
-source("R/_common.R")
+source("scripts/_common.R")
 
 # ---- missingsuppfiles ----
 # In this section we download and analyse supplementary file names
@@ -162,7 +162,7 @@ supp_raw_perc <- percent(n_raw / nrow(suppfilenames), 0)
 
 # ---- out-strings ----
 
-source("R/out_strings.R")
+source("scripts/out_strings.R")
 
 # ---- filesofinterest ----
 suppfiles_of_interest <- suppfilenames_present_unnested %>%
