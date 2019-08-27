@@ -7,8 +7,13 @@ library(parsnip)
 library(yardstick)
 
 #' READ IN CLASSIFICATIONS --------------------------------------------
-#' Load manually assigned classes
-his_all <- read_csv2(here("data/pvalue_sets_classes.csv"))
+#' Load manually assigned classes'
+
+his_all <- read_delim(here("data/pvalue_sets_classes.csv"),
+                                  delim =  ";",
+                                  col_types = "cccdcd",
+                                  escape_double = FALSE, 
+                                  trim_ws = TRUE)
 
 #' Split manualy assigned classes to filtered and non filtered
 his_all <- his_all %>% 
@@ -24,25 +29,24 @@ his_all <- his_all %>%
 # READ IN DATASET WITH PVALUE BINS ----------------------------------
 
 #' Import pvalue data.
-pvalues <- read_rds(here("output/pvalues.rds"))
-pvalues_bm <- read_rds(here("output/pvalues_bm.rds"))
+p_values <- read_rds(here("output/pvalues.rds"))
+p_values_bm <- read_rds(here("output/pvalues_bm.rds"))
 
 #' Pool raw and basemean corrected data.
-pvalues_pool <- bind_rows(raw = pvalues, basemean = pvalues_bm, .id = "Filter")
+pvalues_pool <- bind_rows(raw = p_values, basemean = p_values_bm, .id = "Filter")
 
 #' Number of features to sample from
 features <- pvalues_pool$features
 
 #' Prepare variables for classification. Keep only sets with at least 
-#' nrowthreshold pvalues.
-pvalues_pool <- pvalues_pool %>% 
+#' nrowthreshold pvalues and non-truncated sets identified by any values over 0.9
+pvalues_pool_ecdf <- pvalues_pool %>% 
   select(Filter, suppdata_id, pvalues) %>% 
-  filter(map_lgl(pvalues, ~ length(.x) >= nrowthreshold)) %>% 
-  mutate(eCDF = map(pvalues, ecdf),
-         values = map(eCDF, function(Fn) Fn(seq(0, 1, 3/nrowthreshold))))
+  mutate(eCDF = map(pvalues, ecdf), # Error in .f(.x[[i]], ...) : 'x' must have 1 or more non-missing values
+         values = map(eCDF, function(Fn) Fn(seq(0, 1, 3 / nrowthreshold))))
 
 #' Rearrange pvalue probs to columns.
-pvalues_bins <- pvalues_pool %>% 
+pvalues_bins <- pvalues_pool_ecdf %>% 
   mutate(values = map(values, matrix, nrow = 1),
          values = map(values, as.tibble)) %>% 
   unnest(values) %>% 
@@ -61,15 +65,13 @@ aco <- replicate(10,
                  replicate(sample(features, 1), t.test(rnorm(3, sample(c(0, 0.5, 1, 1.5), 1, prob = c(0.8, rep(0.2 / 3, 3))), 0.3))$p.value),
                  simplify = TRUE)
 
-#' create anti-conservative sets with fdr adjustment
+#' Create anti-conservative sets with fdr adjustment
 con <- map(c(uni, aco), p.adjust, method = "fdr")
 bim <- map2(aco, con[101:110], ~ sample(c(.x, .y, sample(features, 1))))
 synt <- bind_rows(tibble(Type = "uniform", pvalues = uni),
                   tibble(Type = "anti-conservative", pvalues = aco),
                   tibble(Type = "conservative", pvalues = con),
-                  tibble(Type = "bimodal", pvalues = bim),
-                  
-)
+                  tibble(Type = "bimodal", pvalues = bim))
 
 synt <- synt %>% 
   filter(map_lgl(pvalues, ~ length(.x) >= nrowthreshold)) %>% 
@@ -137,4 +139,13 @@ bind_rows(human = select(his_all, -Accession),
           nnet = pvalues_bins_classes, .id = "Method") %>% 
   arrange(suppdata_id) %>% 
   spread(key = Method, value = Type) %>% 
+  mutate(Type = case_when(
+    is.na(human) ~ nnet,
+    TRUE ~ human
+  ),
+  classifier = case_when(
+    is.na(human) ~ "nnet",
+    TRUE ~ "human"
+  )) %>% 
   write_csv(here("output/pvalue_histogram_nnet_classification.csv"))
+

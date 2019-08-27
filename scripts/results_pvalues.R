@@ -218,6 +218,7 @@ p_values_bm <- p_value_dims %>%
   filter(basemean) %>%
   mutate(pvalues = map(pvalues, filter, basemean / (sum(basemean) / 1e6) > 100),
          pvalues = map(pvalues, select, matches("pvalue")),
+         pvalues = map(pvalues, select_if, ~length(na.omit(.x)) > 1),
          pvalues = map(pvalues, as.list)) %>% 
   select(Accession, suppfiles, suppdata_id, annot, features, columns, samples, pvalues)
 
@@ -244,20 +245,18 @@ add_set_to_suppdata_id <- function(pvalue_dataset) {
 p_values <- p_values %>% 
   add_set_to_suppdata_id %>% 
   filter(map_lgl(pvalues, ~typeof(.x) == "double"))
+write_rds(p_values, here("output/pvalues.rds"))
 
 p_values_bm <- p_values_bm %>% 
   add_set_to_suppdata_id %>% 
   filter(map_lgl(pvalues, ~typeof(.x) == "double"))
+write_rds(p_values_bm, here("output/pvalues_bm.rds"))
 
 #' Curated p value histogram classes ---------------------------------------
 #' ## Read in classifications
-nnet_classes <- read_csv(here("output/pvalue_histogram_nnet_classification.csv")) 
+nnet_classes <- read_csv(here("output/pvalue_histogram_nnet_classification.csv"), col_types = "cccccc") 
 nnet_classes <- nnet_classes %>% 
-  mutate(Type = case_when(
-    is.na(human) ~ nnet,
-    TRUE ~ human
-  ))
-
+  select(suppdata_id, Filter, classifier, Type)
 
 #' Pool raw and basemean corrected data.
 #+ pvalues-pool
@@ -269,7 +268,7 @@ pvalues_pool <- bind_rows(
 
 #' ## Calculate ecdf and cluster histograms
 #+ add-ecdf
-pvalues_pool <- pvalues_pool %>% 
+pvalues_pool_ecdf <- pvalues_pool %>% 
   inner_join(nnet_classes) %>% 
   mutate(eCDF = map(pvalues, ecdf),
          values = map(eCDF, function(Fn) Fn(seq(0, 1, 3 / nrowthreshold))))
@@ -278,7 +277,7 @@ pvalues_pool <- pvalues_pool %>%
 
 #' Rearrange pvalue probs to columns.
 #+ pvalues-bins
-pvalues_bins <- pvalues_pool %>% 
+pvalues_bins <- pvalues_pool_ecdf %>% 
   mutate(values = map(values, matrix, nrow = 1),
          values = map(values, as.tibble)) %>% 
   unnest(values) %>% 
@@ -305,10 +304,9 @@ pca_screeplot <- pca_sum$importance %>%
 #' missing use nnet.
 #+ merge-pca-nnet
 pca_tb <- as_tibble(pca$x)
-pc12 <- pvalues_pool %>% 
+pc12 <- pvalues_pool_ecdf %>% 
   bind_cols(pca_tb) %>% 
-  select(Filter, suppdata_id, PC1, PC2) %>% 
-  left_join(nnet_classes)
+  select(Filter, suppdata_id, Type, PC1, PC2)
 
 barcolors <- viridis::viridis(6)
 pca_plot <- ggplot(pc12) +
@@ -368,22 +366,22 @@ calculate_pi0_and_srp <- function(pvalue_dataset) {
 
 #' Calculate pi0 and srp only for anti-conservative sets.
 #+ pvalues-antic
-p_values_antic <- pvalues_pool %>% 
+p_values_antic <- pvalues_pool_ecdf %>% 
   filter(Type == "anti-conservative") %>% 
   calculate_pi0_and_srp
 
 #' Bind anti-conservative sets back to pooled dataset.
 #+ merge-antic
-pvalues_pool <- pvalues_pool %>% 
+pvalues_pool_ecdf <- pvalues_pool_ecdf %>% 
   filter(Type != "anti-conservative") %>% 
   bind_rows(p_values_antic)
 
 #' Calculate bins for table histograms. 
-pvalues_pool <- pvalues_pool %>%
+pvalues_pool_ecdf <- pvalues_pool_ecdf %>%
   mutate(bins = map(pvalues, ntile, 60))
 
 # Save set of vars from pvalues_pool for use in results_publication.R
-pvalues_pool_pub <- pvalues_pool %>% 
+pvalues_pool_pub <- pvalues_pool_ecdf %>% 
   filter(Filter == "raw") %>% 
   select(Accession, suppdata_id, Type, pi0, srp) %>% 
   mutate(has_srp = map_lgl(srp, ~!is.null(.x[[1]]))) %>% 
@@ -395,12 +393,16 @@ pvalues_pool_pub <- pvalues_pool %>%
 write_csv(pvalues_pool_pub, "output/pvalues_pool_pub.csv")
 
 # Histogram of pi0 distribution.
-pi0hist <- ggplot(data = p_values_antic) +
+pi0hist <- p_values_antic %>% 
+  ggplot() +
   geom_histogram(aes(x = pi0, y = ..count.. / sum(..count..)), bins = 30) +
+  facet_wrap(~ factor(case_when(Filter == "basemean" ~ "basemean filtered", TRUE ~ "raw"), levels = c("raw", "basemean filtered"))) +
   labs(x = bquote(Proportion~of~true~nulls~(pi*0)),
-       y = "Fraction of anti-conservative P value sets")
+       y = "Fraction",
+       title = "Anti-conservative P value sets")
 
 pi0_features <- p_values_antic %>% 
+  filter(Filter %in% "raw") %>% 
   mutate(samples = case_when(
     samples < 4 ~ "2 to 3",
     between(samples, 4, 6) ~ "4 to 6",
@@ -434,16 +436,15 @@ grid.draw(pga)
 make_spark <- . %>% 
   mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/40), plot = FALSE)$counts),
          pi0 = digits(pi0, 2)) %>%
-  mutate(Histogram = map_chr(values, ~ spk_chr(.x,
-                                type = "bar"))) %>% 
+  mutate(Histogram = map_chr(values, ~ spk_chr(.x, type = "bar"))) %>% 
   select(Accession, suppdata_id, Histogram, Type, pi0, srp)
 
-spark_table <- pvalues_pool %>%
-  filter(Filter == "raw") %>% 
+spark_table <- pvalues_pool_ecdf %>%
+  filter(Filter %in% "raw") %>% 
   make_spark()
 
-spark_table_bm <- pvalues_pool %>%
-  filter(Filter == "basemean") %>% 
+spark_table_bm <- pvalues_pool_ecdf %>%
+  filter(Filter %in% "basemean") %>% 
   make_spark()
 
 #' Original histogram types.
