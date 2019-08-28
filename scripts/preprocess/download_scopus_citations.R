@@ -10,11 +10,13 @@ if (exists("snakemake")) {
   input_pubs <- snakemake@input[["pubs"]]
   # "output/document_summaries.csv"
   input_document_summaries <- snakemake@input[["document_summaries"]]
+  api_key <- snakemake@params[["api_key"]]
 } else {
   # "output/publications.csv"
   input_pubs <- "output/publications.csv"
   # "output/document_summaries.csv"
   input_document_summaries <- "output/document_summaries.csv"
+  api_key <- Sys.getenv("Elsevier_geoseq")
 }
 
 # Publications
@@ -59,18 +61,18 @@ scopus <- crul::HttpClient$new(url = 'https://api.elsevier.com',
                                    Encoding = "UTF-8"))
 
 #' Query function
-scopus_search <- function(doi, con, sleep = 0.06) { 
+scopus_search <- function(doi, con, api_key, sleep = 0.06) { 
   Sys.sleep(sleep)
   resp <- con$get(path = "content/search/scopus", 
           query = list(query = glue::glue("doi({doi})"),
-                       apiKey = Sys.getenv("Elsevier_geoseq")))
+                       apiKey = api_key))
   message("DOI: ", doi, "; success: ", resp$success())
   return(resp)
 }
 
 #' Run query
 resps <- dois %>% 
-  mutate(resp = map(DOI, scopus_search, con = scopus))
+  mutate(resp = map(DOI, scopus_search, con = scopus, api_key = api_key))
 
 #' Extract citations 
 library(jsonlite)

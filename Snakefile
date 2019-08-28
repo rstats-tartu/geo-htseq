@@ -131,7 +131,8 @@ rule download_citations:
     document_summaries = "output/document_summaries.csv"
   output: "output/scopus_citedbycount.csv"
   params: 
-    last_date = last_date
+    last_date = last_date,
+    api_key = os.environ["ELSEVIER_GEOSEQ"]
   singularity: SIMG
   script:
     "scripts/preprocess/download_scopus_citations.R"
