@@ -1,11 +1,9 @@
 import os
-
+SIMG = "shub://tpall/geo-rnaseq"
 last_date = "2018-12-31"
 
 rule all:
   input: "output/gsem.rds", "output/suppdata.rds", "_main.html"
-
-localrules: all
 
 # Queries HT-seq expression profiling experiments
 # Requires NCBI api_key as NCBI_APIKEY environment variable
@@ -27,7 +25,7 @@ rule download_suppfilenames:
     "output/suppfilenames.rds"
   params: 
     last_date = last_date
-  singularity: "shub://tpall/geo-rnaseq"
+  singularity: SIMG
   script:
     "scripts/preprocess/02_download_suppfilenames.R"
 
@@ -36,7 +34,7 @@ rule filter_suppfilenames:
     rules.download_suppfilenames.output
   output: 
     "output/suppfilenames_filtered.rds"
-  singularity: "shub://tpall/geo-rnaseq"
+  singularity: SIMG
   script:
     "scripts/preprocess/03_filter_suppfilenames.R"
 
@@ -45,7 +43,7 @@ rule download_suppfiles:
     rules.filter_suppfilenames.output
   output: 
     touch("output/downloading_suppfiles.done")
-  singularity: "shub://tpall/geo-rnaseq"
+  singularity: SIMG
   script:
     "scripts/preprocess/04_download_suppfiles.R"
 
@@ -54,7 +52,7 @@ rule series_matrixfiles:
     rules.download_suppfiles.output
   output: 
     "output/gsem.rds"
-  singularity: "shub://tpall/geo-rnaseq"
+  singularity: SIMG
   script:
     "scripts/preprocess/05_series_matrixfiles.R"
 
@@ -81,15 +79,6 @@ BAD = ["GSE93374_Merged_all_020816_DGE.txt.gz",
        "GSE89113_T35_vs_T45.MXE.MATS.JunctionCountOnly.txt.gz",             
        "GSE89113_T25_vs_T40.A3SS.MATS.JunctionCountOnly.txt.gz",            
        "GSE99484_Sulfolobus_acidocaldarius_DSM_639_CP000077_.gbk.txt.gz",   
-       "GSE89113_T25_vs_T40.T25.UP.0.05.A3SS.MATS.JunctionCountOnly.txt.gz",
-       "GSE89113_T25_vs_T40.T40.UP.0.05.A5SS.MATS.JunctionCountOnly.txt.gz",
-       "GSE89113_T25_vs_T45.A3SS.MATS.JunctionCountOnly.txt.gz",            
-       "GSE89113_T25_vs_T45.MXE.MATS.JunctionCountOnly.txt.gz",             
-       "GSE89113_T25_vs_T45.SE.MATS.JunctionCountOnly.txt.gz",              
-       "GSE89113_T25_vs_T45.T25.UP.0.05.SE.MATS.JunctionCountOnly.txt.gz",  
-       "GSE89113_T25_vs_T45.T45.UP.0.05.MXE.MATS.JunctionCountOnly.txt.gz", 
-       "GSE89113_T35_vs_T40.A5SS.MATS.JunctionCountOnly.txt.gz",            
-       "GSE89113_T35_vs_T40.T40.UP.0.05.A5SS.MATS.JunctionCountOnly.txt.gz",
        "GSE121228_gene_expression_anno.txt.gz", 
        "GSE113074_Raw_combined.annotated_counts.tsv.gz", 
        "GSE113074_Corrected_combined.annotated_counts.tsv.gz", 
@@ -104,7 +93,7 @@ rule split_suppfiles:
     temp(expand("output/tmp/supptabs_{n}.rds", n = n_files))
   params:
     bad = BAD
-  singularity: "shub://tpall/geo-rnaseq"
+  singularity: SIMG
   script:
     "scripts/preprocess/06_split_suppfiles.R"
 
@@ -115,7 +104,7 @@ rule import_suppfiles:
     temp("output/tmp/suppdata_{n}.rds")
   params:
     bad = BAD
-  singularity: "shub://tpall/geo-rnaseq"
+  singularity: SIMG
   script:
     "scripts/preprocess/06_import_suppfiles.R"
   
@@ -123,25 +112,35 @@ rule merge_suppdata:
   input: 
     expand("output/tmp/suppdata_{n}.rds", n = n_files)
   output: "output/suppdata.rds"
-  singularity: "shub://tpall/geo-rnaseq"
+  singularity: SIMG
   script:
     "scripts/preprocess/07_merge_suppdata.R"
 
 rule download_publications:
   input: rules.geo_query.output
-  output: "output/publications.rds"
+  output: "output/publications.csv"
   params: 
     last_date = last_date
-  singularity: "shub://tpall/geo-rnaseq"
+  singularity: SIMG
   script:
     "scripts/preprocess/07_download_publications.R"
 
+rule download_citations:
+  input: 
+    pubs = "output/publications.csv", 
+    document_summaries = "output/document_summaries.csv"
+  output: "output/scopus_citedbycount.csv"
+  params: 
+    last_date = last_date
+  singularity: SIMG
+  script:
+    "scripts/preprocess/download_scopus_citations.R"
+
 rule report:
-  input: "index.Rmd", "01_introduction.Rmd", "02_methods.Rmd", "03_results.Rmd", "04_discussion.Rmd", "05_references.Rmd", "output/document_summaries.csv", "output/suppfilenames.rds", "output/suppfilenames_filtered.rds", "output/gsem.rds", "output/suppdata.rds", "output/publications.rds"
+  input: "index.Rmd", "01_introduction.Rmd", "02_methods.Rmd", "03_results.Rmd", "04_discussion.Rmd", "05_references.Rmd", "output/document_summaries.csv", "output/suppfilenames.rds", "output/suppfilenames_filtered.rds", "output/gsem.rds", "output/suppdata.rds", "output/publications.csv", "output/scopus_citedbycount.csv"
   output: "_main.html"
-  singularity: "shub://tpall/geo-rnaseq"
+  singularity: SIMG
   shell:
     """
-    chmod +x ./_build.sh
-    ./_build.sh
+    Rscript -e "bookdown::render_site(encoding = 'UTF-8')"
     """
