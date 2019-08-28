@@ -4,23 +4,48 @@ source("scripts/_common.R")
 
 ## ---- publications ----
 
-pubs <- read_csv("output/publications.csv", 
-                 col_types = "cccccccccccccccccccccccccc")
-# jif <- read_csv("data/JIF_incites.csv", skip = 1)
-pubs <- pubs %>% rename(PubMedIds = Id)
+if (exists("snakemake")) {
+  last_date <- snakemake@params[["last_date"]]
+  # "output/publications.csv"
+  input_pubs <- snakemake@input[["pubs"]]
+  # "output/document_summaries.csv"
+  input_document_summaries <- snakemake@input[["document_summaries"]]
+} else {
+  # "output/publications.csv"
+  input_pubs <- "output/publications.csv"
+  # "output/document_summaries.csv"
+  input_document_summaries <- "output/document_summaries.csv"
+}
 
-pvals_pub <- read_csv("output/pvalues_pool_pub.csv",
-                      col_types = "cccdddddd")
+# Publications
+pubs <- read_csv(input_pubs, col_types = "cccccccccccccccccccccccccc")
+pubs <- rename(pubs, PubMedIds = Id)
 
-ds_redline <- read_csv("output/ds_redline.csv",
-                       col_types = "ccccccccccccccccccccccccccccc")
+# R/A01_GEO_query.R
+ds <- read_csv(input_document_summaries, col_types = "ccccccccccccccDccdccccccc") # GEO HT-seq expr datasets
+
+
+# Date of the first submission
+first_date <- range(ymd(ds$PDAT))[1]
+
+# All HT-seq datasets
+# Lump together all non-human and murine taxa
+# Convert PDAT to date format
+ds_redline <- ds %>% 
+  mutate(PDAT = ymd(PDAT),
+         model = case_when(
+           str_detect(taxon, "Mus musculus|Homo sapiens") ~ "Human and mouse",
+           !str_detect(taxon, "Mus musculus|Homo sapiens") ~ "Other taxa"
+         )) %>%
+  filter(PDAT <= last_date)
+
+write_csv(ds_redline, "output/ds_redline.csv")
 
 pubs <- ds_redline %>% 
   select(Accession, PubMedIds, model) %>% 
   inner_join(pubs) %>% 
-  mutate(ISSN = case_when(str_length(ISSN) == 0 ~ ESSN,
-                          str_length(ISSN) != 0 ~ ISSN))
-
+  mutate(ISSN = case_when(is.na(ISSN) ~ ESSN,
+                          TRUE ~ ISSN))
 
 # Download citations ------------------------------------------------------
 
