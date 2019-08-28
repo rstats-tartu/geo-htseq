@@ -54,7 +54,7 @@ fsupp <- failed_suppfiles %>%
 perc_wsuppfile <- percent(round(1 - (nrow(suppfilenames_not_present) / nrow(suppfilenames)), 2), digits = 0)
 
 ppub_n_ci_nopublicsupps <- suppfilenames_not_present %>% 
-  mutate(pub = str_length(PubMedIds) != 0) %>% 
+  mutate(pub = !is.na(PubMedIds)) %>% 
   group_by(PDAT) %>% 
   summarise(geoseries = n(), 
             pub = sum(pub)) %>% 
