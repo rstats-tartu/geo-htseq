@@ -5,25 +5,8 @@
 source("scripts/_common.R")
 
 ## ---- rna-seq-dynamics ----
-
-# R/A01_GEO_query.R
-ds <- read_csv("output/document_summaries.csv") # GEO HT-seq expr datasets
-
-# Date of the first submission
-first_date <- range(ymd(ds$PDAT))[1]
-
-# All HT-seq datasets
-# Lump together all non-human and murine taxa
-# Convert PDAT to date format
-ds_redline <- ds %>% 
-  mutate(PDAT = ymd(PDAT),
-         model = case_when(
-           str_detect(taxon, "Mus musculus|Homo sapiens") ~ "Human and mouse",
-           !str_detect(taxon, "Mus musculus|Homo sapiens") ~ "Other taxa"
-         )) %>%
-  filter(PDAT <= last_date)
-
-write_csv(ds_redline, "output/ds_redline.csv")
+ds_redline <- read_csv("output/ds_redline.csv",
+                       col_types = "cccccccccccccccccccccccccc")
 
 # Count series with publications
 pdat <- ds_redline %>% 
