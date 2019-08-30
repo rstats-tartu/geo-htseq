@@ -83,9 +83,12 @@ grid.draw(pga)
 scopus <- read_csv(here("output/scopus_citedbycount.csv"), 
                    col_types = "ccdc")
 
+scopus <- scopus %>%
+  filter(!is.na(citations))
+
 #' Distribution of 
 p_citatins <- ggplot(scopus) +
-  geom_histogram(aes(citations), bins = 30) +
+  geom_histogram(aes(1 + citations), bins = 30) +
   scale_x_log10()
 
 # Merge publication data with citations and pvalues
@@ -93,7 +96,10 @@ publications_citations <- pubs %>%
   inner_join(pvals_pub) %>% 
   left_join(select(scopus, -Accession)) %>%
   select_if(function(x) !is.list(x))
-write_csv(publications_citations, "output/publications_citations.csv")
+
+publications_citations %>% 
+  select(Accession, suppdata_id, PubMedIds:SO) %>% 
+  write_csv( "output/publications_citations.csv")
 
 pubs_citations <- publications_citations %>% 
   select(Accession, PubMedIds, DOI, citations, pi0)
@@ -105,21 +111,21 @@ pi0_citations <- pubs_citations %>%
   filter(!is.na(pi0), !is.na(citations))
 
 p_cit <- pi0_citations %>% 
-  ggplot(aes(pi0, citations)) +
+  ggplot(aes(1 + citations, pi0)) +
   geom_point() +
   geom_smooth(se = FALSE, method = "lm") +
-  labs(x = bquote(Proportion~of~true~nulls~(pi*0))) +
-  scale_y_log10()
+  labs(y = bquote(Proportion~of~true~nulls~(pi*0))) +
+  scale_x_log10()
 
 mod_citations <- pi0_citations %>% 
-  lm(log10(citations) ~ pi0, data = .) %>% 
+  lm(log10(1 + citations) ~ pi0, data = .) %>% 
   broom::tidy()
 
 p_cit_pval <- pubs_citations %>% 
   select(-Accession) %>% 
   distinct() %>%
   filter(!is.na(citations)) %>% 
-  ggplot(aes(citations, fill = is.na(pi0))) +
+  ggplot(aes(1 + citations, fill = is.na(pi0))) +
   geom_histogram(bins = 20, position = "dodge") +
   scale_fill_grey(name = "Anti-conservative\nP values", labels = c("Yes", "No")) +
   labs(y = "N of articles") +
@@ -135,14 +141,29 @@ grid.draw(pga)
 #' Importing impact factor data 
 jif <- read_csv("data/JIF_incites.csv", skip = 1)
 jif <- jif %>% 
-  select(-starts_with("X")) %>% 
+  select(-starts_with("X"), -Rank) %>% 
   rename(FullJournalName = `Full Journal Title`,
          Source = `JCR Abbreviated Title`,
          IF = `Journal Impact Factor`) %>% 
   filter(!is.na(IF)) %>% 
   mutate_at("Source", str_to_lower)
 
-#' Publivatons and p value stats
+jif %>% 
+  rename_all(str_replace_all, "\\s+", "_") %>% 
+  rename_at(c("Source", "ISSN", "Total_Cites", "Impact_Factor_without_Journal_Self_Cites"
+              ,"5-Year_Impact_Factor"                    
+              ,"Immediacy_Index"                         
+              , "Citable_Items"                           
+              , "Cited_Half-Life"                         
+              , "Citing_Half-life"                        
+              , "Eigenfactor_Score"                       
+              , "Article_Influence_Score"                 
+              , "%_Articles_in_Citable_Items"             
+              , "Average_Journal_Impact_Factor_Percentile"
+              , "Normalized_Eigenfactor" ), str_to_lower) %>% 
+  write_csv("output/journal_IF.csv")
+
+#' Publicatons and P value stats
 pp_stats <- pubs %>%
   inner_join(pvals_pub) %>% 
   mutate_at("Source", str_to_lower)
@@ -151,5 +172,4 @@ pp_if <- inner_join(pp_stats, jif, by = "Source")
 pp_if %>% 
   ggplot() +
   geom_histogram(aes(IF)) +
-  facet_wrap(~ Type, scales = "free_y")
-
+  facet_wrap(~ Type)
