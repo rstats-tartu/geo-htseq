@@ -378,6 +378,20 @@ pvalues_pool_ecdf <- pvalues_pool_ecdf %>%
   filter(Type != "anti-conservative") %>% 
   bind_rows(p_values_antic)
 
+pvalue_stats_list <- pvalues_pool_ecdf %>% 
+  select(Filter, Accession, suppdata_id, classifier, Type, pi0, srp) %>% 
+  mutate(has_srp = map_lgl(srp, ~!is.null(.x[[1]]))) %>% 
+  split(.$has_srp) %>% 
+  map_if(~all(.$has_srp), unnest) %>% 
+  bind_rows() %>% 
+  select(-srp, -has_srp) %>% 
+  split(.$Filter) %>% 
+  map_if(~all(str_detect(.$Filter, "basemean")), ~rename_at(.x, c("Type", "SRP", "pi0", "pi01", "fp", "rs", "ud"), str_c, "_after_filter")) %>% 
+  map(select, -c("Filter", "classifier"))
+pvalue_stats <- left_join(pvalue_stats_list[[2]], pvalue_stats_list[[1]])
+# Save for further analysis, fix-rename cols for importing
+write_csv(pvalue_stats, here("output/srp_stats.csv"))
+
 #' Calculate bins for table histograms. 
 pvalues_pool_ecdf <- pvalues_pool_ecdf %>%
   mutate(bins = map(pvalues, ntile, 60))
@@ -582,11 +596,6 @@ spark_table_bm_srp <- spark_table_bm_split %>%
   rename_at(vars(Histogram, Type, pi0, SRP, pi01, fp, rs, ud), str_c, "\nafter filter")
 
 srp_stats <- full_join(spark_table_srp, spark_table_bm_srp)
-
-# Save for further analysis, fix-rename cols for importing
-rename_all(srp_stats, str_replace_all, "\\n| ", "_") %>% 
-  select(-starts_with("Histogram")) %>% 
-  write_csv(here("output/srp_stats.csv"))
 
 srp_stats_caption <- "SRP and related stats for anti-conservative P value histograms. pi0 was calculated using limma::propTrueNull() function."
 srp_stats %>%

@@ -11,20 +11,21 @@ pubs <- read_csv(here("output/publications.csv"),
 pubs <- pubs %>% rename(PubMedIds = Id)
 
 # Import P value stats
-pvals_pub <- read_csv("output/pvalues_pool_pub.csv",
+pvals_pub <- read_csv(here("output/pvalues_pool_pub.csv"),
                       col_types = "cccdddddd")
 
 # Merge pubs with document summaries (ds_redline)
-ds_redline <- read_csv("output/ds_redline.csv",
-                       col_types = "ccccccccccccccccccccccccccccc")
+ds_redline <- read_csv(here("output/ds_redline.csv"),
+                       col_types = "cccccccccccccccccccccccccc")
 
 pubs <- ds_redline %>% 
-  select(Accession, PubMedIds, model) %>% 
+  select(Accession, PDAT, model, taxon, PubMedIds) %>% 
   inner_join(pubs) %>% 
   mutate(ISSN = case_when(
     str_length(ISSN) == 0 ~ ESSN,
     str_length(ISSN) != 0 ~ ISSN)
   )
+write_csv(pubs, here("output/accessions_with_publications.csv"))
 
 # Tally journals publishing NGS DE experiments
 pub_fun <- . %>% 
