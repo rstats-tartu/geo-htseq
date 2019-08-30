@@ -8,6 +8,8 @@ source("scripts/_common.R")
 ds_redline <- read_csv("output/ds_redline.csv",
                        col_types = "cccccccccccccccccccccccccc")
 
+first_date <- min(ds_redline$PDAT)
+
 # Count series with publications
 pdat <- ds_redline %>% 
   mutate(pub = !is.na(PubMedIds)) %>% 
@@ -15,7 +17,8 @@ pdat <- ds_redline %>%
   summarise(geoseries = n(), 
             pub = sum(pub)) %>% 
   mutate_at(vars(geoseries, pub), cumsum) %>% 
-  gather(key, value, -PDAT, -model)
+  gather(key, value, -PDAT, -model) %>% 
+  mutate_at("PDAT", as_date)
 
 # Plot submissions
 geop <- pdat %>% 
