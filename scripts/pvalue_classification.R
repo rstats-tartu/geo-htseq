@@ -15,10 +15,19 @@ his_all <- read_delim(here("data/pvalue_sets_classes.csv"),
                                   escape_double = FALSE, 
                                   trim_ws = TRUE)
 
+his_18 <- read_delim("data/corrected histograms_taavile.csv", 
+                     delim =  ";",
+                     col_types = "cccdcd",
+                     escape_double = FALSE, 
+                     trim_ws = TRUE)
+
+his_all <- bind_rows(his_all, his_18) %>% 
+  select(-starts_with("pi0")) %>% 
+  distinct()
+
 #' Split manualy assigned classes to filtered and non filtered
 his_all <- his_all %>% 
   gather(key = Filter, value = Type, type, type_filtered) %>%
-  select(-starts_with("pi0")) %>% 
   na.omit() %>% 
   mutate(Filter = case_when(
     Filter == "type" ~ "raw",
@@ -84,7 +93,7 @@ synt <- synt %>%
   unnest(values) %>% 
   select(starts_with("V"), Type)
 
-# RANDOM FOREST ---- CREATE CLASSIFICATION MODEL -----------------------------
+# nnet ---- CREATE CLASSIFICATION MODEL -----------------------------
 
 # Splitting the dataset into train and validation set in the ratio 70:30
 set.seed(11)
