@@ -5,7 +5,7 @@ source("scripts/_common.R")
 # ---- missingsuppfiles ----
 # In this section we download and analyse supplementary file names
 # R/A02_download_suppfilenames.R
-suppfilenames_imported <- readRDS("output/suppfilenames.rds")
+suppfilenames_imported <- read_rds("output/suppfilenames.rds")
 
 # Extract supplemetary file names
 suppfilenames <- suppfilenames_imported %>% 
@@ -21,14 +21,14 @@ suppfilenames_present <- filter(suppfilenames, map_lgl(SuppFileNames, ~length(.x
 # unnested suppfiles
 suppfilenames_present_unnested <- unnest(suppfilenames_present, SuppFileNames)
 
-# datasets missing public suppfiles
+# Datasets missing public suppfiles
 suppfilenames_not_present <- suppfilenames_imported %>% 
   mutate(result = map(dirlist, "result")) %>% 
   filter(result == "NULL")
 
 # Timeouts need to be checked!!!
 failed_suppfiles <- suppfilenames_not_present %>% 
-  mutate(pub = str_length(PubMedIds) != 0)
+  mutate(pub = !is.na(PubMedIds))
 
 fsupp <- failed_suppfiles %>% 
   group_by(PDAT) %>% 
@@ -106,6 +106,24 @@ suppfiles_notonly_rawtar_unnested <- suppfilenames_present %>%
   select(Id, Accession, SuppFileNames) %>% 
   unnest(SuppFileNames) %>% 
   filter(!map_lgl(SuppFileNames, ~ str_detect(.x, "filelist.txt|RAW.tar")))
+
+yearly_geos_with_suppfiles <- suppfilenames_present %>% 
+  unnest(SuppFileNames) %>% 
+  filter(!map_lgl(SuppFileNames, str_detect, "filelist.txt|RAW.tar")) %>% 
+  select(Accession, PDAT) %>% 
+  distinct() %>% 
+  group_by(year = year(PDAT)) %>% 
+  count(name = "supp")
+
+yearly_geos <- read_csv(here("output/yearly_geos.csv"))
+
+yearly_geos_with_suppfiles <- full_join(yearly_geos, yearly_geos_with_suppfiles) %>% 
+  mutate(`% with ok suppfiles` = percent(supp / geoseries, 1))
+write_csv(yearly_geos_with_suppfiles, here("output/yearly_geos_with_suppfiles.csv"))
+
+yearly_geos_with_suppfiles_plot <- yearly_geos_with_suppfiles %>% 
+  ggplot(aes(x = year, y = `% with ok suppfiles`)) +
+  geom_bar(stat = "identity")
 
 # Publications of series with RAW.tar and filelist supplementary files
 fsupp_rawtar_only <- fsupp %+% (suppfilenames_present %>% 
