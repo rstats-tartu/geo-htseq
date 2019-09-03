@@ -361,8 +361,8 @@ library(SRP)
 safe_srp <- safely(srp)
 calculate_pi0_and_srp <- function(pvalue_dataset) {
   pvalue_dataset %>% 
-    mutate(pi0 = map_dbl(pvalues, propTrueNull),
-           srp = map(pvalues, safe_srp, method = "hist"),
+    mutate(pi0 = map_dbl(pvalues, propTrueNull, method = "hist"),
+           srp = map(pvalues, safe_srp, method = "lfdr"),
            srp = map(srp, "result"))
 }
 
@@ -425,14 +425,14 @@ pi0_features <- p_values_antic %>%
     between(samples, 7, 10) ~ "7 to 10",
     TRUE ~ "11+"
   )) %>%
-  ggplot(aes(x = pi0, y = log10(features))) +
+  ggplot(aes(y = pi0, x = log10(features))) +
   geom_point(aes(color = samples)) +
   geom_smooth(method = 'loess', se = FALSE) +
   scale_color_viridis(discrete = TRUE,
                       name = "N samples", 
                       limits = c("2 to 3", "4 to 6", "7 to 10", "11+")) +
-  labs(x = bquote(Proportion~of~true~nulls~(pi*0)),
-       y = bquote(N~features~(log[10])))
+  labs(y = bquote(Proportion~of~true~nulls~(pi*0)),
+       x = bquote(N~features~(log[10])))
 
 #' Compose pi0 plot.
 pg <- lapply(list(pi0hist, pi0_features), ggplotGrob)
