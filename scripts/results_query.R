@@ -34,7 +34,17 @@ geop <- pdat %>%
         legend.key = element_blank(),
         legend.title = element_blank())
 
-# Yearly submissions
+# Yearly submissions summary
+yearly_geos <- ds_redline %>% 
+  mutate(pub = !is.na(PubMedIds)) %>% 
+  group_by(year = lubridate::year(PDAT)) %>% 
+  summarise(geoseries = n(), 
+            pub = sum(pub)) %>% 
+  ungroup() %>% 
+  mutate(`%` = percent(geoseries / sum(geoseries), 1))
+write_csv(yearly_geos, here("output/yearly_geos.csv"))
+
+# Plot of yearly submissions
 geop_year <- ds_redline %>% 
   mutate(pub = !is.na(PubMedIds)) %>% 
   group_by(model, year = lubridate::year(PDAT)) %>% 
