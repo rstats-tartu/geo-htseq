@@ -382,7 +382,7 @@ pvalues_pool_ecdf <- pvalues_pool_ecdf %>%
   bind_rows(p_values_antic)
 
 pvalue_stats_list <- pvalues_pool_ecdf %>% 
-  select(Filter, Accession, suppdata_id, classifier, Type, pi0, srp) %>% 
+  select(Filter, Accession, suppdata_id, classifier, Type, srp) %>% 
   mutate(has_srp = map_lgl(srp, ~!is.null(.x[[1]]))) %>% 
   split(.$has_srp) %>% 
   map_if(~all(.$has_srp), unnest) %>% 
@@ -393,8 +393,24 @@ pvalue_stats_list <- pvalues_pool_ecdf %>%
   map(select, -c("Filter", "classifier"))
 pvalue_stats <- left_join(pvalue_stats_list[[2]], pvalue_stats_list[[1]])
 
+# Ülo wanted also all srp stats to be recalculated using pi0 obtained using "hist" method (default was "lfdr")
+srp_stats_extended <- p_values_antic_hist %>% 
+  select(Filter, Accession, suppdata_id, classifier, Type, srp) %>% 
+  mutate(has_srp = map_lgl(srp, ~!is.null(.x[[1]]))) %>% 
+  split(.$has_srp) %>% 
+  map_if(~all(.$has_srp), unnest) %>% 
+  bind_rows() %>% 
+  select(-srp, -has_srp) %>% 
+  split(.$Filter) %>% 
+  map_if(~all(str_detect(.$Filter, "basemean")), ~rename_at(.x, c("Type", "SRP", "pi0", "fp", "rs", "ud"), str_c, "_after_filter")) %>% 
+  map(select, -c("Filter", "classifier")) %>% 
+  (function(x) left_join(x[[2]], x[[1]])) %>% 
+  rename_at(vars(matches(str_c(c("Type", "SRP", "pi0", "fp", "rs", "ud"), collapse = "|"))), str_c, "_pi0method_hist") %>% 
+  left_join(pvalue_stats, .)
+
 # Save for further analysis, fix-rename cols for importing
 write_csv(pvalue_stats, here("output/srp_stats.csv"))
+write_csv(srp_stats_extended, here("output/srp_stats_extended.csv"))
 
 #' Calculate bins for table histograms. 
 pvalues_pool_ecdf <- pvalues_pool_ecdf %>%

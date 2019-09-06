@@ -5,7 +5,8 @@ pvalue_types <- read_csv(here::here("output/pvalue_types.csv"), col_types = "ccc
 pvalue_types %>% 
   skimr::skim()
 
-srp_stats <- read_csv(here::here("output/srp_stats.csv"), col_types = "cccddddddcdddddd")
+srp_stats <- read_csv(here::here("output/srp_stats_extended.csv"), 
+                      col_types = "cccdddddcdddddcdddddcddddd")
 srp_stats %>% 
   skimr::skim()
 
@@ -17,7 +18,7 @@ hist_metadata <- ds_redline %>%
 hist_type_with_stats <- srp_stats %>% 
   left_join(hist_metadata) %>% 
   arrange(Accession, suppdata_id) %>% 
-  select(Accession, PDAT, suppdata_id, Type, pi0, SRP, pi01, fp, rs, ud, everything())
+  select(Accession, PDAT, suppdata_id, Type, pi0, SRP, fp, rs, ud, everything())
 
 taxons <- read_csv(here::here("output/taxons.csv"), col_types = "cccccc")
 jif <- read_csv(here::here("output/journal_IF.csv")) %>% 
@@ -41,6 +42,15 @@ geo_publications %>%
 ylo_megatab <- hist_type_with_stats %>% 
   left_join(geo_publications)
 
+# write output to csv file
 write_csv(ylo_megatab, here("output/megatab.csv"))
+
+# get column types string
+ylo_megatab %>% 
+  map_chr(typeof) %>% 
+  map_chr(str_sub, 1, 1) %>% 
+  str_c(collapse = "")
+
+# print out skimr summary
 ylo_megatab %>% 
   skimr::skim()
