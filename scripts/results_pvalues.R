@@ -359,10 +359,9 @@ grid.draw(pga)
 # alternatively, use remotes::install_github()
 library(SRP)
 safe_srp <- safely(srp)
-calculate_pi0_and_srp <- function(pvalue_dataset) {
+calculate_pi0_and_srp <- function(pvalue_dataset, method = "lfdr") {
   pvalue_dataset %>% 
-    mutate(pi0 = map_dbl(pvalues, propTrueNull, method = "hist"),
-           srp = map(pvalues, safe_srp, method = "lfdr"),
+    mutate(srp = map(pvalues, safe_srp, method = method),
            srp = map(srp, "result"))
 }
 
@@ -370,7 +369,11 @@ calculate_pi0_and_srp <- function(pvalue_dataset) {
 #+ pvalues-antic
 p_values_antic <- pvalues_pool_ecdf %>% 
   filter(Type == "anti-conservative") %>% 
-  calculate_pi0_and_srp
+  calculate_pi0_and_srp(method = "lfdr")
+
+p_values_antic_hist <- pvalues_pool_ecdf %>% 
+  filter(Type == "anti-conservative") %>% 
+  calculate_pi0_and_srp(method = "hist")
 
 #' Bind anti-conservative sets back to pooled dataset.
 #+ merge-antic
@@ -386,9 +389,10 @@ pvalue_stats_list <- pvalues_pool_ecdf %>%
   bind_rows() %>% 
   select(-srp, -has_srp) %>% 
   split(.$Filter) %>% 
-  map_if(~all(str_detect(.$Filter, "basemean")), ~rename_at(.x, c("Type", "SRP", "pi0", "pi01", "fp", "rs", "ud"), str_c, "_after_filter")) %>% 
+  map_if(~all(str_detect(.$Filter, "basemean")), ~rename_at(.x, c("Type", "SRP", "pi0", "fp", "rs", "ud"), str_c, "_after_filter")) %>% 
   map(select, -c("Filter", "classifier"))
 pvalue_stats <- left_join(pvalue_stats_list[[2]], pvalue_stats_list[[1]])
+
 # Save for further analysis, fix-rename cols for importing
 write_csv(pvalue_stats, here("output/srp_stats.csv"))
 
@@ -593,7 +597,7 @@ spark_table_bm_srp <- spark_table_bm_split %>%
   pluck(anti_conservatives) %>% 
   unnest() %>% 
   arrange(Accession) %>%
-  rename_at(vars(Histogram, Type, pi0, SRP, pi01, fp, rs, ud), str_c, "\nafter filter")
+  rename_at(vars(Histogram, Type, pi0, SRP, fp, rs, ud), str_c, "\nafter filter")
 
 srp_stats <- full_join(spark_table_srp, spark_table_bm_srp)
 
