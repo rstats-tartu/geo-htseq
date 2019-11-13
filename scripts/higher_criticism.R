@@ -37,10 +37,12 @@ qc_plot <- function(x, breaks) {
   b <- 1 / breaks
   qc <- qbinom(1 - b * 0.05, length(x), b)
   ggplot(data = NULL) +
-    geom_histogram(aes(x), bins = breaks) +
+    geom_histogram(aes(x), binwidth = 1 / breaks, center = 1 / (2 * breaks)) +
     geom_hline(yintercept = qc, linetype = "dashed") +
     theme(axis.title = element_blank())
 }
+
+pvalues_qc$pvalues[[1]] %>% qc_plot(breaks = 40)
 
 pvalues_qc_plots <- pvalues_qc %>% 
   mutate(QC_pass = map(HC, "result")) %>% 
