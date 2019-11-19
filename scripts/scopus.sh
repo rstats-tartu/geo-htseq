@@ -9,5 +9,5 @@
 
 module load singularity \
 	&& cd $HOME/Projects/geo-rnaseq \
-	&& singularity exec $HOME/simg/singularity-tidyverse.simg Rscript R/download_scopus_citations.R
+	&& singularity exec $HOME/simg/singularity-tidyverse.simg Rscript scrips/preprocess/download_scopus_citations.R
 
