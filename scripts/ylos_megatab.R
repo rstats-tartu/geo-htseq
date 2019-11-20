@@ -1,6 +1,7 @@
 library(tidyverse)
 library(lubridate)
 library(here)
+
 pvalue_types <- read_csv(here::here("output/pvalue_types.csv"), col_types = "cccdcd")
 pvalue_types %>% 
   skimr::skim()
@@ -32,7 +33,7 @@ citations <- read_csv(here::here("output/scopus_citedbycount.csv"), col_types = 
 geo_publications <- publications %>% 
   left_join(citations) %>% 
   left_join(jif) %>% 
-  select(Accession, PDAT, model, taxon, PubMedIds, PubDate, Source, citations, IF) %>% 
+  # select(Accession, PDAT, model, taxon, PubMedIds, PubDate, Source, citations, IF) %>% 
   arrange(Accession)
 
 
@@ -54,3 +55,9 @@ ylo_megatab %>%
 # print out skimr summary
 ylo_megatab %>% 
   skimr::skim()
+
+
+ggplot(ylo_megatab, aes(PDAT, citations)) +
+  geom_point() +
+  geom_smooth() +
+  scale_y_log10()

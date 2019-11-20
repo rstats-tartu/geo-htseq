@@ -349,7 +349,7 @@ grid.draw(pga)
 ## ---- pi0hist -----
 #' ## Calculate retrospective power (SRP - shitty retrospective power)
 #' 
-#' Merge pvalues_pool with histogra classes and calculate pi0 and SRP only for
+#' Merge pvalues_pool with histogram classes and calculate pi0 and SRP only for
 #' anti-conservative sets.
 #' 
 #' Filter out one dataset with pvalue threshold info column? (logical)
@@ -361,15 +361,34 @@ library(SRP)
 safe_srp <- safely(srp)
 calculate_pi0_and_srp <- function(pvalue_dataset, method = "lfdr") {
   pvalue_dataset %>% 
-    mutate(srp = map(pvalues, safe_srp, method = method),
+    mutate(pvalues = map(pvalues, na.omit),
+           srp = map(pvalues, safe_srp, method = method),
            srp = map(srp, "result"))
 }
+
+# Add QC-based classification
+source(here("scripts/histogram_qc.R"))
+safe_QC <- safely(histogram_qc)
+breaks = 20
+pvalues_pool_ecdf_QC <- pvalues_pool_ecdf %>% 
+  mutate(QC = map(pvalues, safe_QC, breaks = breaks, fdr = 0.05),
+         QC = map(QC, "result"),
+         QCType = map_chr(QC, 2))
+
+# Upgrade Types where QCType is anti-conservative
+pvalues_pool_ecdf <- pvalues_pool_ecdf_QC %>% 
+  select(-QC) %>% 
+  mutate(Type = case_when(
+    Type != "anti-conservative" & QCType == "anti-conservative" ~ "anti-conservative",
+    TRUE ~ Type
+  ))
 
 #' Calculate pi0 and srp only for anti-conservative sets.
 #+ pvalues-antic
 p_values_antic <- pvalues_pool_ecdf %>% 
   filter(Type == "anti-conservative") %>% 
-  calculate_pi0_and_srp(method = "lfdr")
+  calculate_pi0_and_srp(method = "lfdr") 
+p_values_antic <- p_values_antic %>% unnest(srp)
 
 p_values_antic_hist <- pvalues_pool_ecdf %>% 
   filter(Type == "anti-conservative") %>% 
@@ -382,30 +401,30 @@ pvalues_pool_ecdf <- pvalues_pool_ecdf %>%
   bind_rows(p_values_antic)
 
 pvalue_stats_list <- pvalues_pool_ecdf %>% 
-  select(Filter, Accession, suppdata_id, classifier, Type, srp) %>% 
-  mutate(has_srp = map_lgl(srp, ~!is.null(.x[[1]]))) %>% 
-  split(.$has_srp) %>% 
-  map_if(~all(.$has_srp), unnest) %>% 
-  bind_rows() %>% 
-  select(-srp, -has_srp) %>% 
+  select(Filter, Accession, suppdata_id, classifier, Type, QCType, SRP, pi0, fp, rs, ud) %>% 
+  # mutate(has_srp = map_lgl(srp, ~!is.null(.x[[1]]))) %>% 
+  # split(.$has_srp) %>% 
+  # map_if(~all(.$has_srp), unnest) %>% 
+  # bind_rows() %>% 
+  # select(-srp, -has_srp) %>% 
   split(.$Filter) %>% 
-  map_if(~all(str_detect(.$Filter, "basemean")), ~rename_at(.x, c("Type", "SRP", "pi0", "fp", "rs", "ud"), str_c, "_after_filter")) %>% 
+  map_if(~all(str_detect(.$Filter, "basemean")), ~rename_at(.x, c("Type", "QCType", "SRP", "pi0", "fp", "rs", "ud"), str_c, "_after_filter")) %>% 
   map(select, -c("Filter", "classifier"))
 pvalue_stats <- left_join(pvalue_stats_list[[2]], pvalue_stats_list[[1]])
 
 # Ülo wanted also all srp stats to be recalculated using pi0 obtained using "hist" method (default was "lfdr")
 srp_stats_extended <- p_values_antic_hist %>% 
-  select(Filter, Accession, suppdata_id, classifier, Type, srp) %>% 
+  select(Filter, Accession, suppdata_id, classifier, Type, QCType, srp) %>% 
   mutate(has_srp = map_lgl(srp, ~!is.null(.x[[1]]))) %>% 
   split(.$has_srp) %>% 
   map_if(~all(.$has_srp), unnest) %>% 
   bind_rows() %>% 
-  select(-srp, -has_srp) %>% 
+  select(-has_srp) %>% 
   split(.$Filter) %>% 
-  map_if(~all(str_detect(.$Filter, "basemean")), ~rename_at(.x, c("Type", "SRP", "pi0", "fp", "rs", "ud"), str_c, "_after_filter")) %>% 
+  map_if(~all(str_detect(.$Filter, "basemean")), ~rename_at(.x, c("Type", "QCType", "SRP", "pi0", "fp", "rs", "ud"), str_c, "_after_filter")) %>% 
   map(select, -c("Filter", "classifier")) %>% 
   (function(x) left_join(x[[2]], x[[1]])) %>% 
-  rename_at(vars(matches(str_c(c("Type", "SRP", "pi0", "fp", "rs", "ud"), collapse = "|"))), str_c, "_pi0method_hist") %>% 
+  rename_at(vars(matches(str_c(c("SRP", "pi0", "fp", "rs", "ud"), collapse = "|"))), str_c, "_pi0method_hist") %>% 
   left_join(pvalue_stats, .)
 
 # Save for further analysis, fix-rename cols for importing
@@ -416,17 +435,17 @@ write_csv(srp_stats_extended, here("output/srp_stats_extended.csv"))
 pvalues_pool_ecdf <- pvalues_pool_ecdf %>%
   mutate(bins = map(pvalues, ntile, 60))
 
-# Save set of vars from pvalues_pool for use in results_publication.R
-pvalues_pool_pub <- pvalues_pool_ecdf %>% 
-  filter(Filter == "raw") %>% 
-  select(Accession, suppdata_id, Type, pi0, srp) %>% 
-  mutate(has_srp = map_lgl(srp, ~!is.null(.x[[1]]))) %>% 
-  split(.$has_srp) %>% 
-  map_if(~all(.$has_srp), unnest) %>% 
-  bind_rows() %>% 
-  select(-srp, -has_srp)
-
-write_csv(pvalues_pool_pub, "output/pvalues_pool_pub.csv")
+# # Save set of vars from pvalues_pool for use in results_publication.R
+# pvalues_pool_pub <- pvalues_pool_ecdf %>% 
+#   filter(Filter == "raw") %>% 
+#   select(Accession, suppdata_id, Type, pi0, srp) %>% 
+#   mutate(has_srp = map_lgl(srp, ~!is.null(.x[[1]]))) %>% 
+#   split(.$has_srp) %>% 
+#   map_if(~all(.$has_srp), unnest) %>% 
+#   bind_rows() %>% 
+#   select(-srp, -has_srp)
+# 
+# write_csv(pvalues_pool_pub, "output/pvalues_pool_pub.csv")
 
 # Histogram of pi0 distribution.
 pi0hist <- p_values_antic %>% 
@@ -470,10 +489,10 @@ grid.draw(pga)
 #   spread(Filter, Type) %>% 
 #   select(suppdata_id, Type = raw, `Type filtered` = basemean)
 make_spark <- . %>% 
-  mutate(values = map(pvalues, ~ hist(.x, breaks = seq(0, 1, 1/40), plot = FALSE)$counts),
+  mutate(values = map(pvalues, ~ hist(na.omit(.x), breaks = seq(0, 1, 1/40), plot = FALSE)$counts),
          pi0 = digits(pi0, 2)) %>%
   mutate(Histogram = map_chr(values, ~ spk_chr(.x, type = "bar", chartRangeMin = 0, chartRangeMax = max(.x)))) %>% 
-  select(Accession, suppdata_id, Histogram, Type, pi0, srp)
+  select(Accession, suppdata_id, Histogram, Type, QCType, pi0, SRP, fp, rs, ud)
 
 spark_table <- pvalues_pool_ecdf %>%
   filter(Filter %in% "raw") %>% 
@@ -574,10 +593,6 @@ pvalue_spark %>%
   kable_styling(full_width = FALSE)
 
 #' Write table for manual reclassification.
-manual_classes <- read_delim("data/pvalue_sets_classes.csv", 
-                             delim = ";", 
-                             col_types = "cccdcd")
-
 pvalue_types <- pvalue_spark %>% 
   select(Accession, 
          suppdata_id = `Supplementary file name\n(with p-value set id)`, 
@@ -589,6 +604,8 @@ pvalue_types <- pvalue_spark %>%
   distinct()
 write_csv(pvalue_types, "output/pvalue_types.csv")
 
+manual_classes <- read_delim("data/pvalue_sets_classes.csv", 
+                             ";", escape_double = FALSE, trim_ws = TRUE)
 pvalue_types %>% 
   anti_join(manual_classes, by = "suppdata_id") %>% 
   arrange(Type, Accession) %>% 
@@ -597,10 +614,10 @@ pvalue_types %>%
 ## ---- srp-stats ----
 
 spark_table_split <- spark_table %>% 
-  split(!map_lgl(.$srp, is.null))
+  split(!is.na(.$SRP))
 
 spark_table_bm_split <- spark_table_bm %>% 
-  split(!map_lgl(.$srp, is.null))
+  split(!is.na(.$SRP))
 
 anti_conservatives <- which(as.logical(names(spark_table_split)))
 spark_table_srp <- spark_table_split %>% 
