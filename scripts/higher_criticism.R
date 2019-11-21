@@ -42,6 +42,10 @@ pvalues_qc_pass_spread <- pvalues_qc_pass %>%
 megatab_qc <- megatab %>% 
   inner_join(pvalues_qc_pass_spread)
 
+# Update megatab with QC/HC histogram types
+megatab_qc %>% 
+  write_csv(here("output/megatab.csv"))
+
 megatab_qc %>%
   count(Type, QCType) %>% 
   spread(QCType, n)
