@@ -1,7 +1,7 @@
 #!/bin/sh
 #SBATCH --job-name=scopus
 #SBATCH --partition=main
-#SBATCH --time=03:00:00
+#SBATCH --time=06:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=16000
@@ -9,5 +9,5 @@
 
 module load singularity \
 	&& cd $HOME/Projects/geo-rnaseq \
-	&& singularity exec $HOME/simg/singularity-tidyverse.simg Rscript scrips/preprocess/download_scopus_citations.R
+	&& singularity exec $HOME/simgs/singularity-tidyverse.simg Rscript scripts/preprocess/download_scopus_citations.R
 

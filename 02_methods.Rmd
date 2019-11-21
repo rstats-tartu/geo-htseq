@@ -2,8 +2,8 @@
 ## Materials and methods {-}
 
 ```{r}
-knitr::read_chunk("R/01_geo_query.R")
-knitr::read_chunk("R/results_suppfilenames.R")
+knitr::read_chunk("scripts/preprocess/01_geo_query.R")
+knitr::read_chunk("scripts/results_suppfilenames.R")
 ```
 
 ```{r query-string}
