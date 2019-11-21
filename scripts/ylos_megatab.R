@@ -2,12 +2,12 @@ library(tidyverse)
 library(lubridate)
 library(here)
 
-pvalue_types <- read_csv(here::here("output/pvalue_types.csv"), col_types = "cccdcd")
-pvalue_types %>% 
-  skimr::skim()
+# pvalue_types <- read_csv(here::here("output/pvalue_types.csv"), col_types = "cccdcd")
+# pvalue_types %>% 
+#   skimr::skim()
 
 srp_stats <- read_csv(here::here("output/srp_stats_extended.csv"), 
-                      col_types = "cccdddddcdddddcdddddcddddd")
+                      col_types = "ccccdddddccddddddddddddddd")
 srp_stats %>% 
   skimr::skim()
 
