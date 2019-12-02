@@ -135,6 +135,14 @@ p_value_dims <- dims %>%
   mutate_at("pvalues", ~map(.x, drop_truncated_pvalue_sets, threshold = 0.9)) %>% 
   filter(map_lgl(pvalues, ~any(str_detect(colnames(.x), "pvalue"))))
 
+# Write instrument models to a file
+p_value_dims %>% 
+  mutate(instrument_model = map(series_matrix, pData),
+         instrument_model = map(instrument_model, "instrument_model"),
+         instrument_model = map_chr(instrument_model, ~unique(as.character(.x)))) %>% 
+  select(Accession, suppdata_id, instrument_model) %>% 
+  write_csv(here("output/instrument_model.csv"))
+
 ## ---- plotdims -----
 
 #' ## Plot features versus samples
@@ -424,6 +432,8 @@ srp_stats_extended <- p_values_antic_hist %>%
 
 # Save for further analysis, fix-rename cols for importing
 write_csv(pvalue_stats, here("output/srp_stats.csv"))
+map_chr(srp_stats_extended, ~substr(typeof(.x), 1, 1)) %>% str_c(collapse = "")
+  
 write_csv(srp_stats_extended, here("output/srp_stats_extended.csv"))
 
 #' Calculate bins for table histograms. 
