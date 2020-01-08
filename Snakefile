@@ -1,9 +1,12 @@
 import os
 SIMG = "shub://tpall/geo-rnaseq"
-last_date = "2018-12-31"
+LAST_DATE = "2018-12-31"
+QUERY = 'expression profiling by high throughput sequencing[DataSet Type] AND ("2000-01-01"[PDAT] : "{}"[PDAT])'.format(LAST_DATE)
+
 
 rule all:
   input: "output/gsem.rds", "output/suppdata.rds", "_main.html"
+
 
 # Queries HT-seq expression profiling experiments
 # Requires NCBI api_key as NCBI_APIKEY environment variable
@@ -13,7 +16,7 @@ rule geo_query:
   params:
     email = "taavi.pall@ut.ee",
     api_key = os.environ["NCBI_APIKEY"],
-    query = 'expression profiling by high throughput sequencing[DataSet Type] AND ("2000/01/01"[PDAT] : "2018/12/31"[PDAT])',
+    query = QUERY,
     db = "gds",
     retmax = 30000
   conda:
@@ -21,17 +24,37 @@ rule geo_query:
   script:
     "scripts/preprocess/01_geo_query.py"
 
+
+# Single-cell experiments
+rule single_cell:
+  output: 
+    "output/single-cell.csv"
+  params:
+    email = "taavi.pall@ut.ee",
+    api_key = os.environ["NCBI_APIKEY"],
+    query = QUERY + ' AND "single-cell"[All Fields]',
+    db = "gds",
+    retmax = 3000
+  conda:
+    "envs/geo-query.yaml"
+  script:
+    "scripts/preprocess/01_geo_query.py"
+
+
+# Download supplementary file names
 rule download_suppfilenames:
   input: 
     rules.geo_query.output
   output: 
     "output/suppfilenames.rds"
   params: 
-    last_date = last_date
+    last_date = LAST_DATE
   singularity: SIMG
   script:
     "scripts/preprocess/02_download_suppfilenames.R"
 
+
+# Filter supplementary file names by filename extension
 rule filter_suppfilenames:
   input: 
     rules.download_suppfilenames.output
@@ -41,6 +64,8 @@ rule filter_suppfilenames:
   script:
     "scripts/preprocess/03_filter_suppfilenames.R"
 
+
+# Download filterd supplementary files
 rule download_suppfiles:
   input: 
     rules.filter_suppfilenames.output
@@ -50,6 +75,8 @@ rule download_suppfiles:
   script:
     "scripts/preprocess/04_download_suppfiles.R"
 
+
+# Parse series matrix files
 rule series_matrixfiles:
   input: 
     rules.download_suppfiles.output
@@ -59,6 +86,8 @@ rule series_matrixfiles:
   script:
     "scripts/preprocess/05_series_matrixfiles.R"
 
+
+# Supplementary files that kill R
 BAD = ["GSE93374_Merged_all_020816_DGE.txt.gz", 
        "GSE88931_RNA-seq_MergedReadCounts.tsv.gz",
        "GSE55385_transcripts_GSE.tsv.gz",
@@ -87,6 +116,8 @@ BAD = ["GSE93374_Merged_all_020816_DGE.txt.gz",
        "GSE113074_Corrected_combined.annotated_counts.tsv.gz", 
        "GSE121737_early_and_medium_bud.repGene.txt.gz"]
 
+
+# Split list of supplementary files to chunks for parsing
 n_files = list(range(1, 101, 1))
 rule split_suppfiles:
   input:
@@ -100,6 +131,8 @@ rule split_suppfiles:
   script:
     "scripts/preprocess/06_split_suppfiles.R"
 
+
+# Import supplementary data
 rule import_suppfiles:
   input: 
     "output/tmp/supptabs_{n}.rds"
@@ -110,7 +143,9 @@ rule import_suppfiles:
   singularity: SIMG
   script:
     "scripts/preprocess/06_import_suppfiles.R"
-  
+
+
+# Merge chunks
 rule merge_suppdata:
   input: 
     expand("output/tmp/suppdata_{n}.rds", n = n_files)
@@ -119,29 +154,35 @@ rule merge_suppdata:
   script:
     "scripts/preprocess/07_merge_suppdata.R"
 
+
+# Download publication metadata
 rule download_publications:
   input: rules.geo_query.output
   output: "output/publications.csv"
   params: 
-    last_date = last_date
+    last_date = LAST_DATE
   singularity: SIMG
   script:
     "scripts/preprocess/07_download_publications.R"
 
+
+# Download citations
 rule download_citations:
   input: 
     pubs = "output/publications.csv", 
     document_summaries = "output/document_summaries.csv"
   output: "output/scopus_citedbycount.csv"
   params: 
-    last_date = last_date,
+    last_date = LAST_DATE,
     api_key = os.environ["ELSEVIER_GEOSEQ"]
   singularity: SIMG
   script:
     "scripts/preprocess/download_scopus_citations.R"
 
+
+# Knit report
 rule report:
-  input: "index.Rmd", "01_introduction.Rmd", "02_methods.Rmd", "03_results.Rmd", "04_discussion.Rmd", "05_references.Rmd", "output/document_summaries.csv", "output/suppfilenames.rds", "output/suppfilenames_filtered.rds", "output/gsem.rds", "output/suppdata.rds", "output/publications.csv", "output/scopus_citedbycount.csv"
+  input: "index.Rmd", "01_introduction.Rmd", "02_methods.Rmd", "03_results.Rmd", "04_discussion.Rmd", "05_references.Rmd", "output/document_summaries.csv", "output/single-cell.csv", "output/suppfilenames.rds", "output/suppfilenames_filtered.rds", "output/gsem.rds", "output/suppdata.rds", "output/publications.csv", "output/scopus_citedbycount.csv"
   output: "_main.html"
   singularity: SIMG
   shell:
