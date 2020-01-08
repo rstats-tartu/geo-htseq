@@ -26,7 +26,7 @@ rule geo_query:
     "scripts/preprocess/01_geo_query.py"
 
 
-# Single-cell experiments
+# Single-cell experiment accessions
 rule single_cell:
   output: 
     "output/single-cell.csv"
@@ -35,7 +35,8 @@ rule single_cell:
     api_key = os.environ["NCBI_APIKEY"],
     query = QUERY + ' AND "single-cell"[All Fields]',
     db = "gds",
-    retmax = 3000
+    retmax = 2000,
+    columns = ["Accession"]
   conda:
     "envs/geo-query.yaml"
   script:
