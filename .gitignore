@@ -2,6 +2,8 @@
 .Rhistory
 .RData
 .Ruserdata
+.vscode
+.dropbox
 figures/
 output/*.rds
 output/suppl/
@@ -11,8 +13,7 @@ output/plots
 _book/
 .snakemake
 .cache
-scripts/.snakemake*
-scripts/preprocess/.snakemake*
+*/.snakemake*
 render*
 bookdown*
 *.simg
