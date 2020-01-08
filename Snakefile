@@ -12,7 +12,10 @@ rule geo_query:
     "output/document_summaries.csv"
   params:
     email = "taavi.pall@ut.ee",
-    api_key = os.environ["NCBI_APIKEY"]
+    api_key = os.environ["NCBI_APIKEY"],
+    query = 'expression profiling by high throughput sequencing[DataSet Type] AND ("2000/01/01"[PDAT] : "2018/12/31"[PDAT])',
+    db = "gds",
+    retmax = 30000
   conda:
     "envs/geo-query.yaml"
   script:
