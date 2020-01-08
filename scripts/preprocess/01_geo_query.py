@@ -27,11 +27,12 @@ if query is None:
 
 db = snakemake.params.get("db", "gds")
 retmax = snakemake.params.get("retmax", 10)
+batch_size = snakemake.params.get("batch_size", 1)
 
 # Run query
 search = Entrez.esearch(db=db, term=query, retmax=retmax)
 ids = Entrez.read(search)
-chunked_ids = chunks(ids["IdList"], 200)
+chunked_ids = chunks(ids["IdList"], batch_size)
 
 
 columns = [
