@@ -1,7 +1,7 @@
 
 #' @description Test integer function 
 #' @param x numeric vector
-testInteger <- function(x, id = NULL) {
+test_integer <- function(x, id = NULL) {
   
   if (!is.null(id)) {
     message(id)
@@ -117,7 +117,18 @@ read_geotabs <- function(path) {
   return(tab)
 }
 
-# check for correctness of p values
+
+#' Fix pvalues coerced to characters
+#' 
+fix_pvalues <- function(x) {
+  if (is.character(x)) {
+    return(as.numeric(stringr::str_replace(x, ",", "\\.")))
+  } else {
+    return(x)
+  }
+}
+
+#' check for correctness of p values
 #' @param x full set of p values, a numeric vector
 check_pvalues <- function(x) {
   x <- range(x, na.rm = TRUE) 
@@ -167,7 +178,7 @@ get_pvalues_basemean <- function(x){
   colnames(x) <- stringr::str_to_lower(colnames(x))
   
   pval_regexp <- "p[:punct:]*[:space:]*[:punct:]*[:space:]*val"
-  pval_col <- stringr::str_detect(colns, pval_regexp) & !stringr::str_detect(colns, "adj|fdr|corr")
+  pval_col <- stringr::str_detect(colnames(x), pval_regexp) & !stringr::str_detect(colnames(x), "adj|fdr|corr")
   
   # Return NULL if P values not present
   if (!any(pval_col)) {
@@ -178,13 +189,7 @@ get_pvalues_basemean <- function(x){
   #It can be as characters if there is:
   #1) NA in xsl(x) files
   #2) there is a comma used as a decimal marker
-  for (j in 1:length(x[pval_col])) {
-    for (k in 1:ncol(x[pval_col][j])) {
-      if (typeof(x[pval_col][j][,k][[1]]) == "character") {
-        x[pval_col][j][,k][[1]] <- as.numeric(gsub(",",".", x[pval_col][j][,k][[1]]))
-      }
-    }
-  }
+  x <- dplyr::mutate_at(x, colnames(x)[pval_col], fix_pvalues)
   
   # Check if P values are between 0 and 1
   pvals_ok <- vapply(x[pval_col], check_pvalues, logical(1))
