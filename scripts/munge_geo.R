@@ -89,12 +89,6 @@ read_geotabs <- function(path) {
     tab <- read_excelfs(path)
     return(tab)
   }
-
-  
-  if (stringr::str_detect(path, "gct$")) {
-    tab <- CePa::read.gct(path)
-    return(tab)
-  }
   
   if (stringr::str_detect(path, "\\.gz$")) {
     path <- paste0("zcat < ", path)
