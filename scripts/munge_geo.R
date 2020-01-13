@@ -1,5 +1,6 @@
 
-# Test integer function ---------------------------------------------------
+#' @description Test integer function 
+#' @param x numeric vector
 testInteger <- function(x, id = NULL) {
   
   if (!is.null(id)) {
@@ -214,96 +215,7 @@ get_pvalues_basemean <- function(x){
   return(x)
 }
 
-# munge_geo function ------------------------------------------------------
-
-#' If geo supplementary table has only normalised read counts, return dims.
-#' When table has pvalues return pvalues along with basemean if possible.
-#' When table contains raw read counts, return eset.
-#' @param suppfile GSE supplemental file name
-#' @param eset nested esets
-#' @param path path to GSE supplemental file, defaults to .
-#' @import purrr
-#' @import dplyr
-#' @import Biobase
-#' @import BiocGenerics
-#' @import GEOquery
-munge_geo <- function(eset, suppfile, dir = ".") {
-  
-  ## Assemble path to supplementary file
-  path <- file.path(dir, suppfile)
-  
-  ## Import supplemental file, 
-  supptab <- read_geotabs(path)
-  
-  ## Convert to list if single table
-  if (is.data.frame(supptab) | is.matrix(supptab)) {
-    supptab <- list(supptab) 
-  }
-  
-  ## Check for pvalues
-  pvalues <- purrr::map(supptab, ~try(get_pvalues_basemean(.x)))
-  
-  ## Exclude tables which failed to import
-  pvalues <- pvalues[!purrr::map_lgl(pvalues, ~inherits(.x, "try-error"))]
-  
-  if (any(!purrr::map_lgl(pvalues, is.null))) {
-    supptab <- supptab[purrr::map_lgl(pvalues, is.null)]
-    pvalues <- pvalues[!purrr::map_lgl(pvalues, is.null)]
-    if (length(supptab) == 0) {
-      return(pvalues)
-    }
-  }
-  
-  ## Munge series matrix to eset
-  esets <- eset %>% as.list %>% unlist
-  
-  ## Get sample names from eset
-  titles <- purrr::map(esets, ~as.character(Biobase::pData(.x)[,"title"]))
-  
-  ## Get counts from table
-  counts <- purrr::map(titles, ~get_counts(supptab[[1]], .x))
-  
-  ## Test for integers
-  gplmatch <- purrr::map_lgl(counts, ~testInteger(.x))
-  
-  ## If not integers and no pvalues, return only dim
-  if (sum(gplmatch) == 0) {
-    
-    dims <- unlist(purrr::map(supptab, dim))
-    
-    dims <- dplyr::data_frame(features = dims[1], columns = dims[2])
-    
-    if (all(purrr::map_lgl(pvalues, is.null))) {
-      return(dims)
-    }
-    
-    return(c(pvalues, dims))
-  }
-  
-  ## Return raw read counts
-  exprs <- BiocGenerics::counts[gplmatch][[1]]
-  
-  ## Add feature names
-  rownames(exprs) <- make.names(rownames(exprs), unique = TRUE)
-  
-  ## Create eset
-  title <- Biobase::pData(esets[gplmatch][[1]])[, 1, drop = FALSE]
-  
-  title$title  <- rm_punct_tolower(title$title)
-  
-  exprs <- Biobase::exprs[, title$title]
-  
-  colnames(exprs) <- rownames(title)
-  
-  phenoData <- new("AnnotatedDataFrame", data = Biobase::pData(esets[gplmatch][[1]]))
-  
-  neweset <- Biobase::ExpressionSet(assayData = exprs,
-                                    phenoData = phenoData,
-                                    experimentData = Biobase::experimentData(esets[gplmatch][[1]]),
-                                    annotation = Biobase::annotation(esets[gplmatch][[1]]))
-  
-  return(c(pvalues, neweset))
-}
+#' munge_geo function ------------------------------------------------------
 
 #' Import pvalue column from Entrez GEO supplemental file.
 #' @param suppfile Supplemental file name.
@@ -345,41 +257,4 @@ munge_geo_pvalue <- function(suppfile, n_head = 100) {
   
   ## Collect data into data_frame
   dplyr::data_frame(sheets, heads, pvalues, features, columns)
-}
-
-
-# munge_geo2 --------------------------------------------------------------
-
-munge_geo2 <- function(countfile, dir = ".") {
-  
-  # Assemble path to supplementary file
-  path <- file.path(dir, countfile)
-  
-  # Import supplemental file
-  supptab <- read_geotabs(path)
-  
-  if (inherits(supptab, "try-error")) {
-    stop("Table import error!")
-  }
-  
-  if (is.data.frame(supptab) | is.matrix(supptab)) {
-    supptab <- list(supptab) 
-  }
-  
-  # Check for pvalues
-  pvalues <- map(supptab, ~try(get_pvalues_basemean(.x)))
-  heads <- map(supptab, head)
-  features <- map_int(supptab, nrow)
-  columns <- map_int(supptab, ncol)
-  supptab_names <- names(supptab)
-  
-  if (length(supptab_names) != 0) {
-    sheets <- as.list(supptab_names)
-  } else {
-    
-    sheets <- list("")
-  }
-  
-  data_frame(sheets, heads, pvalues, features, columns)
-  
 }
