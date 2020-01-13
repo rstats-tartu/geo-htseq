@@ -54,14 +54,6 @@ read_excelfs <- function(path) {
   return(tabs)
 }
 
-
-# Find duplicated columns -------------------------------------------------
-
-find_duplicated_columns <- function(x) {
-  hashs <- vapply(x, function(x) digest::digest(x), character(1))
-  duplicated(hashs)
-}
-
 # read_geotabs ------------------------------------------------------------
 #' Import Entrez GEO supplemetary tables
 #' @param path Path to supplementary file.
