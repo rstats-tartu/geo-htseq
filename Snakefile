@@ -23,7 +23,7 @@ rule geo_query:
   conda:
     "envs/geo-query.yaml"
   script:
-    "scripts/preprocess/01_geo_query.py"
+    "scripts/preprocess/geo_query.py"
 
 
 # Single-cell experiment accessions
@@ -40,7 +40,7 @@ rule single_cell:
   conda:
     "envs/geo-query.yaml"
   script:
-    "scripts/preprocess/01_geo_query.py"
+    "scripts/preprocess/geo_query.py"
 
 
 # Download supplementary file names
@@ -53,7 +53,7 @@ rule download_suppfilenames:
     last_date = LAST_DATE
   singularity: SIMG
   script:
-    "scripts/preprocess/02_download_suppfilenames.R"
+    "scripts/preprocess/download_suppfilenames.R"
 
 
 # Filter supplementary file names by filename extension
@@ -64,7 +64,7 @@ rule filter_suppfilenames:
     "output/suppfilenames_filtered.rds"
   singularity: SIMG
   script:
-    "scripts/preprocess/03_filter_suppfilenames.R"
+    "scripts/preprocess/filter_suppfilenames.R"
 
 
 # Download filterd supplementary files
@@ -75,7 +75,7 @@ rule download_suppfiles:
     touch("output/downloading_suppfiles.done")
   singularity: SIMG
   script:
-    "scripts/preprocess/04_download_suppfiles.R"
+    "scripts/preprocess/download_suppfiles.R"
 
 
 # Parse series matrix files
@@ -86,7 +86,7 @@ rule series_matrixfiles:
     "output/gsem.rds"
   singularity: SIMG
   script:
-    "scripts/preprocess/05_series_matrixfiles.R"
+    "scripts/preprocess/series_matrixfiles.R"
 
 
 # Supplementary files that kill R
@@ -131,7 +131,7 @@ rule split_suppfiles:
     bad = BAD
   singularity: SIMG
   script:
-    "scripts/preprocess/06_split_suppfiles.R"
+    "scripts/preprocess/split_suppfiles.R"
 
 
 # Import supplementary data
@@ -144,7 +144,7 @@ rule import_suppfiles:
     bad = BAD
   singularity: SIMG
   script:
-    "scripts/preprocess/06_import_suppfiles.R"
+    "scripts/preprocess/import_suppfiles.R"
 
 
 # Merge chunks
@@ -154,7 +154,7 @@ rule merge_suppdata:
   output: "output/suppdata.rds"
   singularity: SIMG
   script:
-    "scripts/preprocess/07_merge_suppdata.R"
+    "scripts/preprocess/merge_suppdata.R"
 
 
 # Download publication metadata
@@ -165,7 +165,7 @@ rule download_publications:
     last_date = LAST_DATE
   singularity: SIMG
   script:
-    "scripts/preprocess/07_download_publications.R"
+    "scripts/preprocess/download_publications.R"
 
 
 # Download citations
@@ -184,7 +184,7 @@ rule download_citations:
 
 # Knit report
 rule report:
-  input: "index.Rmd", "01_introduction.Rmd", "02_methods.Rmd", "03_results.Rmd", "04_discussion.Rmd", "05_references.Rmd", "output/document_summaries.csv", "output/single-cell.csv", "output/suppfilenames.rds", "output/suppfilenames_filtered.rds", "output/gsem.rds", "output/suppdata.rds", "output/publications.csv", "output/scopus_citedbycount.csv"
+  input: "index.Rmd", "introduction.Rmd", "methods.Rmd", "results.Rmd", "discussion.Rmd", "references.Rmd", "output/document_summaries.csv", "output/single-cell.csv", "output/suppfilenames.rds", "output/suppfilenames_filtered.rds", "output/gsem.rds", "output/suppdata.rds", "output/publications.csv", "output/scopus_citedbycount.csv"
   output: "_main.html"
   singularity: SIMG
   shell:
