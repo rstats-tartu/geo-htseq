@@ -174,10 +174,10 @@ get_pvalues_basemean <- function(x){
   
   x <- x[colns]
   
-  # Now convert column names to lower case
+  # Convert column names to lower case
   colnames(x) <- stringr::str_to_lower(colnames(x))
   
-  pval_regexp <- "p[:punct:]*[:space:]*[:punct:]*[:space:]*val"
+  pval_regexp <- "p.*val"
   pval_col <- stringr::str_detect(colnames(x), pval_regexp) & !stringr::str_detect(colnames(x), "adj|fdr|corr")
   
   # Return NULL if P values not present
@@ -205,8 +205,7 @@ get_pvalues_basemean <- function(x){
   
   # Select only basemean and pvalue columns
   ## changed regexp as matches does not seem to work with named classes with [], eg [:punct:]
-  pval_regexp2 <- "p( )*(.)*(_)*( )*(.)*(_)*val"
-  x <- dplyr::select(x, matches(paste0("bmean|^", pval_regexp2)))
+  x <- dplyr::select(x, matches(paste0("bmean|^", pval_regexp)))
   
   # Rename pvalue column
   colnames(x)[stringr::str_detect(colnames(x), pval_regexp)] <- "pvalue"
@@ -261,5 +260,5 @@ munge_geo_pvalue <- function(suppfile, n_head = 100) {
   }
   
   ## Collect data into data_frame
-  dplyr::data_frame(sheets, heads, pvalues, features, columns)
+  dplyr::tibble(sheets, heads, pvalues, features, columns)
 }
