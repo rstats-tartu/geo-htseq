@@ -135,6 +135,17 @@ check_pvalues <- function(x) {
   all(x >= 0 & x <= 1)
   }
 
+
+summarise_expression <- function(x, type = c("basemean", "value", "logcpm", "rpkm"), prex) {
+  type <- match.arg(type, several.ok = TRUE)
+  pvalue <- dplyr::select(x, prex)
+  cols <- map(type, ~ dplyr::select(x, dplyr::matches(ifelse(.x == "value", "^value_\\d", .x))))
+  summaries <- map2_dfc(type, cols, ~ .y %>% 
+                          transmute(!! .x := rowMeans(., na.rm = TRUE)))
+  bind_cols(pvalue, summaries) %>% 
+    map_dfc(~ ifelse(is.nan(.x), NA_real_, .x))
+}  
+
 # get_pvalues_basemean ----------------------------------------------------
 #' Extract p value and when available basemean columns from geo data frames.
 #' @description Function tries to identify and subscript raw p value and base mean columns from data frame. When multiple basemean columns are detected, function calculates rowmeans.
@@ -198,25 +209,11 @@ get_pvalues_basemean <- function(x){
     stop("Detected P values not in 0 to 1 range or truncated!")
   }
   
-  # Summarise multiple basemean columns
-  if (any(stringr::str_detect(colns, "base[Mm]ean"))) {
-    x <- dplyr::mutate(x, bmean = rowMeans(dplyr::select(x, dplyr::matches("base[Mm]ean"))))
-  }
-  
-  # Select only basemean and pvalue columns
-  ## changed regexp as matches does not seem to work with named classes with [], eg [:punct:]
-  x <- dplyr::select(x, matches(paste0("bmean|^", pval_regexp)))
-  
   # Rename pvalue column
   colnames(x)[stringr::str_detect(colnames(x), pval_regexp)] <- "pvalue"
   
-  # Rename basemean column
-  if (any(stringr::str_detect(colnames(x), "bmean"))) {
-    colnames(x)[stringr::str_detect(colnames(x), "bmean")] <- "basemean"
-  } else {
-    x$basemean <- NA
-  }
-  return(x)
+  # Summarise multiple basemean columns
+  summarise_expression(x, c("basemean", "value", "logcpm", "rpkm"), "pvalue")
 }
 
 #' munge_geo function ------------------------------------------------------
