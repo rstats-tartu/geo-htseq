@@ -18,8 +18,8 @@ rule geo_query:
     api_key = os.environ["NCBI_APIKEY"],
     query = QUERY,
     db = "gds",
-    retmax = 30000,
-    batch_size = 200
+    retmax = 200,
+    batch_size = 1
   conda:
     "envs/geo-query.yaml"
   script:
@@ -164,7 +164,8 @@ rule download_publications:
   params: 
     email = EMAIL,
     api_key = os.environ["NCBI_APIKEY"]
-  singularity: SIMG
+  conda:
+    "envs/geo-query.yaml"
   script:
     "scripts/preprocess/download_publications.py"
 
@@ -172,15 +173,15 @@ rule download_publications:
 # Download citations
 rule download_citations:
   input: 
-    pubs = "output/publications.csv", 
-    document_summaries = "output/document_summaries.csv"
-  output: "output/scopus_citedbycount.csv"
-  params: 
-    last_date = LAST_DATE,
+    "output/publications.csv"
+  output: 
+    "output/scopus_citedbycount.csv"
+  params:
     api_key = os.environ["ELSEVIER_GEOSEQ"]
-  singularity: SIMG
+  conda:
+    "envs/geo-query.yaml"
   script:
-    "scripts/preprocess/download_scopus_citations.R"
+    "scripts/preprocess/download_scopus_citations.py"
 
 
 # Knit report
