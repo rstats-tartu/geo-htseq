@@ -2,7 +2,7 @@ import os
 SIMG = "shub://tpall/geo-rnaseq"
 LAST_DATE = "2018-12-31"
 QUERY = 'expression profiling by high throughput sequencing[DataSet Type] AND ("2000-01-01"[PDAT] : "{}"[PDAT])'.format(LAST_DATE)
-
+EMAIL = "taavi.pall@ut.ee"
 
 rule all:
   input: "output/gsem.rds", "output/suppdata.rds", "_main.html"
@@ -14,7 +14,7 @@ rule geo_query:
   output: 
     "output/document_summaries.csv"
   params:
-    email = "taavi.pall@ut.ee",
+    email = EMAIL,
     api_key = os.environ["NCBI_APIKEY"],
     query = QUERY,
     db = "gds",
@@ -31,7 +31,7 @@ rule single_cell:
   output: 
     "output/single-cell.csv"
   params:
-    email = "taavi.pall@ut.ee",
+    email = EMAIL,
     api_key = os.environ["NCBI_APIKEY"],
     query = QUERY + ' AND "single-cell"[All Fields]',
     db = "gds",
@@ -162,10 +162,11 @@ rule download_publications:
   input: rules.geo_query.output
   output: "output/publications.csv"
   params: 
-    last_date = LAST_DATE
+    email = EMAIL,
+    api_key = os.environ["NCBI_APIKEY"]
   singularity: SIMG
   script:
-    "scripts/preprocess/download_publications.R"
+    "scripts/preprocess/download_publications.py"
 
 
 # Download citations
