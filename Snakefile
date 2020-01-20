@@ -92,9 +92,10 @@ rule download_suppfiles:
     rules.filter_suppfilenames.output
   output: 
     touch("output/downloading_suppfiles_{k}.done")
-  singularity: SIMG
+  conda:
+    "envs/geo-query.yaml"
   script:
-    "scripts/preprocess/download_suppfiles.R"
+    "scripts/preprocess/download_suppfiles.py"
 
 
 # Parse series matrix files
