@@ -79,10 +79,11 @@ rule filter_suppfilenames:
   input: 
     rules.download_suppfilenames.output
   output: 
-    "output/suppfilenames_filtered_{k}.rds"
-  singularity: SIMG
+    "output/tmp/suppfilenames_filtered_{k}.txt"
+  conda:
+    "envs/geo-query.yaml"
   script:
-    "scripts/preprocess/filter_suppfilenames.R"
+    "scripts/preprocess/filter_suppfilenames.py"
 
 
 # Download filterd supplementary files
