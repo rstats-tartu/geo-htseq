@@ -4,8 +4,13 @@ LAST_DATE = "2018-12-31"
 QUERY = 'expression profiling by high throughput sequencing[DataSet Type] AND ("2000-01-01"[PDAT] : "{}"[PDAT])'.format(LAST_DATE)
 EMAIL = "taavi.pall@ut.ee"
 
+K = 10
+N = 10
 rule all:
-  input: "output/gsem.rds", "output/suppdata.rds", "_main.html"
+  input: 
+    expand("output/gsem_{k}.rds", k = list(range(0, K, 1))), 
+    "output/suppdata.rds", 
+    "_main.html"
 
 
 # Queries HT-seq expression profiling experiments
@@ -43,17 +48,30 @@ rule single_cell:
     "scripts/preprocess/geo_query.py"
 
 
+# Split GEO document summaries
+rule split_document_summaries:
+  input:
+    rules.geo_query.output
+  output:
+    expand("output/tmp/document_summaries_{k}.csv", k = list(range(0, K, 1)))
+  params:
+    chunks = K
+  conda:
+    "envs/geo-query.yaml"
+  script:
+    "scripts/preprocess/split_document_summaries.py"
+
+
 # Download supplementary file names
 rule download_suppfilenames:
   input: 
-    rules.geo_query.output
+    "output/tmp/document_summaries_{k}.csv"
   output: 
-    "output/suppfilenames.rds"
-  params: 
-    last_date = LAST_DATE
-  singularity: SIMG
+    "output/tmp/suppfilenames_{k}.txt"
+  conda:
+    "envs/geo-query.yaml"
   script:
-    "scripts/preprocess/download_suppfilenames.R"
+    "scripts/preprocess/download_suppfilenames.py"
 
 
 # Filter supplementary file names by filename extension
@@ -61,7 +79,7 @@ rule filter_suppfilenames:
   input: 
     rules.download_suppfilenames.output
   output: 
-    "output/suppfilenames_filtered.rds"
+    "output/suppfilenames_filtered_{k}.rds"
   singularity: SIMG
   script:
     "scripts/preprocess/filter_suppfilenames.R"
@@ -72,7 +90,7 @@ rule download_suppfiles:
   input: 
     rules.filter_suppfilenames.output
   output: 
-    touch("output/downloading_suppfiles.done")
+    touch("output/downloading_suppfiles_{k}.done")
   singularity: SIMG
   script:
     "scripts/preprocess/download_suppfiles.R"
@@ -83,7 +101,7 @@ rule series_matrixfiles:
   input: 
     rules.download_suppfiles.output
   output: 
-    "output/gsem.rds"
+    "output/gsem_{k}.rds"
   singularity: SIMG
   script:
     "scripts/preprocess/series_matrixfiles.R"
@@ -120,13 +138,12 @@ BAD = ["GSE93374_Merged_all_020816_DGE.txt.gz",
 
 
 # Split list of supplementary files to chunks for parsing
-n_files = list(range(1, 101, 1))
 rule split_suppfiles:
   input:
     suppfilenames_filtered = rules.filter_suppfilenames.output, 
     gsem = rules.series_matrixfiles.output
   output: 
-    temp(expand("output/tmp/supptabs_{n}.rds", n = n_files))
+    temp(expand("output/tmp/supptabs_{{k}}-{n}.rds", n = list(range(0, N, 1))))
   params:
     bad = BAD
   singularity: SIMG
@@ -137,9 +154,9 @@ rule split_suppfiles:
 # Import supplementary data
 rule import_suppfiles:
   input: 
-    "output/tmp/supptabs_{n}.rds"
+    "output/tmp/supptabs_{k}-{n}.rds"
   output: 
-    temp("output/tmp/suppdata_{n}.rds")
+    temp("output/tmp/suppdata_{k}-{n}.rds")
   params:
     bad = BAD
   singularity: SIMG
@@ -150,7 +167,7 @@ rule import_suppfiles:
 # Merge chunks
 rule merge_suppdata:
   input: 
-    expand("output/tmp/suppdata_{n}.rds", n = n_files)
+    expand("output/tmp/suppdata_{k}-{n}.rds", k = list(range(0, K, 1)), n = list(range(0, N, 1)))
   output: "output/suppdata.rds"
   singularity: SIMG
   script:
