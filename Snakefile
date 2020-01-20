@@ -8,7 +8,9 @@ K = 10
 N = 10
 rule all:
   input: 
-    expand("output/gsem_{k}.rds", k = list(range(0, K, 1))), 
+    "output/document_summaries.csv",
+    "output/single-cell.csv",
+    expand(["output/tmp/suppfilenames_filtered_{k}.txt", "output/tmp/suppfilenames_{k}.txt", "output/gsem_{k}.rds"], k = list(range(0, K, 1))), 
     "output/suppdata.rds", 
     "_main.html"
 
