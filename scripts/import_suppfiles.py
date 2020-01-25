@@ -114,7 +114,7 @@ def summarise_pvalue_tables(df):
             e = "^value_\d"
         frames = df.filter(regex=e, axis=1).mean(axis=1, skipna=True)
         pvalues.loc[:, label] = frames
-    return pvalues
+    return pvalues.dropna(how="all")
 
 
 dir = "output/suppl/"
@@ -136,4 +136,4 @@ for input in suppfiles:
 
 for k, v in out.items():
     print("Table: ", k)
-    print(v.head())
+    print(v)
