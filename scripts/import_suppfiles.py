@@ -11,7 +11,8 @@ keep = "|".join(
 )
 keep = re.compile(keep)
 gse = re.compile("GSE\d+_")
-pv = re.compile("p.*val")
+pv_str = "p.{0,4}val"
+pv = re.compile(pv_str)
 adj = re.compile("adj|fdr|corr")
 
 
@@ -94,8 +95,26 @@ def import_flat(path):
     return out
 
 
-def filter_pvalue_tables(input, pv=None):
-    return {k: v for k, v in input.items() if any([pv.search(i) for i in v.columns])}
+def filter_pvalue_tables(input, pv=None, adj=None):
+    return {
+        k: v
+        for k, v in input.items()
+        if any([bool(pv.search(i) and not adj.search(i)) for i in v.columns])
+    }
+
+
+def summarise_pvalue_tables(df):
+    expr = ["basemean", "value", "logcpm", "rpkm"]
+    df.columns = map(str.lower, df.columns)
+    pvalues = df.filter(regex=pv_str).copy()
+    pvalues.columns = ["pvalue"]
+    for e in expr:
+        label = e
+        if e is "value":
+            e = "^value_\d"
+        frames = df.filter(regex=e, axis=1).mean(axis=1, skipna=True)
+        pvalues.loc[:, label] = frames
+    return pvalues
 
 
 dir = "output/suppl/"
@@ -107,9 +126,13 @@ for input in suppfiles:
     print("Working on: ", input)
     path = dir + input
     if path.endswith("tar.gz"):
-        out.update(filter_pvalue_tables(import_tar(path), pv))
+        dfs = filter_pvalue_tables(import_tar(path), pv, adj)
+        dfsums = {k: summarise_pvalue_tables(v) for k, v in dfs.items()}
+        out.update(dfsums)
     else:
-        out.update(filter_pvalue_tables(import_flat(path), pv))
+        dfs = filter_pvalue_tables(import_flat(path), pv, adj)
+        dfsums = {k: summarise_pvalue_tables(v) for k, v in dfs.items()}
+        out.update(dfsums)
 
 for k, v in out.items():
     print("Table: ", k)
