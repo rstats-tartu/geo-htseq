@@ -12,6 +12,7 @@ keep = "|".join(
 keep = re.compile(keep)
 gse = re.compile("GSE\d+_")
 pv = re.compile("p.*val")
+adj = re.compile("adj|fdr|corr")
 
 def find_header(df, n=20):
     head = df.head(n)
