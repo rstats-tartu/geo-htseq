@@ -14,6 +14,7 @@ gse = re.compile("GSE\d+_")
 pv = re.compile("p.*val")
 adj = re.compile("adj|fdr|corr")
 
+
 def find_header(df, n=20):
     head = df.head(n)
     idx = 0
@@ -93,6 +94,10 @@ def import_flat(path):
     return out
 
 
+def filter_pvalue_tables(input, pv=None):
+    return {k: v for k, v in input.items() if any([pv.search(i) for i in v.columns])}
+
+
 dir = "output/suppl/"
 suppfiles = os.listdir(dir)
 # path = "/Users/taavi/Downloads/GSE0_test.tar.gz"
@@ -102,9 +107,9 @@ for input in suppfiles:
     print("Working on: ", input)
     path = dir + input
     if path.endswith("tar.gz"):
-        out.update(import_tar(path))
+        out.update(filter_pvalue_tables(import_tar(path), pv))
     else:
-        out.update(import_flat(path))
+        out.update(filter_pvalue_tables(import_flat(path), pv))
 
 for k, v in out.items():
     print("Table: ", k)
