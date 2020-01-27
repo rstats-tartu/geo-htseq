@@ -103,37 +103,98 @@ def filter_pvalue_tables(input, pv=None, adj=None):
     }
 
 
-def summarise_pvalue_tables(df):
-    expr = ["basemean", "value", "logcpm", "rpkm"]
+def summarise_pvalue_tables(df, var=["basemean", "value", "logcpm", "rpkm"]):
     df.columns = map(str.lower, df.columns)
     pvalues = df.filter(regex=pv_str).copy()
     pvalues.columns = ["pvalue"]
-    for e in expr:
-        label = e
-        if e is "value":
-            e = "^value_\d"
-        frames = df.filter(regex=e, axis=1).mean(axis=1, skipna=True)
-        pvalues.loc[:, label] = frames
-    return pvalues.dropna(how="all")
+    for v in var:
+        label = v
+        if v is "value":
+            v = "^value_\d"
+            label = "fpkm"
+        frames = df.filter(regex=v, axis=1)
+        if not frames.empty:
+            frames = frames.mean(axis=1, skipna=True)
+            pvalues.loc[:, label] = frames
+    return pvalues.dropna(subset=["pvalue"])
+
+
+# https://stackoverflow.com/a/32681075/1657871
+def rle(inarray):
+    """ run length encoding. Partial credit to R rle function. 
+            Multi datatype arrays catered for including non Numpy
+            returns: tuple (runlengths, startpositions, values) """
+    ia = np.asarray(inarray)  # force numpy
+    n = len(ia)
+    if n == 0:
+        return (None, None, None)
+    else:
+        y = np.array(ia[1:] != ia[:-1])  # pairwise unequal (string safe)
+        i = np.append(np.where(y), n - 1)  # must include last element posi
+        z = np.diff(np.append(-1, i))  # run lengths
+        p = np.cumsum(np.append(0, z))[:-1]  # positions
+        return (z, p, ia[i])
+
+
+def get_hist_class(counts, breaks, fdr):
+    qc = binom.ppf(1 - 1 / breaks * fdr, sum(counts), 1 / breaks)
+    counts_over_qc = counts > qc
+    for i in counts_over_qc:
+        if all(~counts_over_qc):
+            Class = "uniform"
+        elif not any(counts_over_qc[rle(counts_over_qc)[0][0] + 2 :]):
+            Class = "anti-conservative"
+        elif not any(np.flip(counts_over_qc)[rle(np.flip(counts_over_qc))[0][0] + 2 :]):
+            Class = "conservative"
+        else:
+            Class = "other"
+    return Class
+
+
+
+def summarise_pvalues(
+    df,
+    breaks=30,
+    fdr=0.05,
+    var={"basemean": 10, "fpkm": 0.5, "logcpm": -0.3, "rpkm": 0.5},
+):
+    bins = np.linspace(0, 1, breaks)
+    center = (bins[:-1] + bins[1:]) / 2
+    # Filter pvalues
+    pf = pd.DataFrame()
+    for k, v in var.items():
+        if k in df.columns:
+            pf = df.loc[df[k] >= v, ["pvalue"]]
+            break
+    # Make histogram
+    hists = [np.histogram(i["pvalue"], bins=bins) for i in [df, pf] if not i.empty]
+    counts = [counts for (counts, bins) in hists]
+    # Assign class to histograms
+    Class = [get_hist_class(i, breaks, fdr) for i in counts]
+    # Calculate pi0
+
+
+def write_to_csv(input, outpath):
+    for k, v in input.items():
+        v.to_csv(outpath + k + ".csv", sep=",", index=False)
 
 
 dir = "output/suppl/"
 suppfiles = os.listdir(dir)
 # path = "/Users/taavi/Downloads/GSE0_test.tar.gz"
 
-out = {}
+
 for input in suppfiles:
     print("Working on: ", input)
     path = dir + input
     if path.endswith("tar.gz"):
-        dfs = filter_pvalue_tables(import_tar(path), pv, adj)
-        dfsums = {k: summarise_pvalue_tables(v) for k, v in dfs.items()}
-        out.update(dfsums)
+        frames = import_tar(path)
     else:
-        dfs = filter_pvalue_tables(import_flat(path), pv, adj)
-        dfsums = {k: summarise_pvalue_tables(v) for k, v in dfs.items()}
-        out.update(dfsums)
+        frames = import_flat(path)
+    frames = filter_pvalue_tables(frames, pv, adj)
+    frames = {k: summarise_pvalue_tables(v) for k, v in frames.items()}
+    write_to_csv(frames, "output/tmp/imported/")
 
-for k, v in out.items():
-    print("Table: ", k)
-    print(v)
+# for k, v in out.items():
+#     print("Table: ", k)
+#     print(v)
