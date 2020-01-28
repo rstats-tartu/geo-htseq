@@ -237,14 +237,6 @@ def estimate_pi0(
     return pi0
 
 
-# https://stackoverflow.com/a/47626762/1657871
-class NumpyEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return json.JSONEncoder.default(self, obj)
-
-
 def conversion(x, y):
     classes = pd.DataFrame.from_dict(
         {
@@ -273,14 +265,17 @@ def summarise_pvalues(
     df,
     breaks=30,
     fdr=0.05,
-    var={"basemean": 10, "fpkm": 0.5, "logcpm": -0.3, "rpkm": 0.5},
+    var={"basemean": 10, "fpkm": 0.5, "logcpm": np.log10(0.5), "rpkm": 0.5},
 ):
+    # Test if pvalues are in 0 to 1 range
     if not df.min()["pvalue"] >= 0 and df.max()["pvalue"] <= 1:
         return {
-            "Class": np.nan,
-            "pi0": np.nan,
-            "hist": json.dumps(()),
-            "note": "p-values should be between 0 and 1",
+            "Class": [np.nan],
+            "Conversion": np.nan,
+            "pi0": [np.nan],
+            "pvalues < FDR": [np.nan],
+            "hist": [],
+            "note": "p-values not in 0 to 1 range",
         }
     bins = np.linspace(0, 1, breaks)
     center = (bins[:-1] + bins[1:]) / 2
@@ -289,17 +284,31 @@ def summarise_pvalues(
     for k, v in var.items():
         if k in df.columns:
             pf = df.loc[df[k] >= v, ["pvalue"]]
+            filt = k
             break
     # Make histogram
     pv_sets = [i for i in [df, pf] if not i.empty]
     hists = [np.histogram(i["pvalue"], bins=bins) for i in pv_sets]
     counts = [counts.tolist() for (counts, bins) in hists]
+    # Test if p-values are truncated
+    truncated = rle([i == 0 for i in counts[0]])[1][-1] > 0
+    if truncated:
+        return {
+            "Class": [np.nan],
+            "Conversion": np.nan,
+            "pi0": [np.nan],
+            "pvalues < FDR": [np.nan],
+            "hist": [],
+            "note": "p-values are truncated",
+        }
     # Assign class to histograms
     Class = [get_hist_class(i, breaks, fdr) for i in counts]
     # Conversion
+    Type = ["raw"]
     conv = np.nan
-    if len(Class)== 2:
+    if len(Class) == 2:
         conv = conversion(Class[0], Class[1])
+        Type = ["raw", filt]
     # Calculate pi0
     pi0 = []
     for i, c in zip(pv_sets, Class):
@@ -308,12 +317,16 @@ def summarise_pvalues(
             pi0.append(pi0_est.item())
         else:
             pi0.append(np.nan)
+    # Number of effects < FDR
+    fdr_effects = [sum(i["pvalue"] < fdr) for i in pv_sets]
     return {
+        "Type": Type,
         "Class": Class,
         "Conversion": conv,
         "pi0": pi0,
+        "pvalues < FDR": fdr_effects,
         "hist": counts,
-        "notes": np.nan,
+        "note": np.nan,
     }
 
 
@@ -326,7 +339,7 @@ dir = "output/suppl/"
 suppfiles = os.listdir(dir)
 # path = "/Users/taavi/Downloads/GSE0_test.tar.gz"
 
-
+out = {}
 for input in suppfiles:
     print("Working on: ", input)
     path = dir + input
@@ -338,9 +351,13 @@ for input in suppfiles:
     frames = {k: summarise_pvalue_tables(v) for k, v in frames.items()}
     pv_stats = {k: summarise_pvalues(v) for k, v in frames.items()}
     for k, v in pv_stats.items():
-        print(k, ": ", v)
+        key = re.sub(r"^.*-(sheet-.*)", r"\1", k) + " from " + input
+        if k == input:
+            key = k
+        out.update({key: pd.DataFrame(v)})
     write_to_csv(frames, "output/tmp/imported/")
 
-# for k, v in out.items():
-#     print("Table: ", k)
-#     print(v)
+result = pd.concat(
+    [df for df in out.values()], keys=[k for k in out.keys()], names=["id"]
+)
+result.reset_index(level="id").to_csv("output/tmp/result.csv", index=False)
