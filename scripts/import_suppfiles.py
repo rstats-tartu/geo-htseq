@@ -1,13 +1,15 @@
-import pandas as pd
 import os
 import re
 import gzip
 import tarfile
 import io
-import numpy as np
 import scipy
+import collections
+import pandas as pd
+import numpy as np
 from scipy.stats import binom
-import json
+import argparse
+
 
 xls = re.compile("xls")
 keep = "|".join(
@@ -18,6 +20,8 @@ gse = re.compile("GSE\d+_")
 pv_str = "p.{0,4}val"
 pv = re.compile(pv_str)
 adj = re.compile("adj|fdr|corr")
+fields = ["Type", "Class", "Conversion", "pi0", "FDR_pval", "hist", "note"]
+PValSum = collections.namedtuple("PValSum", fields, defaults=[np.nan] * 7)
 
 
 def find_header(df, n=20):
@@ -83,7 +87,7 @@ def import_tar(path):
                             else:
                                 out.update(read_csv(member, tar))
                         except Exception as e:
-                            print("Error: ", e)
+                            out.update(note(gse.search(tar.name).group(0) + member.name.replace("/", "_"), e))
     return out
 
 
@@ -95,7 +99,7 @@ def import_flat(path):
         else:
             out.update(read_csv(path))
     except Exception as e:
-        print("Error: ", e)
+        out.update(note(os.path.basename(path), e))
     return out
 
 
@@ -103,7 +107,7 @@ def filter_pvalue_tables(input, pv=None, adj=None):
     return {
         k: v
         for k, v in input.items()
-        if any([bool(pv.search(i) and not adj.search(i)) for i in v.columns])
+        if any([bool(pv.search(i.lower()) and not adj.search(i.lower())) for i in v.columns])
     }
 
 
@@ -265,18 +269,11 @@ def summarise_pvalues(
     df,
     breaks=30,
     fdr=0.05,
-    var={"basemean": 10, "fpkm": 0.5, "logcpm": np.log10(0.5), "rpkm": 0.5},
+    var={"basemean": 10, "fpkm": 0.5, "logcpm": np.log2(0.5), "rpkm": 0.5},
 ):
     # Test if pvalues are in 0 to 1 range
     if not df.min()["pvalue"] >= 0 and df.max()["pvalue"] <= 1:
-        return {
-            "Class": [np.nan],
-            "Conversion": np.nan,
-            "pi0": [np.nan],
-            "pvalues < FDR": [np.nan],
-            "hist": [],
-            "note": "p-values not in 0 to 1 range",
-        }
+        return PValSum(note="p-values not in 0 to 1 range")
     bins = np.linspace(0, 1, breaks)
     center = (bins[:-1] + bins[1:]) / 2
     # Filter pvalues
@@ -293,14 +290,7 @@ def summarise_pvalues(
     # Test if p-values are truncated
     truncated = rle([i == 0 for i in counts[0]])[1][-1] > 0
     if truncated:
-        return {
-            "Class": [np.nan],
-            "Conversion": np.nan,
-            "pi0": [np.nan],
-            "pvalues < FDR": [np.nan],
-            "hist": [],
-            "note": "p-values are truncated",
-        }
+        return PValSum(note="p-values are truncated")
     # Assign class to histograms
     Class = [get_hist_class(i, breaks, fdr) for i in counts]
     # Conversion
@@ -319,15 +309,7 @@ def summarise_pvalues(
             pi0.append(np.nan)
     # Number of effects < FDR
     fdr_effects = [sum(i["pvalue"] < fdr) for i in pv_sets]
-    return {
-        "Type": Type,
-        "Class": Class,
-        "Conversion": conv,
-        "pi0": pi0,
-        "pvalues < FDR": fdr_effects,
-        "hist": counts,
-        "note": np.nan,
-    }
+    return PValSum(Type, Class, conv, pi0, fdr_effects, counts)
 
 
 def write_to_csv(input, outpath):
@@ -335,29 +317,84 @@ def write_to_csv(input, outpath):
         v.to_csv(outpath + k + ".csv", sep=",", index=False)
 
 
-dir = "output/suppl/"
-suppfiles = os.listdir(dir)
-# path = "/Users/taavi/Downloads/GSE0_test.tar.gz"
+def note(filename, text):
+    return {filename: pd.DataFrame(PValSum(note=text)._asdict(), index=[0])}
 
-out = {}
-for input in suppfiles:
-    print("Working on: ", input)
-    path = dir + input
-    if path.endswith("tar.gz"):
-        frames = import_tar(path)
-    else:
-        frames = import_flat(path)
-    frames = filter_pvalue_tables(frames, pv, adj)
-    frames = {k: summarise_pvalue_tables(v) for k, v in frames.items()}
-    pv_stats = {k: summarise_pvalues(v) for k, v in frames.items()}
-    for k, v in pv_stats.items():
-        key = re.sub(r"^.*-(sheet-.*)", r"\1", k) + " from " + input
-        if k == input:
-            key = k
-        out.update({key: pd.DataFrame(v)})
-    write_to_csv(frames, "output/tmp/imported/")
+if __name__ == "__main__":
 
-result = pd.concat(
-    [df for df in out.values()], keys=[k for k in out.keys()], names=["id"]
-)
-result.reset_index(level="id").to_csv("output/tmp/result.csv", index=False)
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--file", nargs="+", help="path to input file to be parsed")
+    group.add_argument(
+        "--list",
+        metavar="FILE",
+        type=argparse.FileType("r"),
+        help="file with paths to input files, one per line",
+    )
+    parser.add_argument(
+        "out", type=argparse.FileType("w", encoding="UTF-8"), help="output file"
+    )
+    parser.add_argument(
+        "--vars",
+        metavar="KEY=VALUE",
+        nargs="*",
+        default=["basemean=10", "fpkm=0.5", "logcpm=-0.3", "rpkm=0.5"],
+        help="variables for expression level filtering. Input 'key=value' pairs without spaces around equation mark",
+    )
+    parser.add_argument(
+        "--breaks",
+        type=int,
+        default=30,
+        help="number of histogram bins, integer, default is 30",
+    )
+    parser.add_argument(
+        "--fdr",
+        type=float,
+        default=0.05,
+        help="false discovery rate, float, default is 0.05",
+    )
+    args = parser.parse_args()
+    var = dict(map(lambda s: s.split("="), args.vars))
+    VAR = {k: float(v) for k, v in var.items()}
+    BREAKS = args.breaks
+    FDR = args.fdr
+
+    if args.file:
+        input = args.file
+    elif args.list:
+        input = []
+        with args.list as f:
+            for line in f:
+                input.append(line.rstrip())
+
+    out = {}
+    for path in input:
+        filename = os.path.basename(path)
+        if path.endswith("tar.gz"):
+            frames = import_tar(path)
+        else:
+            frames = import_flat(path)
+        out.update({k: v for k, v in frames.items() if "note" in v.columns})
+        frames = filter_pvalue_tables(frames, pv, adj)
+        if len(frames) == 0:
+            out.update(note(filename, "no pvalues"))
+        else:
+            frames = {
+                k: summarise_pvalue_tables(v, var=VAR.keys()) for k, v in frames.items()
+            }
+            pv_stats = {
+                k: summarise_pvalues(v, breaks=BREAKS, fdr=FDR, var=VAR)
+                for k, v in frames.items()
+            }
+            for k, v in pv_stats.items():
+                key = re.sub(r"^.*-(sheet-.*)", r"\1", k) + " from " + filename
+                if k == filename:
+                    key = k
+                out.update({key: pd.DataFrame.from_dict(v._asdict())})
+
+    # print(pd.DataFrame.from_dict({k: v._asdict() for k,v in out.items()}, orient="index").reset_index().rename(columns = {"index": "id"}))
+    result = pd.concat(
+        [df for df in out.values()], keys=[k for k in out.keys()], names=["id"]
+    )
+    print(result)
+    result.reset_index(level="id").to_csv(args.out, index=False)
