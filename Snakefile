@@ -25,8 +25,8 @@ rule geo_query:
     api_key = os.environ["NCBI_APIKEY"],
     query = QUERY,
     db = "gds",
-    retmax = 200,
-    batch_size = 1
+    retmax = 30000,
+    batch_size = 100
   conda:
     "envs/geo-query.yaml"
   script:
