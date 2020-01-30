@@ -5,10 +5,11 @@ import tarfile
 import io
 import scipy
 import collections
+import argparse
 import pandas as pd
 import numpy as np
 from scipy.stats import binom
-import argparse
+from pandas.api.types import is_string_dtype
 
 
 xls = re.compile("xls")
@@ -126,6 +127,8 @@ def summarise_pvalue_tables(df, var=["basemean", "value", "fpkm", "logcpm", "rpk
     df.columns = map(str.lower, df.columns)
     pvalues = df.filter(regex=pv_str).copy()
     pvalues.columns = ["pvalue"]
+    if is_string_dtype(pvalues["pvalue"]):
+        pvalues["pvalue"] = pd.to_numeric(pvalues["pvalue"], errors="coerce")
     for v in var:
         label = v
         if v is "value":
@@ -133,6 +136,9 @@ def summarise_pvalue_tables(df, var=["basemean", "value", "fpkm", "logcpm", "rpk
             label = "fpkm"
         frames = df.filter(regex=v, axis=1)
         if not frames.empty:
+            for col in frames.columns:
+                if is_string_dtype(frames[col]):
+                    frames[col] = pd.to_numeric(frames[col], errors="coerce")
             frames = frames.mean(axis=1, skipna=True)
             pvalues.loc[:, label] = frames
     return pvalues.dropna(subset=["pvalue"])
@@ -285,7 +291,9 @@ def summarise_pvalues(
 ):
     # Test if pvalues are in 0 to 1 range
     if not df.min()["pvalue"] >= 0 and df.max()["pvalue"] <= 1:
-        return PValSum(note="p-values not in 0 to 1 range")
+        return pd.DataFrame(
+            PValSum(note="p-values not in 0 to 1 range")._asdict(), index=[0]
+        )
     breaks = np.linspace(0, 1, bins)
     center = (breaks[:-1] + breaks[1:]) / 2
     # Filter pvalues
@@ -302,7 +310,7 @@ def summarise_pvalues(
     # Test if p-values are truncated
     truncated = rle([i == 0 for i in counts[0]])[1][-1] > 0
     if truncated:
-        return PValSum(note="p-values are truncated")
+        return pd.DataFrame(PValSum(note="p-values are truncated")._asdict(), index=[0])
     # Assign class to histograms
     Class = [get_hist_class(i, fdr) for i in counts]
     # Conversion
@@ -321,7 +329,7 @@ def summarise_pvalues(
             pi0.append(np.nan)
     # Number of effects < FDR
     fdr_effects = [sum(i["pvalue"] < fdr) for i in pv_sets]
-    return PValSum(Type, Class, conv, pi0, fdr_effects, counts)
+    return pd.DataFrame(PValSum(Type, Class, conv, pi0, fdr_effects, counts)._asdict())
 
 
 def write_to_csv(input, outpath):
@@ -371,6 +379,9 @@ if __name__ == "__main__":
         default=0.05,
         help="false discovery rate, float, default is 0.05",
     )
+    parser.add_argument(
+        "-v", "--verbose", help="increase output verbosity", action="store_true"
+    )
     args = parser.parse_args()
     var = dict(map(lambda s: s.split("="), args.vars))
     VAR = {k: float(v) for k, v in var.items()}
@@ -388,6 +399,8 @@ if __name__ == "__main__":
 
     out = {}
     for path in input:
+        if args.verbose:
+            print("Working on ", path)
         filename = os.path.basename(path)
         if path.endswith("tar.gz"):
             frames = import_tar(path)
@@ -408,13 +421,16 @@ if __name__ == "__main__":
                 k: summarise_pvalue_tables(v, var=VAR.keys()) for k, v in frames.items()
             }
             pv_stats = {
-                k: summarise_pvalues(v, bins=BINS, fdr=FDR, var={k: v for k, v in VAR.items() if "value" not in k})
+                k: summarise_pvalues(
+                    v,
+                    bins=BINS,
+                    fdr=FDR,
+                    var={k: v for k, v in VAR.items() if "value" not in k},
+                )
                 for k, v in frames.items()
             }
             for k, v in pv_stats.items():
-                out.update(
-                    {parse_key(k, filename): pd.DataFrame.from_dict(v._asdict())}
-                )
+                out.update({parse_key(k, filename): v})
 
     result = pd.concat(
         [df for df in out.values()], keys=[k for k in out.keys()], names=["id"]
