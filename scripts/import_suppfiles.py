@@ -1,4 +1,5 @@
 import os
+import sys
 import re
 import gzip
 import tarfile
@@ -10,6 +11,7 @@ import pandas as pd
 import numpy as np
 from scipy.stats import binom
 from pandas.api.types import is_string_dtype
+from pathlib import Path
 
 
 xls = re.compile("xls")
@@ -397,6 +399,11 @@ if __name__ == "__main__":
             for line in f:
                 input.append(line.rstrip())
 
+    # Keep only inputs that exist
+    input = [i for i in input if os.path.isfile(i)]
+    if len(input) == 0:
+        Path(args.out).touch()
+        sys.exit()
     out = {}
     for path in input:
         if args.verbose:
