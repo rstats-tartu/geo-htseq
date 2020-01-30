@@ -87,7 +87,13 @@ def import_tar(path):
                             else:
                                 out.update(read_csv(member, tar))
                         except Exception as e:
-                            out.update(note(gse.search(tar.name).group(0) + member.name.replace("/", "_"), e))
+                            out.update(
+                                note(
+                                    gse.search(tar.name).group(0)
+                                    + member.name.replace("/", "_"),
+                                    e,
+                                )
+                            )
     return out
 
 
@@ -107,11 +113,16 @@ def filter_pvalue_tables(input, pv=None, adj=None):
     return {
         k: v
         for k, v in input.items()
-        if any([bool(pv.search(i.lower()) and not adj.search(i.lower())) for i in v.columns])
+        if any(
+            [
+                bool(pv.search(i.lower()) and not adj.search(i.lower()))
+                for i in v.columns
+            ]
+        )
     }
 
 
-def summarise_pvalue_tables(df, var=["basemean", "value", "logcpm", "rpkm"]):
+def summarise_pvalue_tables(df, var=["basemean", "value", "fpkm", "logcpm", "rpkm"]):
     df.columns = map(str.lower, df.columns)
     pvalues = df.filter(regex=pv_str).copy()
     pvalues.columns = ["pvalue"]
@@ -144,8 +155,9 @@ def rle(inarray):
         return (z, p, ia[i])
 
 
-def get_hist_class(counts, breaks, fdr):
-    qc = binom.ppf(1 - 1 / breaks * fdr, sum(counts), 1 / breaks)
+def get_hist_class(counts, fdr):
+    bins = len(counts)
+    qc = binom.ppf(1 - 1 / bins * fdr, sum(counts), 1 / bins)
     counts_over_qc = counts > qc
     for i in counts_over_qc:
         if all(~counts_over_qc):
@@ -267,15 +279,15 @@ def conversion(x, y):
 
 def summarise_pvalues(
     df,
-    breaks=30,
+    bins=30,
     fdr=0.05,
     var={"basemean": 10, "fpkm": 0.5, "logcpm": np.log2(0.5), "rpkm": 0.5},
 ):
     # Test if pvalues are in 0 to 1 range
     if not df.min()["pvalue"] >= 0 and df.max()["pvalue"] <= 1:
         return PValSum(note="p-values not in 0 to 1 range")
-    bins = np.linspace(0, 1, breaks)
-    center = (bins[:-1] + bins[1:]) / 2
+    breaks = np.linspace(0, 1, bins)
+    center = (breaks[:-1] + breaks[1:]) / 2
     # Filter pvalues
     pf = pd.DataFrame()
     for k, v in var.items():
@@ -285,14 +297,14 @@ def summarise_pvalues(
             break
     # Make histogram
     pv_sets = [i for i in [df, pf] if not i.empty]
-    hists = [np.histogram(i["pvalue"], bins=bins) for i in pv_sets]
+    hists = [np.histogram(i["pvalue"], bins=breaks) for i in pv_sets]
     counts = [counts.tolist() for (counts, bins) in hists]
     # Test if p-values are truncated
     truncated = rle([i == 0 for i in counts[0]])[1][-1] > 0
     if truncated:
         return PValSum(note="p-values are truncated")
     # Assign class to histograms
-    Class = [get_hist_class(i, breaks, fdr) for i in counts]
+    Class = [get_hist_class(i, fdr) for i in counts]
     # Conversion
     Type = ["raw"]
     conv = np.nan
@@ -304,7 +316,7 @@ def summarise_pvalues(
     for i, c in zip(pv_sets, Class):
         if c in ["uniform", "anti-conservative"]:
             pi0_est = estimate_pi0(i["pvalue"])
-            pi0.append(pi0_est.item())
+            pi0.append(pi0_est)
         else:
             pi0.append(np.nan)
     # Number of effects < FDR
@@ -320,6 +332,14 @@ def write_to_csv(input, outpath):
 def note(filename, text):
     return {filename: pd.DataFrame(PValSum(note=text)._asdict(), index=[0])}
 
+
+def parse_key(k, filename):
+    key = re.sub(r"^.*-(sheet-.*)", r"\1", k) + " from " + filename
+    if k == filename:
+        key = k
+    return key
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -331,9 +351,7 @@ if __name__ == "__main__":
         type=argparse.FileType("r"),
         help="file with paths to input files, one per line",
     )
-    parser.add_argument(
-        "out", type=argparse.FileType("w", encoding="UTF-8"), help="output file"
-    )
+    parser.add_argument("--out", metavar="FILE", help="output file")
     parser.add_argument(
         "--vars",
         metavar="KEY=VALUE",
@@ -342,7 +360,7 @@ if __name__ == "__main__":
         help="variables for expression level filtering. Input 'key=value' pairs without spaces around equation mark",
     )
     parser.add_argument(
-        "--breaks",
+        "--bins",
         type=int,
         default=30,
         help="number of histogram bins, integer, default is 30",
@@ -356,7 +374,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     var = dict(map(lambda s: s.split("="), args.vars))
     VAR = {k: float(v) for k, v in var.items()}
-    BREAKS = args.breaks
+    VAR.update({"value": VAR["fpkm"]})
+    BINS = args.bins + 1
     FDR = args.fdr
 
     if args.file:
@@ -374,7 +393,13 @@ if __name__ == "__main__":
             frames = import_tar(path)
         else:
             frames = import_flat(path)
-        out.update({k: v for k, v in frames.items() if "note" in v.columns})
+        out.update(
+            {
+                parse_key(k, filename): v
+                for k, v in frames.items()
+                if "note" in v.columns
+            }
+        )
         frames = filter_pvalue_tables(frames, pv, adj)
         if len(frames) == 0:
             out.update(note(filename, "no pvalues"))
@@ -383,18 +408,16 @@ if __name__ == "__main__":
                 k: summarise_pvalue_tables(v, var=VAR.keys()) for k, v in frames.items()
             }
             pv_stats = {
-                k: summarise_pvalues(v, breaks=BREAKS, fdr=FDR, var=VAR)
+                k: summarise_pvalues(v, bins=BINS, fdr=FDR, var={k: v for k, v in VAR.items() if "value" not in k})
                 for k, v in frames.items()
             }
             for k, v in pv_stats.items():
-                key = re.sub(r"^.*-(sheet-.*)", r"\1", k) + " from " + filename
-                if k == filename:
-                    key = k
-                out.update({key: pd.DataFrame.from_dict(v._asdict())})
+                out.update(
+                    {parse_key(k, filename): pd.DataFrame.from_dict(v._asdict())}
+                )
 
-    # print(pd.DataFrame.from_dict({k: v._asdict() for k,v in out.items()}, orient="index").reset_index().rename(columns = {"index": "id"}))
     result = pd.concat(
         [df for df in out.values()], keys=[k for k in out.keys()], names=["id"]
     )
-    print(result)
-    result.reset_index(level="id").to_csv(args.out, index=False)
+    with open(args.out, "w") as f:
+        result.reset_index(level="id").to_csv(f, index=False)
