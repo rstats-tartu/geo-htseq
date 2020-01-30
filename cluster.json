@@ -18,12 +18,12 @@
     },
     "download_suppfilenames" :
     {   
-        "time" : 960,
+        "time" : 60,
         "partition": "main"
     },
     "download_suppfiles" :
     {   
-        "time" : 1440,
+        "time" : 120,
         "partition": "main"
     },
     "report" :
