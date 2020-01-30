@@ -10,9 +10,9 @@ rule all:
   input: 
     "output/document_summaries.csv",
     "output/single-cell.csv",
-    expand(["output/tmp/suppfilenames_filtered_{k}.txt", "output/tmp/suppfilenames_{k}.txt", "output/gsem_{k}.rds"], k = list(range(0, K, 1))), 
-    "output/suppdata.rds", 
-    "_main.html"
+    "output/parsed_suppfiles.csv", 
+    "output/publications.csv",
+    "output/scopus_citedbycount.csv"
 
 
 # Queries HT-seq expression profiling experiments
@@ -100,17 +100,6 @@ rule download_suppfiles:
     "scripts/preprocess/download_suppfiles.py"
 
 
-# Parse series matrix files
-rule series_matrixfiles:
-  input: 
-    rules.download_suppfiles.output
-  output: 
-    "output/gsem_{k}.rds"
-  singularity: SIMG
-  script:
-    "scripts/preprocess/series_matrixfiles.R"
-
-
 # Supplementary files that kill R
 BAD = ["GSE93374_Merged_all_020816_DGE.txt.gz", 
        "GSE88931_RNA-seq_MergedReadCounts.tsv.gz",
@@ -141,47 +130,44 @@ BAD = ["GSE93374_Merged_all_020816_DGE.txt.gz",
        "GSE121737_early_and_medium_bud.repGene.txt.gz"]
 
 
-# Split list of supplementary files to chunks for parsing
-rule split_suppfiles:
-  input:
-    suppfilenames_filtered = rules.filter_suppfilenames.output, 
-    gsem = rules.series_matrixfiles.output
-  output: 
-    temp(expand("output/tmp/supptabs_{{k}}-{n}.rds", n = list(range(0, N, 1))))
-  params:
-    bad = BAD
-  singularity: SIMG
-  script:
-    "scripts/preprocess/split_suppfiles.R"
-
-
 # Import supplementary data
 rule import_suppfiles:
   input: 
-    "output/tmp/supptabs_{k}-{n}.rds"
+    "output/tmp/suppfilenames_filtered_{k}.txt"
   output: 
-    temp("output/tmp/suppdata_{k}-{n}.rds")
+    "output/tmp/parsed_suppfiles_{k}.csv"
   params:
-    bad = BAD
-  singularity: SIMG
-  script:
-    "scripts/preprocess/import_suppfiles.R"
+    "--var basemean=10 logcpm=1 rpkm=0.5 fpkm=0.5 --bins 40 --fdr 0.05"
+  conda: 
+    "envs/geo-query.yaml"
+  shell:
+    """
+    cat {input} | grep 'suppl' | sed 's/suppl/output\/suppl/g' | \
+      python scripts/import_suppfiles.py --list - {params} --out {output} -v
+    """
+
+
+
 
 
 # Merge chunks
-rule merge_suppdata:
+rule merge_parsed_suppfiles:
   input: 
-    expand("output/tmp/suppdata_{k}-{n}.rds", k = list(range(0, K, 1)), n = list(range(0, N, 1)))
-  output: "output/suppdata.rds"
-  singularity: SIMG
+    expand("output/tmp/parsed_suppfiles_{k}.csv", k = list(range(0, K, 1)))
+  output: 
+    "output/parsed_suppfiles.csv"
+  conda: 
+    "envs/geo-query.yaml"
   script:
-    "scripts/preprocess/merge_suppdata.R"
+    "scripts/concat_tabs.py"
+    
 
 
 # Download publication metadata
 rule download_publications:
   input: rules.geo_query.output
-  output: "output/publications.csv"
+  output: 
+    "output/publications.csv"
   params: 
     email = EMAIL,
     api_key = os.environ["NCBI_APIKEY"]
@@ -206,11 +192,11 @@ rule download_citations:
 
 
 # Knit report
-rule report:
-  input: "index.Rmd", "introduction.Rmd", "methods.Rmd", "results.Rmd", "discussion.Rmd", "references.Rmd", "output/document_summaries.csv", "output/single-cell.csv", "output/suppfilenames.rds", "output/suppfilenames_filtered.rds", "output/gsem.rds", "output/suppdata.rds", "output/publications.csv", "output/scopus_citedbycount.csv"
-  output: "_main.html"
-  singularity: SIMG
-  shell:
-    """
-    Rscript -e "bookdown::render_site(encoding = 'UTF-8')"
-    """
+# rule report:
+#   input: "index.Rmd", "introduction.Rmd", "methods.Rmd", "results.Rmd", "discussion.Rmd", "references.Rmd", "output/document_summaries.csv", "output/single-cell.csv", "output/suppfilenames.rds", "output/suppfilenames_filtered.rds", "output/gsem.rds", "output/suppdata.rds", "output/publications.csv", "output/scopus_citedbycount.csv"
+#   output: "_main.html"
+#   singularity: SIMG
+#   shell:
+#     """
+#     Rscript -e "bookdown::render_site(encoding = 'UTF-8')"
+#     """
