@@ -27,6 +27,10 @@
         "time" : 120,
         "partition": "main"
     },
+    "download_publications" :
+    {   
+        "time" : 240
+    },
     "report" :
     {
         "mem" : 8000
