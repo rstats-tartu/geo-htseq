@@ -128,22 +128,25 @@ def filter_pvalue_tables(input, pv=None, adj=None):
 def summarise_pvalue_tables(df, var=["basemean", "value", "fpkm", "logcpm", "rpkm"]):
     df.columns = map(str.lower, df.columns)
     pvalues = df.filter(regex=pv_str).copy()
-    pvalues.columns = ["pvalue"]
-    if is_string_dtype(pvalues["pvalue"]):
-        pvalues["pvalue"] = pd.to_numeric(pvalues["pvalue"], errors="coerce")
+    pval_cols = pvalues.columns
     for v in var:
         label = v
         if v is "value":
             v = "^value_\d"
             label = "fpkm"
-        frames = df.filter(regex=v, axis=1)
-        if not frames.empty:
-            for col in frames.columns:
-                if is_string_dtype(frames[col]):
-                    frames[col] = pd.to_numeric(frames[col], errors="coerce")
-            frames = frames.mean(axis=1, skipna=True)
-            pvalues.loc[:, label] = frames
-    return pvalues.dropna(subset=["pvalue"])
+        exprs = df.filter(regex=v, axis=1)
+        if not exprs.empty:
+            for col in exprs.columns:
+                if is_string_dtype(exprs[col]):
+                    exprs[col] = pd.to_numeric(exprs[col], errors="coerce")
+            exprs = exprs.mean(axis=1, skipna=True)
+            pvalues.loc[:, label] = exprs
+        else:
+            label=None
+    pv_stacked = pvalues.melt(id_vars=label).set_index("variable").rename(columns={"value": "pvalue"})
+    if is_string_dtype(pv_stacked["pvalue"]):
+        pv_stacked["pvalue"] = pd.to_numeric(pv_stacked["pvalue"], errors="coerce")
+    return pv_stacked.dropna()
 
 
 # https://stackoverflow.com/a/32681075/1657871
