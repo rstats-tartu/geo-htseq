@@ -273,14 +273,14 @@ def conversion(x, y):
             "uniform": ["same good", "improve, effects", "worsen", "worsen"],
             "anti-conservative": ["effects lost", "same good", "worsen", "worsen"],
             "conservative": [
-                "improvement, no effects",
-                "improvement, effects",
+                "improvement; no effects",
+                "improvement; effects",
                 "same bad",
                 "no improvement",
             ],
             "other": [
-                "improvement, no effects",
-                "improvement, effects",
+                "improvement; no effects",
+                "improvement; effects",
                 "no improvement",
                 "same bad",
             ],
@@ -296,11 +296,11 @@ def summarise_pvalues(
     bins=30,
     fdr=0.05,
     var={"basemean": 10, "fpkm": 0.5, "logcpm": np.log2(0.5), "rpkm": 0.5},
+    verbose=True,
 ):
     breaks = np.linspace(0, 1, bins)
     center = (breaks[:-1] + breaks[1:]) / 2
     out = {}
-    print(df)
     grouped = df.groupby(level=0)
     for name, group in grouped:
         # Test if pvalues are in 0 to 1 range
@@ -348,7 +348,7 @@ def summarise_pvalues(
         pi0 = []
         for i, c in zip(pv_sets, Class):
             if c in ["uniform", "anti-conservative"]:
-                pi0_est = estimate_pi0(i["pvalue"])
+                pi0_est = estimate_pi0(i["pvalue"], verbose=verbose)
                 pi0.append(pi0_est)
             else:
                 pi0.append(np.nan)
@@ -469,16 +469,18 @@ if __name__ == "__main__":
                     bins=BINS,
                     fdr=FDR,
                     var={k: v for k, v in VAR.items() if "value" not in k},
+                    verbose=args.verbose,
                 )
                 for k, v in frames.items()
             }
             for k, v in pv_stats.items():
-                print(k)
-                print(v)
                 out.update({parse_key(k, filename): v})
 
     result = pd.concat(
-        [df for df in out.values()], keys=[k for k in out.keys()], names=["id"]
+        [df for df in out.values()],
+        keys=[k for k in out.keys()],
+        names=["id"],
+        sort=False,
     )
     with open(args.out, "w") as f:
         result.reset_index(level="id").to_csv(f, index=False)
