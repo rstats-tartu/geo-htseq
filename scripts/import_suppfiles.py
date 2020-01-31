@@ -141,9 +141,12 @@ def summarise_pvalue_tables(df, var=["basemean", "value", "fpkm", "logcpm", "rpk
                     exprs[col] = pd.to_numeric(exprs[col], errors="coerce")
             exprs = exprs.mean(axis=1, skipna=True)
             pvalues.loc[:, label] = exprs
-        else:
-            label=None
-    pv_stacked = pvalues.melt(id_vars=label).set_index("variable").rename(columns={"value": "pvalue"})
+            break
+    pv_stacked = (
+        pvalues.melt(id_vars=list(set(pvalues.columns) - set(pval_cols)))
+        .set_index("variable")
+        .rename(columns={"value": "pvalue"})
+    )
     if is_string_dtype(pv_stacked["pvalue"]):
         pv_stacked["pvalue"] = pd.to_numeric(pv_stacked["pvalue"], errors="coerce")
     return pv_stacked.dropna()
@@ -294,47 +297,77 @@ def summarise_pvalues(
     fdr=0.05,
     var={"basemean": 10, "fpkm": 0.5, "logcpm": np.log2(0.5), "rpkm": 0.5},
 ):
-    # Test if pvalues are in 0 to 1 range
-    if not df.min()["pvalue"] >= 0 and df.max()["pvalue"] <= 1:
-        return pd.DataFrame(
-            PValSum(note="p-values not in 0 to 1 range")._asdict(), index=[0]
-        )
     breaks = np.linspace(0, 1, bins)
     center = (breaks[:-1] + breaks[1:]) / 2
-    # Filter pvalues
-    pf = pd.DataFrame()
-    for k, v in var.items():
-        if k in df.columns:
-            pf = df.loc[df[k] >= v, ["pvalue"]]
-            filt = k
-            break
-    # Make histogram
-    pv_sets = [i for i in [df, pf] if not i.empty]
-    hists = [np.histogram(i["pvalue"], bins=breaks) for i in pv_sets]
-    counts = [counts.tolist() for (counts, bins) in hists]
-    # Test if p-values are truncated
-    truncated = rle([i == 0 for i in counts[0]])[1][-1] > 0
-    if truncated:
-        return pd.DataFrame(PValSum(note="p-values are truncated")._asdict(), index=[0])
-    # Assign class to histograms
-    Class = [get_hist_class(i, fdr) for i in counts]
-    # Conversion
-    Type = ["raw"]
-    conv = np.nan
-    if len(Class) == 2:
-        conv = conversion(Class[0], Class[1])
-        Type = ["raw", filt]
-    # Calculate pi0
-    pi0 = []
-    for i, c in zip(pv_sets, Class):
-        if c in ["uniform", "anti-conservative"]:
-            pi0_est = estimate_pi0(i["pvalue"])
-            pi0.append(pi0_est)
-        else:
-            pi0.append(np.nan)
-    # Number of effects < FDR
-    fdr_effects = [sum(i["pvalue"] < fdr) for i in pv_sets]
-    return pd.DataFrame(PValSum(Type, Class, conv, pi0, fdr_effects, counts)._asdict())
+    out = {}
+    print(df)
+    grouped = df.groupby(level=0)
+    for name, group in grouped:
+        # Test if pvalues are in 0 to 1 range
+        if not group.min()["pvalue"] >= 0 and group.max()["pvalue"] <= 1:
+            out.update(
+                {
+                    name: pd.DataFrame(
+                        PValSum(note="p-values not in 0 to 1 range")._asdict(),
+                        index=[0],
+                    )
+                }
+            )
+            continue
+        # Filter pvalues
+        pf = pd.DataFrame()
+        for k, v in var.items():
+            if k in group.columns:
+                pf = group.loc[group[k] >= v, ["pvalue"]]
+                filt = k
+                break
+        # Make histogram
+        pv_sets = [i for i in [group, pf] if not i.empty]
+        hists = [np.histogram(i["pvalue"], bins=breaks) for i in pv_sets]
+        counts = [counts.tolist() for (counts, bins) in hists]
+        # Test if p-values are truncated
+        truncated = rle([i == 0 for i in counts[0]])[1][-1] > 0
+        if truncated:
+            out.update(
+                {
+                    name: pd.DataFrame(
+                        PValSum(note="p-values seem truncated")._asdict(), index=[0]
+                    )
+                }
+            )
+            continue
+        # Assign class to histograms
+        Class = [get_hist_class(i, fdr) for i in counts]
+        # Conversion
+        Type = ["raw"]
+        conv = np.nan
+        if len(Class) == 2:
+            conv = conversion(Class[0], Class[1])
+            Type = ["raw", filt]
+        # Calculate pi0
+        pi0 = []
+        for i, c in zip(pv_sets, Class):
+            if c in ["uniform", "anti-conservative"]:
+                pi0_est = estimate_pi0(i["pvalue"])
+                pi0.append(pi0_est)
+            else:
+                pi0.append(np.nan)
+        # Number of effects < FDR
+        fdr_effects = [sum(i["pvalue"] < fdr) for i in pv_sets]
+        out.update(
+            {
+                name: pd.DataFrame(
+                    PValSum(Type, Class, conv, pi0, fdr_effects, counts)._asdict()
+                )
+            }
+        )
+    return (
+        pd.concat(
+            [df for df in out.values()], keys=[k for k in out.keys()], names=["Set"]
+        )
+        .reset_index(level=["Set"])
+        .astype(dtype={"FDR_pval": "Int64"})
+    )
 
 
 def write_to_csv(input, outpath):
@@ -440,6 +473,8 @@ if __name__ == "__main__":
                 for k, v in frames.items()
             }
             for k, v in pv_stats.items():
+                print(k)
+                print(v)
                 out.update({parse_key(k, filename): v})
 
     result = pd.concat(
