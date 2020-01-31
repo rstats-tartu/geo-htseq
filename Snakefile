@@ -147,9 +147,6 @@ rule import_suppfiles:
     """
 
 
-
-
-
 # Merge chunks
 rule merge_parsed_suppfiles:
   input: 

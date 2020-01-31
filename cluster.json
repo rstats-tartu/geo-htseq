@@ -9,8 +9,8 @@
     },
     "import_suppfiles" :
     {
-        "mem" : 4000,
-        "time": 240
+        "mem" : 8000,
+        "time": 360
     },
     "merge_parsed_suppfiles" :
     {   
