@@ -125,10 +125,22 @@ def filter_pvalue_tables(input, pv=None, adj=None):
     }
 
 
+def fix_column_dtype(df):
+    for col in df.columns:
+        if is_string_dtype(df[col]):
+            if df[col].apply(lambda x: u"," in x).any():
+                s = df[col].apply(lambda x: x.replace(u",", u"."))
+                df.loc[:, col] = s
+            s = pd.to_numeric(df[col], errors="coerce")
+            df.loc[:, col] = s
+    return df
+
+
 def summarise_pvalue_tables(df, var=["basemean", "value", "fpkm", "logcpm", "rpkm"]):
     df.columns = map(str.lower, df.columns)
     pvalues = df.filter(regex=pv_str).copy()
     pval_cols = pvalues.columns
+    pvalues_check = fix_column_dtype(pvalues)
     for v in var:
         label = v
         if v is "value":
@@ -136,19 +148,15 @@ def summarise_pvalue_tables(df, var=["basemean", "value", "fpkm", "logcpm", "rpk
             label = "fpkm"
         exprs = df.filter(regex=v, axis=1)
         if not exprs.empty:
-            for col in exprs.columns:
-                if is_string_dtype(exprs[col]):
-                    exprs[col] = pd.to_numeric(exprs[col], errors="coerce")
-            exprs = exprs.mean(axis=1, skipna=True)
-            pvalues.loc[:, label] = exprs
+            exprs_check = fix_column_dtype(exprs)
+            exprs_sum = exprs_check.mean(axis=1, skipna=True)
+            pvalues_check.loc[:, label] = exprs_sum
             break
     pv_stacked = (
-        pvalues.melt(id_vars=list(set(pvalues.columns) - set(pval_cols)))
+        pvalues_check.melt(id_vars=list(set(pvalues_check.columns) - set(pval_cols)))
         .set_index("variable")
         .rename(columns={"value": "pvalue"})
     )
-    if is_string_dtype(pv_stacked["pvalue"]):
-        pv_stacked["pvalue"] = pd.to_numeric(pv_stacked["pvalue"], errors="coerce")
     return pv_stacked.dropna()
 
 
@@ -203,7 +211,7 @@ def estimate_pi0(
     assert pv.min() >= 0 and pv.max() <= 1, "p-values should be between 0 and 1"
     if lambdas is None:
         epsilon = 1e-8
-        lambdas = numpy.arange(0, 0.9 + 1e-8, 0.05)
+        lambdas = np.arange(0, 0.9 + 1e-8, 0.05)
     if len(lambdas) > 1 and len(lambdas) < 4:
         raise ValueError(
             """if length of lambda greater than 1, you need at least 4 values"""
