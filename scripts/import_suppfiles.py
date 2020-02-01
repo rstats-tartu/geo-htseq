@@ -131,12 +131,11 @@ def filter_pvalue_tables(input, pv=None, adj=None):
 
 def fix_column_dtype(df):
     for col in df.columns:
-        if is_string_dtype(df[col]):
-            if df[col].apply(lambda x: u"," in x).any():
-                s = df[col].apply(lambda x: x.replace(u",", u"."))
-                df.loc[:, col] = s
-            s = pd.to_numeric(df[col], errors="coerce")
-            df.loc[:, col] = s
+        s = df[col]
+        if is_string_dtype(s):
+            if "," in s[:5].str.cat(sep=" "):
+                df[col] = s.apply(lambda x: x.replace(",", "."))
+            df[col] = pd.to_numeric(s, errors="coerce")
     return df
 
 
