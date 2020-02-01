@@ -48,12 +48,16 @@ def read_csv(input, tar=None):
         csv, sep=None, engine="python", iterator=True, skiprows=20, nrows=1000
     )
     sep = r._engine.data.dialect.delimiter
-    df = pd.read_csv(input, sep=sep, comment="#", encoding="unicode_escape")
+    h = pd.read_csv(csv, sep=None, engine="python", iterator=True, nrows=10)
+    comment = None
+    if "#" in list(h.get_chunk(0).columns)[0]:
+        comment = "#"
+    df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape")
     if all(["Unnamed" in i for i in list(df.columns)]):
         idx = find_header(df)
         if idx > 0:
             df = pd.read_csv(
-                input, sep=sep, comment="#", skiprows=idx, encoding="unicode_escape"
+                input, sep=sep, comment=comment, skiprows=idx, encoding="unicode_escape"
             )
     return {os.path.basename(input_name): df}
 
