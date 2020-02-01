@@ -304,7 +304,7 @@ def summarise_pvalues(
     grouped = df.groupby(level=0)
     for name, group in grouped:
         # Test if pvalues are in 0 to 1 range
-        if not group.min()["pvalue"] >= 0 and group.max()["pvalue"] <= 1:
+        if group.min()["pvalue"] < 0 or group.max()["pvalue"] > 1:
             out.update(
                 {
                     name: pd.DataFrame(
