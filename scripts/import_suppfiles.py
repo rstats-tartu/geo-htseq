@@ -44,14 +44,19 @@ def read_csv(input, tar=None):
         input_name = gse.search(tar.name).group(0) + input.name.replace("/", "_")
         csv = io.StringIO(tar.extractfile(input).read().decode("unicode_escape"))
         input = tar.extractfile(input)
-    r = pd.read_csv(
-        csv, sep=None, engine="python", iterator=True, skiprows=20, nrows=1000
-    )
-    sep = r._engine.data.dialect.delimiter
-    h = pd.read_csv(csv, sep=None, engine="python", iterator=True, nrows=10)
+    # Get comments and set rows to skip
+    h = pd.read_csv(csv, sep=None, engine="python", iterator=True, nrows=5)
     comment = None
+    skiprows = 0
     if "#" in list(h.get_chunk(0).columns)[0]:
         comment = "#"
+        skiprows = 20
+    # Get delimiter
+    r = pd.read_csv(
+        csv, sep=None, engine="python", iterator=True, skiprows=skiprows, nrows=1000
+    )
+    sep = r._engine.data.dialect.delimiter
+    # Import file
     df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape")
     if all(["Unnamed" in i for i in list(df.columns)]):
         idx = find_header(df)
