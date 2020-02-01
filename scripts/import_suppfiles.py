@@ -57,7 +57,7 @@ def read_csv(input, tar=None):
     )
     sep = r._engine.data.dialect.delimiter
     # Import file
-    df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape")
+    df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape", low_memory=False)
     if all(["Unnamed" in i for i in list(df.columns)]):
         idx = find_header(df)
         if idx > 0:
