@@ -86,6 +86,22 @@ def read_excel(input, tar=None):
     return tabs
 
 
+def import_flat(path, tar=None):
+    out = {}
+    try:
+        if xls.search(path.name if tar else path):
+            out.update(read_excel(path, tar=tar))
+        else:
+            out.update(read_csv(path, tar=tar))
+    except Exception as e:
+        if tar:
+            key = re.search("GSE\d+_", tar.name).group(0) + path.name.replace("/", "_")
+        else:
+            key = os.path.basename(path)
+        out.update(note(key, e))
+    return out
+
+
 def import_tar(path):
     out = {}
     with tarfile.open(path, "r:*") as tar:
@@ -93,31 +109,7 @@ def import_tar(path):
             if member.isfile():
                 if keep.search(member.name):
                     if not member.name.startswith("."):
-                        try:
-                            if xls.search(member.name):
-                                out.update(read_excel(member, tar))
-                            else:
-                                out.update(read_csv(member, tar))
-                        except Exception as e:
-                            out.update(
-                                note(
-                                    gse.search(tar.name).group(0)
-                                    + member.name.replace("/", "_"),
-                                    e,
-                                )
-                            )
-    return out
-
-
-def import_flat(path):
-    out = {}
-    try:
-        if xls.search(path):
-            out.update(read_excel(path))
-        else:
-            out.update(read_csv(path))
-    except Exception as e:
-        out.update(note(os.path.basename(path), e))
+                        out.update(import_flat(member, tar))
     return out
 
 
@@ -391,8 +383,8 @@ def write_to_csv(input, outpath):
         v.to_csv(outpath + k + ".csv", sep=",", index=False)
 
 
-def note(filename, text):
-    return {filename: pd.DataFrame(PValSum(note=text)._asdict(), index=[0])}
+def note(filename, message):
+    return {filename: pd.DataFrame(PValSum(note=str(message).rstrip())._asdict(), index=[0])}
 
 
 def parse_key(k, filename):
