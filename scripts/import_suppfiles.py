@@ -391,8 +391,8 @@ def write_to_csv(input, outpath):
         v.to_csv(outpath + k + ".csv", sep=",", index=False)
 
 
-def note(filename, text):
-    return {filename: pd.DataFrame(PValSum(note=text)._asdict(), index=[0])}
+def note(filename, message):
+    return {filename: pd.DataFrame(PValSum(note=str(message).rstrip())._asdict(), index=[0])}
 
 
 def parse_key(k, filename):
