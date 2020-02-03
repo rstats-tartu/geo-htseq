@@ -45,21 +45,20 @@ def read_csv(input, tar=None):
     input_name = input
     csv = input
     if isinstance(input, (tarfile.TarInfo)):
-        input_name = gse.search(tar.name).group(0) + input.name.replace("/", "_")
+        input_name = os.path.basename(input.name)
         csv = io.StringIO(tar.extractfile(input).read().decode("unicode_escape"))
         input = tar.extractfile(input)
     # Get comments and set rows to skip
-    r = pd.read_csv(csv, sep=None, engine="python", iterator=True, nrows=5)
+    r = pd.read_csv(csv, sep=None, engine="python", iterator=True, nrows=1000)
     comment = None
-    skiprows = 0
+    sep = r._engine.data.dialect.delimiter
     if re.search("^#", list(r.get_chunk(0).columns)[0]):
         comment = "#"
-        skiprows = 20
-    # Get delimiter
-    r = pd.read_csv(
-        csv, sep=None, engine="python", iterator=True, skiprows=skiprows, nrows=1000
-    )
-    sep = r._engine.data.dialect.delimiter
+        # Get delimiter
+        r = pd.read_csv(
+            csv, sep=None, engine="python", iterator=True, skiprows=20, nrows=1000
+        )
+        sep = r._engine.data.dialect.delimiter
     # Import file
     df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape")
     if all(["Unnamed" in i for i in list(df.columns)]):
@@ -75,7 +74,7 @@ def read_excel(input, tar=None):
     tabs = {}
     input_name = input
     if isinstance(input, (tarfile.TarInfo)):
-        input_name = gse.search(tar.name).group(0) + input.name.replace("/", "_")
+        input_name = os.path.basename(input.name)
         input = tar.extractfile(input)
     if input_name.endswith(".gz"):
         with gzip.open(input) as gz:
@@ -95,25 +94,30 @@ def read_excel(input, tar=None):
     return tabs
 
 
-def import_flat(path, tar=None):
+def import_flat(input, tar=None):
     out = {}
     try:
-        if xls.search(path.name if tar else path):
-            out.update(read_excel(path, tar=tar))
+        if xls.search(input.name if tar else input):
+            out.update(read_excel(input, tar=tar))
         else:
-            out.update(read_csv(path, tar=tar))
+            d = read_csv(input, tar=tar)
+            is_empty = [v.empty for v in d.values()][0]
+            if is_empty:
+                raise Exception("empty table")
+            else:
+                out.update(d)
     except Exception as e:
         if tar:
-            key = re.search("GSE\d+_", tar.name).group(0) + path.name.replace("/", "_")
+            key = os.path.basename(input.name)
         else:
-            key = os.path.basename(path)
+            key = os.path.basename(input)
         out.update(note(key, e))
     return out
 
 
-def import_tar(path):
+def import_tar(input):
     out = {}
-    with tarfile.open(path, "r:*") as tar:
+    with tarfile.open(input, "r:*") as tar:
         for member in tar:
             if member.isfile():
                 if keep.search(member.name):
@@ -321,14 +325,7 @@ def summarise_pvalues(
     for name, group in grouped:
         # Test if pvalues are in 0 to 1 range
         if group.min()["pvalue"] < 0 or group.max()["pvalue"] > 1:
-            out.update(
-                {
-                    name: pd.DataFrame(
-                        PValSum(note="p-values not in 0 to 1 range")._asdict(),
-                        index=[0],
-                    )
-                }
-            )
+            out.update(note(name, "p-values not in 0 to 1 range"))
             continue
         # Filter pvalues
         pf = pd.DataFrame()
@@ -344,13 +341,7 @@ def summarise_pvalues(
         # Test if p-values are truncated
         truncated = rle([i == 0 for i in counts[0]])[1][-1] > 0
         if truncated:
-            out.update(
-                {
-                    name: pd.DataFrame(
-                        PValSum(note="p-values seem truncated")._asdict(), index=[0]
-                    )
-                }
-            )
+            out.update(note(name, "p-values seem truncated"))
             continue
         # Assign class to histograms
         Class = [get_hist_class(i, fdr) for i in counts]
