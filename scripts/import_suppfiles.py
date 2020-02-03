@@ -27,12 +27,16 @@ fields = ["Type", "Class", "Conversion", "pi0", "FDR_pval", "hist", "note"]
 PValSum = collections.namedtuple("PValSum", fields, defaults=[np.nan] * 7)
 
 
+def raw_pvalues(i):
+    return bool(pv.search(i.lower()) and not adj.search(i.lower()))
+
+
 def find_header(df, n=20):
     head = df.head(n)
     idx = 0
     for index, row in head.iterrows():
-        if all([isinstance(i, str) for i in row]):
-            idx = index
+        if all([isinstance(i, str) for i in row if i is not np.nan]):
+            idx = index + 1
             break
     return idx
 
@@ -41,23 +45,22 @@ def read_csv(input, tar=None):
     input_name = input
     csv = input
     if isinstance(input, (tarfile.TarInfo)):
-        input_name = gse.search(tar.name).group(0) + input.name.replace("/", "_")
+        input_name = os.path.basename(input.name)
         csv = io.StringIO(tar.extractfile(input).read().decode("unicode_escape"))
         input = tar.extractfile(input)
     # Get comments and set rows to skip
-    h = pd.read_csv(csv, sep=None, engine="python", iterator=True, nrows=5)
+    r = pd.read_csv(csv, sep=None, engine="python", iterator=True, nrows=1000)
     comment = None
-    skiprows = 0
-    if "#" in list(h.get_chunk(0).columns)[0]:
-        comment = "#"
-        skiprows = 20
-    # Get delimiter
-    r = pd.read_csv(
-        csv, sep=None, engine="python", iterator=True, skiprows=skiprows, nrows=1000
-    )
     sep = r._engine.data.dialect.delimiter
+    if re.search("^#", list(r.get_chunk(0).columns)[0]):
+        comment = "#"
+        # Get delimiter
+        r = pd.read_csv(
+            csv, sep=None, engine="python", iterator=True, skiprows=20, nrows=1000
+        )
+        sep = r._engine.data.dialect.delimiter
     # Import file
-    df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape", low_memory=False)
+    df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape")
     if all(["Unnamed" in i for i in list(df.columns)]):
         idx = find_header(df)
         if idx > 0:
@@ -71,7 +74,7 @@ def read_excel(input, tar=None):
     tabs = {}
     input_name = input
     if isinstance(input, (tarfile.TarInfo)):
-        input_name = gse.search(tar.name).group(0) + input.name.replace("/", "_")
+        input_name = os.path.basename(input.name)
         input = tar.extractfile(input)
     if input_name.endswith(".gz"):
         with gzip.open(input) as gz:
@@ -82,56 +85,49 @@ def read_excel(input, tar=None):
     for sheet in sheets:
         df = wb.parse(sheet, comment="#")
         if not df.empty:
+            pu = sum(["Unnamed" in i for i in list(df.columns)]) / len(df.columns)
+            if pu >= 2 / 3:
+                idx = find_header(df)
+                if idx > 0:
+                    df = wb.parse(sheet, skiprows=idx)
             tabs.update({os.path.basename(input_name) + "-sheet-" + sheet: df})
     return tabs
 
 
-def import_tar(path):
+def import_flat(input, tar=None):
     out = {}
-    with tarfile.open(path, "r:*") as tar:
+    try:
+        if xls.search(input.name if tar else input):
+            out.update(read_excel(input, tar=tar))
+        else:
+            d = read_csv(input, tar=tar)
+            is_empty = [v.empty for v in d.values()][0]
+            if is_empty:
+                raise Exception("empty table")
+            else:
+                out.update(d)
+    except Exception as e:
+        if tar:
+            key = os.path.basename(input.name)
+        else:
+            key = os.path.basename(input)
+        out.update(note(key, e))
+    return out
+
+
+def import_tar(input):
+    out = {}
+    with tarfile.open(input, "r:*") as tar:
         for member in tar:
             if member.isfile():
                 if keep.search(member.name):
                     if not member.name.startswith("."):
-                        try:
-                            if xls.search(member.name):
-                                out.update(read_excel(member, tar))
-                            else:
-                                out.update(read_csv(member, tar))
-                        except Exception as e:
-                            out.update(
-                                note(
-                                    gse.search(tar.name).group(0)
-                                    + member.name.replace("/", "_"),
-                                    e,
-                                )
-                            )
-    return out
-
-
-def import_flat(path):
-    out = {}
-    try:
-        if xls.search(path):
-            out.update(read_excel(path))
-        else:
-            out.update(read_csv(path))
-    except Exception as e:
-        out.update(note(os.path.basename(path), e))
+                        out.update(import_flat(member, tar))
     return out
 
 
 def filter_pvalue_tables(input, pv=None, adj=None):
-    return {
-        k: v
-        for k, v in input.items()
-        if any(
-            [
-                bool(pv.search(i.lower()) and not adj.search(i.lower()))
-                for i in v.columns
-            ]
-        )
-    }
+    return {k: v for k, v in input.items() if any([raw_pvalues(i) for i in v.columns])}
 
 
 def fix_column_dtype(df):
@@ -144,10 +140,12 @@ def fix_column_dtype(df):
     return df
 
 
-def summarise_pvalue_tables(df, var=["basemean", "value", "fpkm", "logcpm", "rpkm"]):
+def summarise_pvalue_tables(
+    df, var=["basemean", "value", "fpkm", "logcpm", "rpkm", "aveexpr"]
+):
     df.columns = map(str.lower, df.columns)
-    pvalues = df.filter(regex=pv_str).copy()
-    pval_cols = pvalues.columns
+    pval_cols = [i for i in df.columns if raw_pvalues(i)]
+    pvalues = df[pval_cols].copy()
     pvalues_check = fix_column_dtype(pvalues)
     for v in var:
         label = v
@@ -311,7 +309,13 @@ def summarise_pvalues(
     df,
     bins=30,
     fdr=0.05,
-    var={"basemean": 10, "fpkm": 0.5, "logcpm": np.log2(0.5), "rpkm": 0.5},
+    var={
+        "basemean": 10,
+        "fpkm": 0.5,
+        "logcpm": np.log2(0.5),
+        "rpkm": 0.5,
+        "aveexpr": np.log2(10),
+    },
     verbose=True,
 ):
     breaks = np.linspace(0, 1, bins)
@@ -321,14 +325,7 @@ def summarise_pvalues(
     for name, group in grouped:
         # Test if pvalues are in 0 to 1 range
         if group.min()["pvalue"] < 0 or group.max()["pvalue"] > 1:
-            out.update(
-                {
-                    name: pd.DataFrame(
-                        PValSum(note="p-values not in 0 to 1 range")._asdict(),
-                        index=[0],
-                    )
-                }
-            )
+            out.update(note(name, "p-values not in 0 to 1 range"))
             continue
         # Filter pvalues
         pf = pd.DataFrame()
@@ -344,13 +341,7 @@ def summarise_pvalues(
         # Test if p-values are truncated
         truncated = rle([i == 0 for i in counts[0]])[1][-1] > 0
         if truncated:
-            out.update(
-                {
-                    name: pd.DataFrame(
-                        PValSum(note="p-values seem truncated")._asdict(), index=[0]
-                    )
-                }
-            )
+            out.update(note(name, "p-values seem truncated"))
             continue
         # Assign class to histograms
         Class = [get_hist_class(i, fdr) for i in counts]
@@ -392,7 +383,9 @@ def write_to_csv(input, outpath):
 
 
 def note(filename, message):
-    return {filename: pd.DataFrame(PValSum(note=str(message).rstrip())._asdict(), index=[0])}
+    return {
+        filename: pd.DataFrame(PValSum(note=str(message).rstrip())._asdict(), index=[0])
+    }
 
 
 def parse_key(k, filename):
@@ -418,7 +411,7 @@ if __name__ == "__main__":
         "--vars",
         metavar="KEY=VALUE",
         nargs="*",
-        default=["basemean=10", "fpkm=0.5", "logcpm=-0.3", "rpkm=0.5"],
+        default=["basemean=10", "fpkm=0.5", "logcpm=-0.3", "rpkm=0.5", "aveexpr=3.32"],
         help="variables for expression level filtering. Input 'key=value' pairs without spaces around equation mark",
     )
     parser.add_argument(
