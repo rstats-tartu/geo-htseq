@@ -27,12 +27,16 @@ fields = ["Type", "Class", "Conversion", "pi0", "FDR_pval", "hist", "note"]
 PValSum = collections.namedtuple("PValSum", fields, defaults=[np.nan] * 7)
 
 
+def raw_pvalues(i):
+    return bool(pv.search(i.lower()) and not adj.search(i.lower()))
+
+
 def find_header(df, n=20):
     head = df.head(n)
     idx = 0
     for index, row in head.iterrows():
-        if all([isinstance(i, str) for i in row]):
-            idx = index
+        if all([isinstance(i, str) for i in row if i is not np.nan]):
+            idx = index + 1
             break
     return idx
 
@@ -45,10 +49,10 @@ def read_csv(input, tar=None):
         csv = io.StringIO(tar.extractfile(input).read().decode("unicode_escape"))
         input = tar.extractfile(input)
     # Get comments and set rows to skip
-    h = pd.read_csv(csv, sep=None, engine="python", iterator=True, nrows=5)
+    r = pd.read_csv(csv, sep=None, engine="python", iterator=True, nrows=5)
     comment = None
     skiprows = 0
-    if "#" in list(h.get_chunk(0).columns)[0]:
+    if re.search("^#", list(r.get_chunk(0).columns)[0]):
         comment = "#"
         skiprows = 20
     # Get delimiter
@@ -57,7 +61,7 @@ def read_csv(input, tar=None):
     )
     sep = r._engine.data.dialect.delimiter
     # Import file
-    df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape", low_memory=False)
+    df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape")
     if all(["Unnamed" in i for i in list(df.columns)]):
         idx = find_header(df)
         if idx > 0:
@@ -82,6 +86,11 @@ def read_excel(input, tar=None):
     for sheet in sheets:
         df = wb.parse(sheet, comment="#")
         if not df.empty:
+            pu = sum(["Unnamed" in i for i in list(df.columns)]) / len(df.columns)
+            if pu >= 2 / 3:
+                idx = find_header(df)
+                if idx > 0:
+                    df = wb.parse(sheet, skiprows=idx)
             tabs.update({os.path.basename(input_name) + "-sheet-" + sheet: df})
     return tabs
 
@@ -114,16 +123,7 @@ def import_tar(path):
 
 
 def filter_pvalue_tables(input, pv=None, adj=None):
-    return {
-        k: v
-        for k, v in input.items()
-        if any(
-            [
-                bool(pv.search(i.lower()) and not adj.search(i.lower()))
-                for i in v.columns
-            ]
-        )
-    }
+    return {k: v for k, v in input.items() if any([raw_pvalues(i) for i in v.columns])}
 
 
 def fix_column_dtype(df):
@@ -136,10 +136,12 @@ def fix_column_dtype(df):
     return df
 
 
-def summarise_pvalue_tables(df, var=["basemean", "value", "fpkm", "logcpm", "rpkm", "aveexpr"]):
+def summarise_pvalue_tables(
+    df, var=["basemean", "value", "fpkm", "logcpm", "rpkm", "aveexpr"]
+):
     df.columns = map(str.lower, df.columns)
-    pvalues = df.filter(regex=pv_str).copy()
-    pval_cols = pvalues.columns
+    pval_cols = [i for i in df.columns if raw_pvalues(i)]
+    pvalues = df[pval_cols].copy()
     pvalues_check = fix_column_dtype(pvalues)
     for v in var:
         label = v
@@ -303,7 +305,13 @@ def summarise_pvalues(
     df,
     bins=30,
     fdr=0.05,
-    var={"basemean": 10, "fpkm": 0.5, "logcpm": np.log2(0.5), "rpkm": 0.5, "aveexpr": np.log2(10)},
+    var={
+        "basemean": 10,
+        "fpkm": 0.5,
+        "logcpm": np.log2(0.5),
+        "rpkm": 0.5,
+        "aveexpr": np.log2(10),
+    },
     verbose=True,
 ):
     breaks = np.linspace(0, 1, bins)
