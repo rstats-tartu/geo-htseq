@@ -4,6 +4,8 @@ LAST_DATE = "2018-12-31"
 QUERY = 'expression profiling by high throughput sequencing[DataSet Type] AND ("2000-01-01"[PDAT] : "{}"[PDAT])'.format(LAST_DATE)
 EMAIL = "taavi.pall@ut.ee"
 
+localrules: all, suppfiles_list
+
 K = 10
 N = 10
 rule all:
@@ -131,19 +133,32 @@ BAD = ["GSE93374_Merged_all_020816_DGE.txt.gz",
 
 
 # Import supplementary data
-rule import_suppfiles:
+rule suppfiles_list:
   input: 
     "output/tmp/suppfilenames_filtered_{k}.txt"
   output: 
-    "output/tmp/parsed_suppfiles_{k}.csv"
+    "output/tmp/suppfiles_list_{k}.txt"
   params:
     "--var basemean=10 logcpm=1 rpkm=0.5 fpkm=0.5 --bins 40 --fdr 0.05"
   conda: 
     "envs/geo-query.yaml"
   shell:
     """
-    cat {input} | grep 'suppl' | sed 's/suppl/output\/suppl/g' | \
-      python scripts/import_suppfiles.py --list - {params} --out {output} -v
+    cat {input} | grep 'suppl' | sed 's/suppl/output\/suppl/g' > {output}
+    """
+
+rule import_suppfiles:
+  input: 
+    "output/tmp/suppfiles_list_{k}.txt"
+  output: 
+    "output/tmp/parsed_suppfiles_{k}.csv"
+  params:
+    "--var basemean=10 logcpm=1 rpkm=0.5 fpkm=0.5 aveexpr=3.32 --bins 40 --fdr 0.05 -v"
+  conda: 
+    "envs/geo-query.yaml"
+  shell:
+    """
+    python scripts/import_suppfiles.py --list {input} --out {output} {params}
     """
 
 
