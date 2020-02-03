@@ -136,7 +136,7 @@ def fix_column_dtype(df):
     return df
 
 
-def summarise_pvalue_tables(df, var=["basemean", "value", "fpkm", "logcpm", "rpkm"]):
+def summarise_pvalue_tables(df, var=["basemean", "value", "fpkm", "logcpm", "rpkm", "aveexpr"]):
     df.columns = map(str.lower, df.columns)
     pvalues = df.filter(regex=pv_str).copy()
     pval_cols = pvalues.columns
@@ -303,7 +303,7 @@ def summarise_pvalues(
     df,
     bins=30,
     fdr=0.05,
-    var={"basemean": 10, "fpkm": 0.5, "logcpm": np.log2(0.5), "rpkm": 0.5},
+    var={"basemean": 10, "fpkm": 0.5, "logcpm": np.log2(0.5), "rpkm": 0.5, "aveexpr": np.log2(10)},
     verbose=True,
 ):
     breaks = np.linspace(0, 1, bins)
@@ -384,7 +384,9 @@ def write_to_csv(input, outpath):
 
 
 def note(filename, message):
-    return {filename: pd.DataFrame(PValSum(note=str(message).rstrip())._asdict(), index=[0])}
+    return {
+        filename: pd.DataFrame(PValSum(note=str(message).rstrip())._asdict(), index=[0])
+    }
 
 
 def parse_key(k, filename):
@@ -410,7 +412,7 @@ if __name__ == "__main__":
         "--vars",
         metavar="KEY=VALUE",
         nargs="*",
-        default=["basemean=10", "fpkm=0.5", "logcpm=-0.3", "rpkm=0.5"],
+        default=["basemean=10", "fpkm=0.5", "logcpm=-0.3", "rpkm=0.5", "aveexpr=3.32"],
         help="variables for expression level filtering. Input 'key=value' pairs without spaces around equation mark",
     )
     parser.add_argument(
