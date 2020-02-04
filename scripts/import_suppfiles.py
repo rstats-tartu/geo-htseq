@@ -64,7 +64,6 @@ def read_csv(input, tar=None):
         sep = "\s+"
     # Import file
     df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape")
-    print(df)
     if all(["Unnamed" in i for i in list(df.columns)]):
         idx = find_header(df)
         if idx > 0:
