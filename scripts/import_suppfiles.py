@@ -23,6 +23,7 @@ gse = re.compile("GSE\d+_")
 pv_str = "p.{0,4}val"
 pv = re.compile(pv_str)
 adj = re.compile("adj|fdr|corr")
+space = re.compile("\s+")
 fields = ["Type", "Class", "Conversion", "pi0", "FDR_pval", "hist", "note"]
 PValSum = collections.namedtuple("PValSum", fields, defaults=[np.nan] * 7)
 
@@ -59,8 +60,11 @@ def read_csv(input, tar=None):
             csv, sep=None, engine="python", iterator=True, skiprows=20, nrows=1000
         )
         sep = r._engine.data.dialect.delimiter
+    if space.search(sep):
+        sep = "\s+"
     # Import file
     df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape")
+    print(df)
     if all(["Unnamed" in i for i in list(df.columns)]):
         idx = find_header(df)
         if idx > 0:
