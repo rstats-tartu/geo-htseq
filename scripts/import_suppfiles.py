@@ -53,6 +53,7 @@ def read_csv(input, tar=None):
     r = pd.read_csv(csv, sep=None, engine="python", iterator=True, nrows=1000)
     comment = None
     sep = r._engine.data.dialect.delimiter
+    columns = r._engine.columns
     if re.search("^#", list(r.get_chunk(0).columns)[0]):
         comment = "#"
         # Get delimiter
@@ -64,6 +65,11 @@ def read_csv(input, tar=None):
         sep = "\s+"
     # Import file
     df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape")
+    if len(df.columns) > len(columns):
+        df = pd.read_csv(input, header=None, skiprows=[0], sep=sep, comment=comment, encoding="unicode_escape").drop([0])
+        df.columns = columns
+    if args.verbose > 1:
+            print("df after import:\n", df)
     if all(["Unnamed" in i for i in list(df.columns)]):
         idx = find_header(df)
         if idx > 0:
@@ -87,6 +93,8 @@ def read_excel(input, tar=None):
     sheets = wb.sheet_names
     for sheet in sheets:
         df = wb.parse(sheet, comment="#")
+        if args.verbose > 1:
+            print("df after import:\n", df)
         if not df.empty:
             pu = sum(["Unnamed" in i for i in list(df.columns)]) / len(df.columns)
             if pu >= 2 / 3:
@@ -430,7 +438,7 @@ if __name__ == "__main__":
         help="false discovery rate, float, default is 0.05",
     )
     parser.add_argument(
-        "-v", "--verbose", help="increase output verbosity", action="store_true"
+        "--verbose", "-v", help="increase output verbosity", action="count", default=0
     )
     args = parser.parse_args()
     var = dict(map(lambda s: s.split("="), args.vars))
@@ -454,8 +462,8 @@ if __name__ == "__main__":
         sys.exit()
     out = {}
     for path in input:
-        if args.verbose:
-            print("Working on ", path)
+        if args.verbose > 0:
+            print("working on", path)
         filename = os.path.basename(path)
         if path.endswith("tar.gz"):
             frames = import_tar(path)
