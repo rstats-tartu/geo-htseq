@@ -154,11 +154,13 @@ rule import_suppfiles:
     "output/tmp/parsed_suppfiles_{k}.csv"
   params:
     "--var basemean=10 logcpm=1 rpkm=0.5 fpkm=0.5 aveexpr=3.32 --bins 40 --fdr 0.05 -v"
+  log:
+    "output/logs/parsed_suppfiles_{k}.log"
   conda: 
     "envs/geo-query.yaml"
   shell:
     """
-    python scripts/import_suppfiles.py --list {input} --out {output} {params}
+    python scripts/import_suppfiles.py --list {input} --out {output} {params} 2>&1 | tee {log}
     """
 
 
