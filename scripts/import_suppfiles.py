@@ -410,11 +410,6 @@ def summarise_pvalues(
     )
 
 
-def write_to_csv(input, outpath):
-    for k, v in input.items():
-        v.to_csv(outpath + k + ".csv", sep=",", index=False)
-
-
 def note(filename, message):
     return {
         filename: pd.DataFrame(PValSum(note=str(message).rstrip())._asdict(), index=[0])
