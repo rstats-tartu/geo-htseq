@@ -1,6 +1,5 @@
 import os
 
-
 def batch_iterator(iterator, batch_size):
     """Returns lists of length batch_size.
     This can be used on any iterator, for example to batch up
@@ -27,16 +26,17 @@ def batch_iterator(iterator, batch_size):
             yield batch
 
 N = snakemake.params.get("n", 10)
+dir = snakemake.params.get("dir", "")
 s = []
 with open(snakemake.input[0], "r") as h:
     for line in h:
         if "series_matrix.txt.gz" not in line:
-            s.append(line)
+            s.append(os.path.join(dir, line.rstrip()))
 chunks =  N - 1
 parts = os.path.splitext(snakemake.input[0])
 
 for i, batch in enumerate(batch_iterator(iter(s), len(s)//chunks), start=1):
     filename = parts[0] + "_{}" + parts[1]
     with open(filename.format(i), "w") as h:
-        h.writelines(l for l in batch)
+        h.writelines("{}\n".format(l) for l in batch)
 

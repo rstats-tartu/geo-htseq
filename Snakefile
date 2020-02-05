@@ -139,7 +139,8 @@ rule suppfiles_list:
   output: 
     expand("output/tmp/suppfilenames_filtered_{{k}}_{n}.txt", n = list(range(1, N, 1)))
   params:
-    n = N
+    n = N,
+    dir = "output"
   conda: 
     "envs/geo-query.yaml"
   script:
