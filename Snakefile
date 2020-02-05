@@ -137,37 +137,33 @@ rule suppfiles_list:
   input: 
     "output/tmp/suppfilenames_filtered_{k}.txt"
   output: 
-    "output/tmp/suppfiles_list_{k}.txt"
+    expand("output/tmp/suppfilenames_filtered_{{k}}_{n}.txt", n = list(range(1, N, 1)))
   params:
-    "--var basemean=10 logcpm=1 rpkm=0.5 fpkm=0.5 --bins 40 --fdr 0.05"
+    n = N
   conda: 
     "envs/geo-query.yaml"
-  shell:
-    """
-    cat {input} | grep 'suppl' | sed 's/suppl/output\/suppl/g' > {output}
-    """
+  script:
+    "scripts/split.py"
 
 rule import_suppfiles:
   input: 
-    "output/tmp/suppfiles_list_{k}.txt"
+    "output/tmp/suppfilenames_filtered_{k}_{n}.txt"
   output: 
-    "output/tmp/parsed_suppfiles_{k}.csv"
+    "output/tmp/parsed_suppfiles_{k}_{n}.csv"
   params:
     "--var basemean=10 logcpm=1 rpkm=0.5 fpkm=0.5 aveexpr=3.32 --bins 40 --fdr 0.05 -v"
-  log:
-    "output/logs/parsed_suppfiles_{k}.log"
   conda: 
     "envs/geo-query.yaml"
   shell:
     """
-    python scripts/import_suppfiles.py --list {input} --out {output} {params} 2>&1 | tee {log}
+    python scripts/import_suppfiles.py --list {input} --out {output} {params}
     """
 
 
 # Merge chunks
 rule merge_parsed_suppfiles:
   input: 
-    expand("output/tmp/parsed_suppfiles_{k}.csv", k = list(range(0, K, 1)))
+    expand("output/tmp/parsed_suppfiles_{k}_{n}.csv", k = list(range(0, K, 1)), n = list(range(1, N, 1)))
   output: 
     "output/parsed_suppfiles.csv"
   conda: 
