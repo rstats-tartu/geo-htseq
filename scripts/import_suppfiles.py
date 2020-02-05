@@ -42,13 +42,7 @@ def find_header(df, n=20):
     return idx
 
 
-def read_csv(input, tar=None):
-    input_name = input
-    csv = input
-    if isinstance(input, (tarfile.TarInfo)):
-        input_name = os.path.basename(input.name)
-        csv = io.StringIO(tar.extractfile(input).read().decode("unicode_escape"))
-        input = tar.extractfile(input)
+def csv_helper(input, input_name, csv):
     # Get comments and set rows to skip
     r = pd.read_csv(csv, sep=None, engine="python", iterator=True, nrows=1000)
     comment = None
@@ -66,10 +60,17 @@ def read_csv(input, tar=None):
     # Import file
     df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape")
     if len(df.columns) > len(columns):
-        df = pd.read_csv(input, header=None, skiprows=[0], sep=sep, comment=comment, encoding="unicode_escape").drop([0])
+        df = pd.read_csv(
+            input,
+            header=None,
+            skiprows=[0],
+            sep=sep,
+            comment=comment,
+            encoding="unicode_escape",
+        ).drop([0])
         df.columns = columns
     if args.verbose > 1:
-            print("df after import:\n", df)
+        print("df after import:\n", df)
     if all(["Unnamed" in i for i in list(df.columns)]):
         idx = find_header(df)
         if idx > 0:
@@ -79,12 +80,8 @@ def read_csv(input, tar=None):
     return {os.path.basename(input_name): df}
 
 
-def read_excel(input, tar=None):
+def excel_helper(input, input_name):
     tabs = {}
-    input_name = input
-    if isinstance(input, (tarfile.TarInfo)):
-        input_name = os.path.basename(input.name)
-        input = tar.extractfile(input)
     if input_name.endswith(".gz"):
         with gzip.open(input) as gz:
             wb = pd.ExcelFile(gz)
@@ -103,6 +100,31 @@ def read_excel(input, tar=None):
                     df = wb.parse(sheet, skiprows=idx)
             tabs.update({os.path.basename(input_name) + "-sheet-" + sheet: df})
     return tabs
+
+
+def read_csv(input, tar=None):
+    if isinstance(input, (tarfile.TarInfo)):
+        input_name = os.path.basename(input.name)
+        with tar.extractfile(input) as h:
+            csv = io.StringIO(h.read().decode("unicode_escape"))
+        with tar.extractfile(input) as h:
+            out = csv_helper(h, input_name, csv)
+    else:
+        input_name = input
+        csv = input
+        out = csv_helper(input, input_name, csv)
+    return out
+
+
+def read_excel(input, tar=None):
+    if isinstance(input, (tarfile.TarInfo)):
+        input_name = os.path.basename(input.name)
+        with tar.extractfile(input) as h:
+            out = excel_helper(h, input_name)
+    else:
+        input_name = input
+        out = excel_helper(input, input_name)
+    return out
 
 
 def import_flat(input, tar=None):
