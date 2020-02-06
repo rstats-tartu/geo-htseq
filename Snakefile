@@ -14,7 +14,8 @@ rule all:
     "output/single-cell.csv",
     "output/parsed_suppfiles.csv", 
     "output/publications.csv",
-    "output/scopus_citedbycount.csv"
+    "output/scopus_citedbycount.csv",
+    expand("output/downloading_suppfiles_{k}.done", k = list(range(0, K, 1)))
 
 
 # Queries HT-seq expression profiling experiments
