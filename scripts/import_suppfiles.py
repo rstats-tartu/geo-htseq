@@ -23,7 +23,7 @@ gse = re.compile("GSE\d+_")
 pv_str = "p.{0,4}val"
 pv = re.compile(pv_str)
 adj = re.compile("adj|fdr|corr")
-space = re.compile("\s+")
+space = re.compile(" ")
 fields = ["Type", "Class", "Conversion", "pi0", "FDR_pval", "hist", "note"]
 PValSum = collections.namedtuple("PValSum", fields, defaults=[np.nan] * 7)
 
@@ -481,7 +481,7 @@ if __name__ == "__main__":
         if args.verbose > 0:
             print("working on", path)
         filename = os.path.basename(path)
-        if path.endswith("tar.gz"):
+        if tarfile.is_tarfile(path):
             frames = import_tar(path)
         else:
             frames = import_flat(path)
@@ -494,7 +494,7 @@ if __name__ == "__main__":
         )
         frames = filter_pvalue_tables(frames, pv, adj)
         if len(frames) == 0:
-            out.update(note(filename, "no pvalues"))
+            pass
         else:
             frames = {
                 k: summarise_pvalue_tables(v, var=VAR.keys()) for k, v in frames.items()
