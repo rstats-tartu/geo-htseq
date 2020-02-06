@@ -26,7 +26,7 @@ with ftplib.FTP("ftp.ncbi.nlm.nih.gov") as ftp:
                         + os.path.dirname(line.rstrip())
                     )
                     ftp.cwd(dir)
-                    if ftp.size < 1e9:
+                    if ftp.size(filename) < 1e9:
                         with open(path, "wb") as file:
                             ftp.retrbinary("RETR " + filename, file.write, 1024)
     except ftplib.all_errors as e:
