@@ -55,6 +55,7 @@ def csv_helper(input, input_name, csv):
             csv, sep=None, engine="python", iterator=True, skiprows=20, nrows=1000
         )
         sep = r._engine.data.dialect.delimiter
+        columns = r._engine.columns
     if space.search(sep):
         sep = "\s+"
     # Import file
