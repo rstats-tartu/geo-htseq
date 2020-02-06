@@ -4,7 +4,7 @@ LAST_DATE = "2018-12-31"
 QUERY = 'expression profiling by high throughput sequencing[DataSet Type] AND ("2000-01-01"[PDAT] : "{}"[PDAT])'.format(LAST_DATE)
 EMAIL = "taavi.pall@ut.ee"
 
-localrules: all, suppfiles_list
+localrules: all, filter_suppfilenames, suppfiles_list
 
 K = 10
 N = 10
