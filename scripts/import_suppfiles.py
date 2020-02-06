@@ -154,8 +154,7 @@ def import_tar(input):
         for member in tar:
             if member.isfile():
                 if keep.search(member.name):
-                    if not member.name.startswith("."):
-                        out.update(import_flat(member, tar))
+                    out.update(import_flat(member, tar))
     return out
 
 
