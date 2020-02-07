@@ -174,7 +174,7 @@ def fix_column_dtype(df):
     for col in df.columns:
         s = df[col]
         if is_string_dtype(s):
-            if "," in s[:5].str.cat(sep=" "):
+            if "," in s[:5].astype(str).str.cat(sep=" "):
                 df[col] = s.apply(lambda x: str(x).replace(",", "."))
             df[col] = pd.to_numeric(s, errors="coerce")
     return df
