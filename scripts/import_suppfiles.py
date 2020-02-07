@@ -179,6 +179,26 @@ def summarise_pvalue_tables(
     df.columns = map(str.lower, df.columns)
     pval_cols = [i for i in df.columns if raw_pvalues(i)]
     pvalues = df[pval_cols].copy()
+    # Check if there is ANOTHER(!!#?) level of ":" delimiters in p value column(s)
+    extra_delim = ":"
+    split_col = [i for i in pvalues.columns if extra_delim in i]
+    if split_col:
+        for index, col in enumerate(split_col):
+            col_count = len(re.findall(extra_delim, col))
+            obs_count = len(re.findall(extra_delim, str(pvalues.iloc[0, index])))
+            if obs_count == 0:
+                pass
+            elif col_count == obs_count:
+                new_cols = col.split(extra_delim)
+                split_pval_col = [i for i in new_cols if raw_pvalues(i)]
+                cols_split = pvalues.iloc[:,index].str.split(extra_delim, expand=True)
+                try:
+                    cols_split.columns = new_cols
+                    pvalues[split_pval_col] = cols_split[split_pval_col]
+                    pvalues.drop(col, axis = 1, inplace=True)
+                except ValueError:
+                    pass
+        pval_cols = [i for i in pvalues.columns if raw_pvalues(i)] 
     pvalues_check = fix_column_dtype(pvalues)
     for v in var:
         label = v
