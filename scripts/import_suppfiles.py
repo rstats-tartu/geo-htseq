@@ -20,7 +20,7 @@ keep = "|".join(
 )
 keep = re.compile(keep)
 gse = re.compile("GSE\d+_")
-pv_str = "p.{0,4}val"
+pv_str = "p[^a-zA-Z]{0,4}val"
 pv = re.compile(pv_str)
 adj = re.compile("adj|fdr|corr")
 space = re.compile(" ")
@@ -191,14 +191,14 @@ def summarise_pvalue_tables(
             elif col_count == obs_count:
                 new_cols = col.split(extra_delim)
                 split_pval_col = [i for i in new_cols if raw_pvalues(i)]
-                cols_split = pvalues.iloc[:,index].str.split(extra_delim, expand=True)
+                cols_split = pvalues.iloc[:, index].str.split(extra_delim, expand=True)
                 try:
                     cols_split.columns = new_cols
                     pvalues[split_pval_col] = cols_split[split_pval_col]
-                    pvalues.drop(col, axis = 1, inplace=True)
+                    pvalues.drop(col, axis=1, inplace=True)
                 except ValueError:
                     pass
-        pval_cols = [i for i in pvalues.columns if raw_pvalues(i)] 
+        pval_cols = [i for i in pvalues.columns if raw_pvalues(i)]
     pvalues_check = fix_column_dtype(pvalues)
     for v in var:
         label = v
@@ -394,7 +394,7 @@ def summarise_pvalues(
         # Test if p-values are truncated
         truncated = rle([i == 0 for i in counts[0]])[1][-1] > 0
         if truncated:
-            out.update(note(name, "p-values seem truncated"))
+            out.update(note(name, "p-values truncated or right-skewed"))
             continue
         # Assign class to histograms
         Class = [get_hist_class(i, fdr) for i in counts]
@@ -515,7 +515,8 @@ if __name__ == "__main__":
         )
         frames = filter_pvalue_tables(frames, pv, adj)
         if len(frames) == 0:
-            pass
+            out.update(note(filename, "no pvalues"))
+            continue
         else:
             frames = {
                 k: summarise_pvalue_tables(v, var=VAR.keys()) for k, v in frames.items()
