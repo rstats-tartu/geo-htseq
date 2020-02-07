@@ -1,5 +1,6 @@
 id,Set,Type,Class,Conversion,pi0,FDR_pval,hist,note
 GSE100338_X189_FC1.5_pVal0.05_42_genes.txt.gz,pvalue,,,,,,,p-values truncated or right-skewed
+GSE102299_genes.tsv.gz,,,,,,,,no pvalues
 sheet-limma_LEC_VC0-LEC_VC100.txt from GSE102351_EMC_limma_3x5.xlsx,p.value,raw,anti-conservative,same good,0.30555969593083926,3620,"[3236, 384, 265, 185, 154, 147, 132, 101, 111, 90, 88, 68, 85, 72, 84, 60, 73, 71, 62, 72, 76, 59, 76, 55, 60, 60, 68, 68, 61, 55, 63, 45, 60, 52, 46, 60, 58, 59, 38, 50]",
 sheet-limma_LEC_VC0-LEC_VC100.txt from GSE102351_EMC_limma_3x5.xlsx,p.value,aveexpr,anti-conservative,same good,0.28949024543738205,3472,"[3116, 356, 253, 173, 144, 135, 124, 93, 105, 87, 83, 62, 79, 69, 75, 56, 66, 65, 60, 68, 74, 56, 72, 50, 59, 56, 63, 64, 55, 54, 58, 42, 57, 47, 43, 53, 52, 53, 35, 44]",
 sheet-limma_LEC_VC10-LEC_VC100.txt from GSE102351_EMC_limma_3x5.xlsx,p.value,raw,anti-conservative,same good,0.33686093307497395,3561,"[3192, 369, 261, 201, 167, 147, 125, 113, 107, 109, 99, 90, 100, 87, 74, 68, 79, 67, 65, 74, 58, 56, 54, 69, 59, 65, 56, 54, 62, 60, 50, 46, 41, 67, 50, 42, 58, 60, 47, 61]",
@@ -12,30 +13,46 @@ sheet-rpkms_GeneMapping from GSE102351_LNLECs_RNASeq_72hVEGFCStim.xlsx,p.value.1
 sheet-rpkms_GeneMapping from GSE102351_LNLECs_RNASeq_72hVEGFCStim.xlsx,p.value.1,rpkm,anti-conservative,same good,0.30555969593083926,3620,"[3236, 384, 265, 185, 154, 147, 132, 101, 111, 90, 88, 68, 85, 72, 84, 60, 73, 71, 62, 72, 76, 59, 76, 55, 60, 60, 68, 68, 61, 55, 63, 45, 60, 52, 46, 60, 58, 59, 38, 50]",
 sheet-rpkms_GeneMapping from GSE102351_LNLECs_RNASeq_72hVEGFCStim.xlsx,p.value.2,raw,anti-conservative,same good,0.33686093307497395,3561,"[3192, 369, 261, 201, 167, 147, 125, 113, 107, 109, 99, 90, 100, 87, 74, 68, 79, 67, 65, 74, 58, 56, 54, 69, 59, 65, 56, 54, 62, 60, 50, 46, 41, 67, 50, 42, 58, 60, 47, 61]",
 sheet-rpkms_GeneMapping from GSE102351_LNLECs_RNASeq_72hVEGFCStim.xlsx,p.value.2,rpkm,anti-conservative,same good,0.33686093307497395,3561,"[3192, 369, 261, 201, 167, 147, 125, 113, 107, 109, 99, 90, 100, 87, 74, 68, 79, 67, 65, 74, 58, 56, 54, 69, 59, 65, 56, 54, 62, 60, 50, 46, 41, 67, 50, 42, 58, 60, 47, 61]",
+GSE103773_HL58_Norm_Exp_Values.csv.gz,,,,,,,,no pvalues
+GSE104028_genes_normacounts_processeddata.txt.gz,,,,,,,,no pvalues
 GSE104609_ICC283_SAM_RNAseq_RRBS_DESeq2.csv.gz,pvalue,raw,other,improvement; effects,,7295,"[6098, 1197, 878, 751, 621, 624, 529, 499, 472, 451, 436, 405, 387, 391, 443, 376, 354, 475, 597, 335, 983, 546, 290, 295, 310, 306, 287, 261, 267, 287, 319, 323, 314, 297, 264, 259, 248, 290, 318, 327]",
 GSE104609_ICC283_SAM_RNAseq_RRBS_DESeq2.csv.gz,pvalue,basemean,anti-conservative,improvement; effects,0.43296009187482065,6801,"[5770, 1031, 749, 636, 506, 494, 406, 396, 357, 351, 329, 292, 294, 283, 274, 265, 260, 270, 229, 230, 226, 228, 214, 198, 227, 210, 210, 189, 175, 194, 182, 218, 194, 208, 172, 194, 183, 211, 177, 183]",
 GSE104609_ICC283_SAM_RNAseq_RRBS_edgeR.csv.gz,pvalue,,,,,,,p-values truncated or right-skewed
 GSE104609_ICC8261_SAM_RNAseq_RRBS_DESeq2.csv.gz,pvalue,raw,other,improvement; effects,,6776,"[5620, 1156, 830, 653, 617, 552, 515, 472, 425, 495, 500, 418, 434, 444, 407, 433, 394, 469, 495, 581, 911, 991, 369, 318, 359, 334, 337, 349, 382, 363, 384, 345, 369, 328, 300, 331, 341, 401, 447, 358]",
 GSE104609_ICC8261_SAM_RNAseq_RRBS_DESeq2.csv.gz,pvalue,basemean,anti-conservative,improvement; effects,0.4760569698329035,6535,"[5469, 1066, 733, 587, 505, 463, 414, 378, 327, 394, 366, 319, 289, 315, 281, 281, 261, 296, 228, 268, 267, 241, 256, 223, 265, 226, 237, 212, 253, 223, 248, 208, 241, 222, 211, 212, 201, 234, 225, 189]",
 GSE104609_ICC8261_SAM_RNAseq_RRBS_edgeR.csv.gz,pvalue,,,,,,,p-values truncated or right-skewed
+GSE104639_Reads_count_matrix.txt.gz,,,,,,,,no pvalues
+GSE104785_Salmonella_GeneCounts.txt.gz,,,,,,,,no pvalues
 GSE105068_deseq_WT_versus_KO_lung_all_genes.txt.gz,pvalue,raw,other,improvement; effects,,1451,"[933, 518, 431, 448, 431, 409, 423, 404, 453, 425, 461, 437, 488, 439, 427, 500, 465, 494, 480, 472, 503, 493, 488, 541, 520, 596, 514, 547, 528, 492, 576, 607, 628, 601, 557, 543, 493, 477, 476, 759]",
 GSE105068_deseq_WT_versus_KO_lung_all_genes.txt.gz,pvalue,basemean,anti-conservative,improvement; effects,1.0,1434,"[924, 510, 421, 437, 407, 384, 394, 385, 410, 392, 393, 394, 418, 375, 376, 393, 392, 419, 390, 394, 422, 422, 395, 423, 410, 429, 419, 431, 410, 416, 439, 435, 464, 452, 445, 437, 414, 436, 438, 431]",
+GSE105155_gene_expression_vsd.txt.gz,,,,,,,,no pvalues
 GSE105769_WT-VS-DLTpcrS.GeneDiffExp.txt.gz,p-value,raw,anti-conservative,same good,0.7792824899025899,1377,"[1193, 184, 156, 124, 112, 94, 83, 90, 77, 94, 87, 83, 53, 80, 72, 70, 67, 56, 62, 69, 64, 79, 65, 68, 52, 52, 83, 46, 61, 62, 62, 50, 52, 64, 49, 66, 67, 81, 111, 69]",
 GSE105769_WT-VS-DLTpcrS.GeneDiffExp.txt.gz,p-value,rpkm,anti-conservative,same good,0.7811753463927379,1374,"[1190, 184, 153, 123, 111, 93, 83, 89, 77, 92, 86, 82, 53, 78, 72, 69, 67, 56, 62, 69, 64, 78, 65, 68, 52, 52, 81, 46, 61, 62, 61, 50, 51, 64, 49, 66, 67, 81, 111, 68]",
+GSE106506_all.gene_counts.txt.gz,,,,,,,,no pvalues
+GSE107971_combined.counts.txt.gz,,,,,,,,no pvalues
+GSE107982_Differential_expression_DT3017pDT16_J1929.txt.gz,p-value,raw,other,,,240,"[128, 112, 128, 139, 131, 131, 141, 153, 152, 140, 172, 170, 177, 181, 167, 204, 193, 190, 192, 197, 195, 215, 237, 189, 220, 226, 226, 242, 206, 250, 217, 217, 238, 253, 222, 225, 225, 250, 246, 243]",
 GSE108864_Pkd1_Pkd2_summary.csv.gz,pkd1.pvalue,raw,other,improvement; effects,,4802,"[3797, 1005, 943, 781, 604, 557, 907, 660, 509, 526, 471, 1035, 536, 1155, 451, 457, 442, 1076, 440, 413, 411, 421, 514, 541, 404, 461, 420, 394, 420, 550, 493, 440, 457, 444, 472, 377, 411, 431, 405, 2952]",
 GSE108864_Pkd1_Pkd2_summary.csv.gz,pkd1.pvalue,logcpm,anti-conservative,improvement; effects,0.8037412809131264,2289,"[1808, 481, 379, 324, 338, 313, 287, 315, 281, 273, 279, 263, 275, 274, 258, 245, 259, 256, 268, 280, 272, 264, 278, 273, 253, 262, 261, 253, 266, 261, 270, 272, 227, 265, 229, 240, 250, 251, 245, 268]",
 GSE108864_Pkd1_Pkd2_summary.csv.gz,pkd2.pvalue,raw,other,improvement; effects,,5633,"[4480, 1153, 739, 903, 782, 526, 534, 531, 459, 864, 834, 462, 499, 1110, 755, 411, 353, 377, 462, 375, 352, 522, 390, 343, 606, 355, 377, 347, 431, 356, 326, 331, 351, 360, 350, 353, 392, 487, 651, 3894]",
 GSE108864_Pkd1_Pkd2_summary.csv.gz,pkd2.pvalue,logcpm,anti-conservative,improvement; effects,0.749841471147749,2831,"[2276, 555, 430, 363, 300, 311, 298, 272, 248, 258, 265, 262, 243, 266, 256, 233, 234, 254, 263, 252, 229, 241, 250, 236, 232, 251, 235, 225, 256, 245, 217, 216, 246, 251, 264, 237, 241, 235, 220, 250]",
 GSE108919_CsA_differential_expression.txt.gz,pvalue,raw,anti-conservative,same good,0.8910969166469522,1580,"[1106, 474, 412, 392, 365, 331, 336, 314, 327, 371, 306, 303, 298, 284, 313, 291, 269, 275, 309, 259, 277, 295, 271, 255, 270, 266, 236, 254, 271, 240, 269, 264, 275, 274, 240, 259, 260, 309, 291, 270]",
 GSE108919_CsA_differential_expression.txt.gz,pvalue,logcpm,anti-conservative,same good,0.8796773086165468,1520,"[1073, 447, 393, 360, 343, 309, 317, 293, 303, 340, 274, 281, 273, 262, 283, 265, 250, 252, 273, 232, 256, 266, 252, 224, 247, 236, 222, 233, 246, 219, 237, 231, 246, 245, 212, 232, 246, 282, 262, 235]",
+GSE110213_Htseq_counts_AZs.txt.gz,,,,,,,,no pvalues
 GSE111126_Mutt110_vs_Wt.txt.gz,p_value,raw,other,same bad,,3064,"[2712, 352, 273, 240, 184, 180, 177, 143, 126, 152, 162, 117, 112, 112, 111, 110, 110, 75, 98, 95, 96, 90, 92, 101, 75, 78, 95, 85, 80, 87, 64, 82, 92, 79, 76, 81, 79, 87, 106, 1032]",
 GSE111126_Mutt110_vs_Wt.txt.gz,p_value,fpkm,other,same bad,,3064,"[2712, 352, 273, 240, 184, 180, 177, 143, 126, 152, 162, 117, 112, 112, 111, 110, 110, 75, 98, 95, 96, 90, 92, 101, 75, 78, 95, 85, 80, 87, 64, 82, 92, 79, 76, 81, 79, 87, 106, 389]",
 GSE111126_Mutt110_vs_Wtcu.txt.gz,p_value,raw,other,same bad,,3420,"[3054, 366, 287, 233, 189, 152, 151, 135, 196, 128, 97, 113, 109, 87, 103, 97, 120, 89, 87, 70, 56, 86, 91, 74, 91, 83, 75, 68, 72, 62, 63, 79, 81, 78, 47, 65, 74, 72, 65, 1053]",
 GSE111126_Mutt110_vs_Wtcu.txt.gz,p_value,fpkm,other,same bad,,3420,"[3054, 366, 287, 233, 189, 152, 151, 135, 196, 128, 97, 113, 109, 87, 103, 97, 120, 89, 87, 70, 56, 86, 91, 74, 91, 83, 75, 68, 72, 62, 63, 79, 81, 78, 47, 65, 74, 72, 65, 386]",
 GSE111126_Wtcu_vs_Wt.txt.gz,p_value,raw,other,same bad,,2299,"[1871, 428, 309, 230, 219, 218, 173, 171, 156, 165, 145, 161, 146, 136, 141, 132, 134, 110, 123, 117, 112, 110, 129, 139, 95, 117, 120, 116, 117, 108, 107, 101, 103, 96, 101, 101, 95, 103, 114, 927]",
 GSE111126_Wtcu_vs_Wt.txt.gz,p_value,fpkm,other,same bad,,2299,"[1871, 428, 309, 230, 219, 218, 173, 171, 156, 165, 145, 161, 146, 136, 141, 132, 134, 110, 123, 117, 112, 110, 129, 139, 95, 117, 120, 116, 117, 108, 107, 101, 103, 96, 101, 101, 95, 103, 114, 358]",
+GSE111400_Annotated_Probe_Report_DESeq2_24h_p005.txt.gz,,,,,,,,no pvalues
 GSE112176_Treg_MT_CHIP_Seq_peaks.txt.gz,-log10(pvalue),,,,,,,p-values not in 0 to 1 range
-GSE115818_RNA-Seq_CARM1_in_J1_ES_Cells.no_NR.xlsx,,,,,,,,File is not a zip file
+GSE112334_KH2-ISY1_miRNA.txt.gz,,,,,,,,no pvalues
+GSE112997_rnadata_ppm.txt.gz,,,,,,,,no pvalues
+GSE114103_RPKM_Data.txt.gz,,,,,,,,no pvalues
+GSE114922_TPM_table.txt.gz,,,,,,,,no pvalues
+GSE115818_RNA-Seq_CARM1_in_J1_ES_Cells.no_NR.xlsx,,,,,,,,no pvalues
+GSE116268_dbGaP_ExpressionTable.tsv.gz,,,,,,,,no pvalues
+GSE116329_Mettl16_featureCounts_table_E2.5.csv.gz,,,,,,,,no pvalues
 sheet-wt vs hsrw66 from GSE116610_gene_expression_level.xlsx,p_value,raw,conservative,same bad,,437,"[313, 124, 102, 86, 90, 93, 98, 121, 112, 127, 130, 117, 125, 167, 147, 156, 183, 182, 214, 223, 222, 240, 267, 271, 328, 295, 381, 387, 445, 426, 519, 506, 574, 599, 649, 684, 710, 744, 710, 4037]",
 sheet-wt vs hsrw66 from GSE116610_gene_expression_level.xlsx,p_value,fpkm,conservative,same bad,,407,"[293, 114, 98, 82, 87, 84, 91, 108, 105, 115, 112, 104, 112, 151, 132, 147, 167, 173, 201, 206, 207, 232, 259, 263, 313, 284, 369, 377, 435, 419, 503, 495, 568, 587, 644, 676, 706, 738, 705, 683]",
 sheet-wt vs hsp90 hsrw66 from GSE116610_gene_expression_level.xlsx,p_value,raw,other,same bad,,2278,"[1860, 418, 366, 314, 257, 288, 272, 378, 325, 443, 288, 265, 247, 230, 204, 231, 235, 211, 266, 288, 243, 252, 241, 242, 215, 243, 251, 251, 277, 269, 281, 255, 268, 289, 292, 307, 281, 289, 289, 3483]",
@@ -50,20 +67,39 @@ sheet-hsp90 hsrw66 vs hsp90 from GSE116610_gene_expression_level.xlsx,p_value,ra
 sheet-hsp90 hsrw66 vs hsp90 from GSE116610_gene_expression_level.xlsx,p_value,fpkm,other,same bad,,1844,"[1439, 405, 340, 314, 253, 278, 255, 313, 265, 372, 243, 244, 257, 227, 201, 243, 248, 244, 239, 228, 252, 228, 221, 241, 229, 257, 256, 273, 275, 297, 306, 285, 282, 300, 303, 280, 308, 308, 290, 255]",
 GSE116756_10033956.1KT_Glu_Exp_KT_Myr_Exp.toptags_edgeR.csv.gz,pvalue,raw,anti-conservative,same good,0.7309622518001311,1176,"[934, 242, 185, 183, 142, 132, 124, 117, 121, 104, 89, 83, 91, 90, 78, 81, 76, 96, 62, 94, 76, 84, 76, 67, 78, 85, 62, 62, 73, 66, 80, 58, 61, 69, 55, 72, 66, 78, 58, 133]",
 GSE116756_10033956.1KT_Glu_Exp_KT_Myr_Exp.toptags_edgeR.csv.gz,pvalue,logcpm,anti-conservative,same good,0.6655413551965278,1118,"[892, 226, 163, 174, 130, 124, 116, 112, 107, 98, 81, 72, 84, 75, 71, 69, 68, 81, 50, 83, 67, 75, 66, 64, 69, 75, 56, 51, 65, 55, 71, 55, 60, 58, 49, 59, 59, 67, 58, 92]",
+GSE116756_genes_FPKM.txt.gz,,,,,,,,no pvalues
 GSE116758_Twt_vs._Tko_all.txt.gz,"edge test: twt vs tko, tagwise dispersions - p-value",raw,other,,,842,"[512, 330, 322, 313, 347, 349, 355, 396, 349, 295, 359, 474, 462, 336, 311, 362, 382, 625, 367, 334, 347, 537, 385, 411, 419, 1003, 452, 353, 442, 388, 364, 418, 353, 359, 370, 364, 292, 300, 240, 9043]",
+GSE120100_processed_data.txt.gz,,,,,,,,no pvalues
+GSE120755_osteoblast-ENCLB766DWN-ENCLB906BCL.hg19.hotspots2_noAlt.fdr0.01.txt.gz,,,,,,,,no pvalues
+GSE120888_raw_counts.xls.gz,,,,,,,,no pvalues
+GSE121994_RNAseq_condenseGenes_raw.txt.gz,,,,,,,,no pvalues
+GSE122026_E15.0_Mesenchymal_cells_scRNAseq_Final.csv.gz,,,,,,,,no pvalues
+GSE122043_genes.tsv.gz,,,,,,,,no pvalues
 sheet-WT-vs-hda6.genes.annot from GSE122047_WT-vs-hda6.genes.annot.xlsx,pvalue,raw,other,same bad,,6946,"[5848, 1098, 864, 657, 573, 644, 414, 463, 467, 422, 516, 394, 343, 332, 304, 395, 341, 253, 347, 297, 638, 292, 248, 312, 295, 401, 245, 337, 274, 283, 309, 258, 268, 276, 266, 246, 244, 208, 149, 7163]",
 sheet-WT-vs-hda6.genes.annot from GSE122047_WT-vs-hda6.genes.annot.xlsx,pvalue,fpkm,other,same bad,,6719,"[5694, 1025, 771, 636, 550, 512, 411, 423, 402, 401, 335, 366, 338, 311, 299, 316, 320, 252, 290, 296, 270, 271, 247, 293, 285, 283, 241, 276, 272, 239, 271, 249, 250, 268, 264, 246, 244, 208, 149, 1042]",
+GSE122233_BH9.rsem.regress.txt.gz,,,,,,,,no pvalues
 GSE123186_Lanno_et_al_2018_Cuffdiff.txt.gz,p_value,raw,conservative,same bad,,382,"[250, 132, 127, 140, 182, 203, 183, 210, 194, 196, 214, 227, 231, 257, 226, 265, 269, 295, 269, 325, 326, 362, 375, 375, 359, 374, 401, 422, 438, 450, 488, 464, 475, 512, 484, 515, 503, 511, 515, 4531]",
 GSE123186_Lanno_et_al_2018_Cuffdiff.txt.gz,p_value,fpkm,conservative,same bad,,381,"[249, 132, 127, 140, 182, 203, 183, 210, 194, 196, 214, 227, 231, 257, 226, 265, 269, 295, 269, 325, 326, 362, 375, 375, 359, 374, 401, 422, 438, 450, 488, 464, 475, 512, 484, 515, 503, 511, 515, 1233]",
+GSE123300_24h.after_data.txt.gz,,,,,,,,no pvalues
+GSE123847_norm_counts_mgl.csv.gz,,,,,,,,no pvalues
 GSE124304_ReadCounts_DeSeqRes.csv.gz,pvalue,raw,other,improvement; effects,,5142,"[4271, 871, 710, 601, 479, 465, 464, 431, 421, 416, 437, 444, 422, 399, 411, 407, 435, 435, 463, 440, 460, 616, 511, 421, 455, 465, 422, 1204, 420, 382, 405, 450, 546, 2966, 446, 439, 382, 395, 483, 918]",
 GSE124304_ReadCounts_DeSeqRes.csv.gz,pvalue,basemean,anti-conservative,improvement; effects,0.5194612993932219,4846,"[4106, 740, 583, 463, 348, 333, 318, 291, 269, 248, 278, 240, 240, 215, 207, 179, 197, 179, 221, 204, 200, 207, 175, 196, 179, 192, 168, 163, 176, 182, 181, 208, 196, 153, 171, 206, 183, 168, 171, 180]",
 GSE124341_Mmar_Mmar_ESX1.txt.gz,pval,,,,,,,p-values not in 0 to 1 range
+GSE124410_gene_data.csv.gz,,,,,,,,no pvalues
+GSE124419_combine_bulk.txt.gz,,,,,,,,no pvalues
+GSE124428_barcode.tsv.gz,,,,,,,,no pvalues
+GSE124485_RNAseq_normalizeExp.txt.gz,,,,,,,,no pvalues
+GSE124506_reads_matrix.txt.gz,,,,,,,,no pvalues
+GSE124506_reads_org_map.txt.gz,,,,,,,,no pvalues
 GSE41950_csl4-s2-ribominus.csv.gz,pval,raw,other,same bad,,124,"[77, 47, 59, 96, 44, 201, 39, 62, 102, 105, 246, 51, 133, 71, 28, 115, 205, 37, 64, 176, 420, 133, 43, 92, 65, 305, 68, 47, 211, 159, 106, 76, 113, 95, 83, 46, 32, 18, 9, 3571]",
 GSE41950_csl4-s2-ribominus.csv.gz,pval,basemean,other,same bad,,55,"[37, 18, 29, 25, 25, 39, 30, 28, 31, 39, 34, 33, 38, 43, 28, 54, 32, 37, 32, 46, 23, 28, 43, 40, 24, 30, 35, 23, 56, 34, 32, 14, 22, 63, 83, 46, 32, 18, 9, 259]",
+GSE43575_RNAseq030113.txt.gz,,,,,,,,no pvalues
 GSE45284_MEF_mats.txt.gz,pvalue,,,,,,,p-values truncated or right-skewed
 GSE45788_S72_2_RefII_S72_1_Emf_exp.cuff.gz,p_value,raw,other,same bad,,325,"[238, 87, 70, 92, 91, 88, 61, 73, 53, 54, 57, 47, 50, 39, 48, 36, 54, 54, 39, 42, 35, 46, 37, 44, 41, 33, 41, 50, 38, 46, 36, 44, 44, 29, 41, 48, 48, 42, 39, 110]",
 GSE45788_S72_2_RefII_S72_1_Emf_exp.cuff.gz,p_value,fpkm,other,same bad,,324,"[238, 86, 70, 91, 87, 78, 50, 61, 52, 46, 57, 45, 50, 37, 46, 36, 54, 53, 38, 42, 35, 46, 36, 44, 40, 32, 41, 50, 36, 45, 36, 44, 42, 29, 41, 48, 48, 41, 35, 47]",
 GSE46878_YW11_m6A_IP_mettl14KD_vs_YW10_m6A_IP_Scr.txt.gz,x.10.log10.pvalue.,,,,,,,p-values not in 0 to 1 range
+GSE49587_EG003_EG007.a5ss.miso_bf.txt.gz,,,,,,,,no pvalues
+GSE49587_EG004_EG007.mxe.miso_bf.txt.gz,,,,,,,,no pvalues
 GSE54831_CallingCards_pValue.txt.gz,dig1_pval,,,,,,,p-values truncated or right-skewed
 GSE54831_CallingCards_pValue.txt.gz,fkh1_pval,raw,other,,,232,"[204, 28, 41, 74, 7, 22, 30, 43, 66, 8, 115, 3, 50, 4, 31, 64, 13, 46, 7, 149, 16, 82, 40, 17, 7, 319, 83, 38, 28, 7, 229, 227, 4, 114, 123, 283, 153, 352, 335, 2988]",
 GSE54831_CallingCards_pValue.txt.gz,flo8_pval,,,,,,,p-values truncated or right-skewed
@@ -92,8 +128,14 @@ GSE54831_CallingCards_pValue.txt.gz,sok2_pval,,,,,,,p-values truncated or right-
 GSE54831_CallingCards_pValue.txt.gz,ste12_pval,,,,,,,p-values truncated or right-skewed
 GSE54831_CallingCards_pValue.txt.gz,tec1_pval,raw,other,,,114,"[111, 3, 10, 11, 1, 5, 8, 7, 22, 8, 34, 8, 4, 9, 24, 3, 18, 9, 56, 23, 20, 5, 4, 1, 67, 176, 7, 1, 28, 100, 3, 221, 37, 102, 24, 294, 50, 339, 323, 4274]",
 GSE54831_CallingCards_pValue.txt.gz,yap6_pval,,,,,,,p-values truncated or right-skewed
+GSE55280_Heart_Pool3_vs._Heart_Pool4.xls.gz,,,,,,,,no pvalues
 GSE55328_Cbrb_vs_LadS.csv.gz,pval,raw,other,improvement; effects,,761,"[592, 169, 146, 142, 118, 142, 121, 118, 129, 124, 109, 84, 79, 87, 88, 59, 67, 59, 60, 63, 53, 70, 43, 55, 45, 43, 51, 46, 35, 36, 54, 34, 45, 54, 40, 42, 56, 28, 38, 144]",
 GSE55328_Cbrb_vs_LadS.csv.gz,pval,basemean,anti-conservative,improvement; effects,0.5351386202450034,754,"[588, 166, 141, 135, 114, 125, 113, 107, 120, 114, 100, 72, 71, 75, 76, 46, 53, 44, 48, 54, 44, 54, 33, 42, 33, 36, 44, 33, 24, 27, 44, 22, 32, 42, 27, 37, 43, 18, 30, 75]",
+GSE56122_LPS-genes.fpkm_tracking.gz,,,,,,,,no pvalues
+GSE57374_qm9414_norm.counts.txt.gz,,,,,,,,no pvalues
+GSE57993_peakwise-tails.csv.gz,,,,,,,,no pvalues
+GSE59773_angcuffdiffconserved_genes.fpkm_tracking.gz,,,,,,,,no pvalues
+GSE63509_Raw_read_counts_of_imprinted_genes_in_skeletal_muscle.txt.gz,,,,,,,,no pvalues
 cds.diff from GSE67931_cuffdiff_out_pLKO1_vs_shLPA2.tar.gz,,,,,,,,empty table
 cds_exp.diff from GSE67931_cuffdiff_out_pLKO1_vs_shLPA2.tar.gz,,,,,,,,empty table
 gene_exp.diff from GSE67931_cuffdiff_out_pLKO1_vs_shLPA2.tar.gz,p_value,raw,conservative,no improvement,,780,"[520, 260, 204, 228, 215, 225, 295, 277, 374, 326, 374, 667, 338, 332, 406, 441, 467, 450, 397, 418, 435, 467, 438, 469, 491, 463, 493, 536, 530, 558, 624, 574, 562, 644, 634, 672, 686, 673, 740, 6429]",
@@ -106,6 +148,7 @@ tss_group_exp.diff from GSE67931_cuffdiff_out_pLKO1_vs_shLPA2.tar.gz,p_value,raw
 tss_group_exp.diff from GSE67931_cuffdiff_out_pLKO1_vs_shLPA2.tar.gz,p_value,fpkm,other,no improvement,,778,"[531, 247, 203, 208, 179, 218, 212, 249, 216, 242, 246, 259, 268, 297, 289, 304, 307, 300, 338, 334, 343, 383, 364, 382, 399, 407, 389, 408, 413, 408, 459, 491, 412, 473, 485, 517, 507, 519, 527, 922]",
 GSE68775_SIN3_KD_LID_KD_vs_GFP_RNAi.txt.gz,p_value,raw,other,same bad,,1842,"[1483, 359, 328, 235, 193, 192, 191, 208, 163, 155, 183, 167, 173, 156, 160, 148, 151, 143, 126, 146, 148, 160, 139, 145, 154, 147, 161, 144, 151, 148, 154, 139, 168, 153, 180, 147, 169, 169, 153, 6553]",
 GSE68775_SIN3_KD_LID_KD_vs_GFP_RNAi.txt.gz,p_value,fpkm,other,same bad,,1826,"[1468, 358, 326, 233, 190, 192, 185, 207, 162, 154, 181, 165, 173, 155, 159, 148, 150, 139, 126, 145, 147, 158, 138, 142, 154, 146, 161, 144, 151, 148, 153, 139, 168, 153, 180, 147, 169, 169, 153, 267]",
+GSE70078_LHSAR_RNA_seq_expression.txt.gz,,,,,,,,no pvalues
 GSE71396_K1-ER_K1-NanER_DEGs.csv.gz,k1-er tamx pval,raw,anti-conservative,same good,0.38560411311053994,1045,"[956, 89, 66, 36, 39, 28, 23, 27, 20, 22, 10, 11, 17, 16, 14, 13, 8, 10, 5, 10, 3, 8, 3, 4, 11, 8, 2, 2, 8, 1, 7, 3, 7, 3, 2, 4, 7, 5, 6, 42]",
 GSE71396_K1-ER_K1-NanER_DEGs.csv.gz,k1-er tamx pval,fpkm,anti-conservative,same good,0.3858520900321545,1044,"[955, 89, 66, 36, 39, 28, 23, 27, 20, 22, 10, 11, 17, 16, 14, 13, 8, 10, 5, 10, 3, 8, 3, 4, 11, 8, 2, 2, 8, 1, 7, 3, 7, 3, 2, 4, 7, 5, 6, 42]",
 GSE71396_K1-ER_K1-NanER_DEGs.csv.gz,k1-naner tamx pval,raw,anti-conservative,same good,0.35989717223650397,1300,"[1275, 25, 24, 14, 11, 13, 9, 11, 12, 6, 10, 7, 6, 7, 5, 1, 5, 3, 7, 5, 5, 2, 1, 5, 1, 2, 5, 1, 5, 3, 3, 1, 2, 1, 2, 5, 3, 3, 4, 46]",
@@ -122,6 +165,7 @@ GSE71609_2015_MZT.txt.gz,p_value.4,raw,other,same bad,,9646,"[9040, 606, 405, 31
 GSE71609_2015_MZT.txt.gz,p_value.4,fpkm,other,same bad,,9619,"[9017, 602, 402, 318, 243, 200, 203, 164, 163, 144, 137, 117, 104, 99, 94, 95, 100, 94, 97, 84, 69, 74, 75, 74, 76, 70, 86, 76, 84, 59, 64, 76, 71, 64, 57, 75, 78, 73, 82, 3199]",
 sheet-EST-d_lt40_over_EST-u.cuffdiff from GSE72712_ESCd_lt40_over_ESCu.cuffdiff.xlsx,p_value,raw,other,same bad,,9732,"[8684, 1048, 765, 583, 539, 460, 484, 448, 468, 540, 374, 310, 301, 277, 277, 248, 269, 240, 246, 218, 228, 224, 215, 196, 200, 171, 205, 185, 191, 205, 169, 195, 195, 160, 189, 198, 156, 156, 155, 43861]",
 sheet-EST-d_lt40_over_EST-u.cuffdiff from GSE72712_ESCd_lt40_over_ESCu.cuffdiff.xlsx,p_value,fpkm,other,same bad,,9322,"[8336, 986, 704, 539, 489, 410, 436, 416, 422, 470, 335, 289, 270, 266, 253, 233, 244, 225, 234, 204, 219, 213, 209, 191, 191, 164, 200, 177, 187, 201, 167, 189, 190, 157, 187, 197, 156, 156, 155, 732]",
+GSE74356_X4p53_Chr16_sgRNA_2_APH_comb.txt.gz,,,,,,,,no pvalues
 cds.diff from GSE75035_04_cuffdiff_LNCaP_ECI1_vs_Scr.tar.gz,p_value,raw,anti-conservative,,1.0,269,"[222, 47, 68, 64, 62, 73, 51, 57, 55, 49, 34, 54, 62, 43, 47, 39, 43, 62, 43, 49, 47, 48, 44, 44, 36, 42, 42, 43, 46, 55, 46, 51, 59, 55, 39, 43, 50, 46, 41, 16466]",
 cds_exp.diff from GSE75035_04_cuffdiff_LNCaP_ECI1_vs_Scr.tar.gz,p_value,raw,other,same bad,,1239,"[827, 412, 331, 312, 339, 344, 323, 364, 457, 399, 297, 287, 331, 260, 308, 294, 291, 275, 279, 292, 276, 283, 266, 251, 281, 294, 260, 260, 281, 253, 277, 258, 280, 242, 239, 258, 244, 262, 269, 17202]",
 cds_exp.diff from GSE75035_04_cuffdiff_LNCaP_ECI1_vs_Scr.tar.gz,p_value,fpkm,other,same bad,,1239,"[827, 412, 331, 312, 336, 339, 315, 358, 454, 396, 295, 286, 327, 259, 308, 294, 290, 275, 279, 292, 276, 283, 265, 251, 281, 294, 260, 260, 281, 253, 277, 258, 280, 242, 239, 258, 244, 262, 269, 1682]",
@@ -133,14 +177,33 @@ promoters.diff from GSE75035_04_cuffdiff_LNCaP_ECI1_vs_Scr.tar.gz,p_value,raw,an
 splicing.diff from GSE75035_04_cuffdiff_LNCaP_ECI1_vs_Scr.tar.gz,p_value,raw,anti-conservative,,1.0,728,"[561, 167, 217, 234, 234, 229, 208, 163, 177, 148, 146, 155, 150, 159, 132, 126, 125, 134, 135, 125, 116, 137, 129, 129, 127, 122, 101, 155, 120, 111, 114, 119, 112, 126, 124, 133, 126, 127, 137, 31138]",
 tss_group_exp.diff from GSE75035_04_cuffdiff_LNCaP_ECI1_vs_Scr.tar.gz,p_value,raw,other,same bad,,1747,"[1209, 538, 503, 440, 502, 490, 477, 565, 557, 530, 476, 420, 464, 410, 460, 470, 431, 385, 433, 410, 444, 398, 386, 374, 387, 417, 409, 423, 407, 411, 383, 357, 424, 374, 408, 438, 397, 398, 443, 19380]",
 tss_group_exp.diff from GSE75035_04_cuffdiff_LNCaP_ECI1_vs_Scr.tar.gz,p_value,fpkm,other,same bad,,1747,"[1209, 538, 502, 439, 500, 487, 471, 553, 551, 524, 475, 419, 460, 406, 457, 469, 429, 385, 433, 407, 444, 398, 386, 374, 387, 417, 409, 423, 407, 411, 383, 357, 424, 374, 408, 438, 397, 398, 443, 2394]",
+GSE75293_Chitosan_Summary.xls.gz,,,,,,,,no pvalues
+GSE75818_WTKasRep1.csv.gz,,,,,,,,no pvalues
+GSE75818_sigPep.csv.gz,,,,,,,,no pvalues
 GSE77217_expression.txt.gz,p value,raw,other,,,1118,"[848, 270, 295, 187, 226, 189, 113, 107, 142, 78, 115, 116, 59, 94, 53, 62, 100, 56, 73, 33, 81, 56, 70, 80, 61, 48, 61, 48, 33, 27, 51, 25, 47, 50, 35, 28, 49, 43, 28, 39]",
+GSE77257_FPKM_expression_matrix.txt.gz,,,,,,,,no pvalues
+GSE80543_rpkm.txt.gz,,,,,,,,no pvalues
 GSE80737_BR20-20_2028-20_batch_DE.txt.gz,pvalue,raw,conservative,no improvement,,621,"[400, 221, 196, 195, 221, 202, 218, 245, 261, 246, 286, 287, 333, 337, 355, 379, 400, 427, 392, 417, 439, 492, 504, 476, 505, 494, 516, 562, 547, 599, 600, 606, 629, 661, 616, 621, 673, 706, 657, 681]",
 GSE80737_BR20-20_2028-20_batch_DE.txt.gz,pvalue,logcpm,other,no improvement,,603,"[388, 215, 192, 193, 217, 202, 217, 240, 257, 246, 284, 286, 332, 335, 353, 379, 399, 422, 392, 416, 436, 490, 503, 473, 504, 491, 514, 561, 544, 598, 599, 602, 627, 659, 612, 616, 667, 703, 656, 676]",
+GSE81063_MR1T_counts.txt.gz,,,,,,,,no pvalues
+GSE81802_M81_new_viral_genes_RPKM.txt.gz,,,,,,,,no pvalues
 sheet-CTRL_vs_Gsk3b_Cuffdiff.txt from GSE84302_CTRL_vs_siGsk3b.xlsx,p value,raw,other,,,915,"[581, 334, 341, 307, 342, 339, 316, 323, 337, 356, 341, 334, 312, 343, 348, 387, 385, 359, 385, 347, 400, 381, 404, 415, 396, 391, 440, 423, 440, 428, 462, 486, 486, 479, 503, 502, 520, 588, 599, 827]",
 GSE86086_Processed_data_Result_DEG_LEEKT.txt.gz,pvalue,,,,,,,p-values truncated or right-skewed
+GSE87266_gene_counts.csv.gz,,,,,,,,no pvalues
+GSE87821_BRG1fl.nucRNAseq.DESeq2_Results.txt.gz,brg1fl.deseq.pvalue,raw,anti-conservative,same good,0.6908029496108153,4555,"[3625, 930, 650, 556, 555, 502, 504, 453, 424, 395, 419, 334, 388, 328, 368, 348, 358, 353, 396, 340, 349, 404, 327, 489, 347, 344, 321, 480, 338, 317, 484, 334, 302, 307, 440, 370, 339, 289, 397, 324]",
+GSE87821_BRG1fl.nucRNAseq.DESeq2_Results.txt.gz,brg1fl.deseq.pvalue,basemean,anti-conservative,same good,0.6224826071036251,4494,"[3596, 898, 615, 520, 521, 466, 455, 418, 380, 359, 365, 300, 326, 275, 285, 267, 296, 293, 274, 271, 276, 304, 267, 263, 282, 279, 254, 234, 279, 250, 241, 253, 241, 237, 247, 279, 270, 233, 276, 241]",
+GSE90766_Huising_mouse_alpha_transdifferentiated_STAR_mm10_RPKM.csv.gz,,,,,,,,no pvalues
+GSE93894_SLX085-02-v4.604p_complete.xls.gz,,,,,,,,no pvalues
 GSE94335_Differential_expression_BUD_vs_vehicle_asthma.txt.gz,pval,raw,anti-conservative,,0.8945297059480642,7205,"[5178, 2027, 1711, 1614, 1504, 1474, 1450, 1425, 1372, 1414, 1343, 1408, 1365, 1275, 1326, 1327, 1257, 1361, 1292, 1263, 1294, 1260, 1248, 1291, 1324, 1306, 1365, 1242, 1246, 1289, 1336, 1297, 1279, 1334, 1275, 1210, 1292, 1309, 1327, 1277]",
+GSE94501_GeneMat.results.txt.gz,,,,,,,,no pvalues
 GSE94813_v1.var.txt.gz,p-value,,,,,,,p-values truncated or right-skewed
 GSE95180_Control_vs_clone5.csv.gz,pvalue,,,,,,,p-values not in 0 to 1 range
+GSE95756_counts_scaled_DESeq.txt.gz,,,,,,,,no pvalues
+GSE96586_HS83_normalized_counts.txt.gz,,,,,,,,no pvalues
+GSE96896_Analysis_w115-M_vs._w115-NM.xls.gz,,,,,,,,no pvalues
+GSE97728_Counts_Raw_Normalized.txt.gz,,,,,,,,no pvalues
 GSE97776_res_ob6_ob10_deseq_full.tsv.gz,pval,raw,other,improvement; effects,,2924,"[2159, 765, 679, 628, 543, 550, 531, 520, 477, 457, 474, 461, 469, 495, 460, 471, 506, 522, 429, 452, 539, 482, 454, 451, 467, 619, 545, 468, 432, 469, 840, 448, 525, 544, 598, 563, 518, 436, 390, 1429]",
 GSE97776_res_ob6_ob10_deseq_full.tsv.gz,pval,basemean,anti-conservative,improvement; effects,0.8357069919922611,2876,"[2135, 741, 638, 570, 501, 511, 498, 475, 428, 407, 418, 396, 416, 413, 408, 408, 407, 426, 367, 401, 386, 387, 385, 352, 375, 385, 385, 401, 365, 347, 365, 353, 394, 356, 449, 403, 400, 354, 340, 461]",
-GSE99574_HiSAT2_dana.nrc.FB.txt.tar.gz,,,,,,,,'utf-8' codec can't decode byte 0x8b in position 1: invalid start byte
+GSE98117_103888_1230_gene.xlsx,,,,,,,,no pvalues
+GSE98898_TPM.txt.gz,,,,,,,,no pvalues
+GSE99574_HiSAT2_dana.nrc.FB.txt.tar.gz,,,,,,,,no pvalues

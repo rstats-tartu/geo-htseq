@@ -22,7 +22,7 @@ keep = re.compile(keep)
 gse = re.compile("GSE\d+_")
 pv_str = "p[^a-zA-Z]{0,4}val"
 pv = re.compile(pv_str)
-adj = re.compile("adj|fdr|corr")
+adj = re.compile("adj|fdr|corr|thresh")
 space = re.compile(" ")
 fields = ["Type", "Class", "Conversion", "pi0", "FDR_pval", "hist", "note"]
 PValSum = collections.namedtuple("PValSum", fields, defaults=[np.nan] * 7)
@@ -35,10 +35,17 @@ def raw_pvalues(i):
 def find_header(df, n=20):
     head = df.head(n)
     idx = 0
-    for index, row in head.iterrows():
-        if all([isinstance(i, str) for i in row if i is not np.nan]):
-            idx = index + 1
+    for col in head:
+        s = head[col]
+        match = s.str.contains(pv_str, na=False)
+        if any(match):
+            idx = s.index[match].tolist()[0] + 1
             break
+    if idx == 0:
+        for index, row in head.iterrows():
+            if all([isinstance(i, str) for i in row if i is not np.nan]):
+                idx = index + 1
+                break
     return idx
 
 
@@ -70,14 +77,14 @@ def csv_helper(input, input_name, csv):
             encoding="unicode_escape",
         ).drop([0])
         df.columns = columns
-    if args.verbose > 1:
-        print("df after import:\n", df)
     if all(["Unnamed" in i for i in list(df.columns)]):
         idx = find_header(df)
         if idx > 0:
             df = pd.read_csv(
                 input, sep=sep, comment=comment, skiprows=idx, encoding="unicode_escape"
             )
+    if args.verbose > 1:
+        print("df after import:\n", df)
     return {os.path.basename(input_name): df}
 
 
