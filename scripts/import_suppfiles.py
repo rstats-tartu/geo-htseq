@@ -67,6 +67,8 @@ def csv_helper(input, input_name, csv):
         sep = "\s+"
     # Import file
     df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape")
+    # Check and fix column names
+    # Case of extra level of delimiters in column names 
     if len(df.columns) > len(columns):
         df = pd.read_csv(
             input,
@@ -77,12 +79,18 @@ def csv_helper(input, input_name, csv):
             encoding="unicode_escape",
         ).drop([0])
         df.columns = columns
-    if all(["Unnamed" in i for i in list(df.columns)]):
+    unnamed = ["Unnamed" in i for i in df.columns]
+    # Case of empty rows before header
+    if all(unnamed):
         idx = find_header(df)
         if idx > 0:
             df = pd.read_csv(
                 input, sep=sep, comment=comment, skiprows=idx, encoding="unicode_escape"
             )
+    # Case of anonymous row names
+    if (unnamed[-1] & sum(unnamed) == 1):
+        if any([pv.search(i) for i in df.columns]):
+            df.columns = [df.columns[-1]] + list(df.columns[:-1])
     if args.verbose > 1:
         print("df after import:\n", df)
     return {os.path.basename(input_name): df}
