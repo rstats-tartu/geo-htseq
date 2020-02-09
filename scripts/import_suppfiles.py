@@ -55,8 +55,12 @@ def csv_helper(input, input_name, csv):
     comment = None
     sep = r._engine.data.dialect.delimiter
     columns = r._engine.columns
-    with gzip.open(input, "rb") if re.search("gz$", input) else open(input, "r") as h:
-        first_line=h.readline().decode("utf-8").rstrip()
+    if isinstance(input, (tarfile.ExFileObject)):
+        with csv as h:
+            first_line = h.readline()
+    else:
+        with gzip.open(input, "rb") if re.search("gz$", input) else open(input, "r") as h:
+            first_line = h.readline().decode("utf-8").rstrip()
     if re.search("^#", first_line):
         comment = "#"
         # Get delimiter
@@ -70,7 +74,7 @@ def csv_helper(input, input_name, csv):
     # Import file
     df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape")
     # Check and fix column names
-    # Case of extra level of delimiters in column names 
+    # Case of extra level of delimiters in column names
     if len(df.columns) > len(columns):
         df = pd.read_csv(
             input,
@@ -90,7 +94,7 @@ def csv_helper(input, input_name, csv):
                 input, sep=sep, comment=comment, skiprows=idx, encoding="unicode_escape"
             )
     # Case of anonymous row names
-    if (unnamed[-1] & sum(unnamed) == 1):
+    if unnamed[-1] & sum(unnamed) == 1:
         if any([pv.search(i) for i in df.columns]):
             df.columns = [df.columns[-1]] + list(df.columns[:-1])
     if args.verbose > 1:
@@ -545,6 +549,10 @@ if __name__ == "__main__":
                     fdr=FDR,
                     var={k: v for k, v in VAR.items() if "value" not in k},
                     verbose=args.verbose,
+                )
+                if not v.empty
+                else pd.DataFrame(
+                    PValSum(note="all p-values are NaN")._asdict(), index=[0]
                 )
                 for k, v in frames.items()
             }

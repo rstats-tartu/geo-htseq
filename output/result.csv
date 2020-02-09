@@ -98,6 +98,8 @@ GSE124428_barcode.tsv.gz,,,,,,,,no pvalues
 GSE124485_RNAseq_normalizeExp.txt.gz,,,,,,,,no pvalues
 GSE124506_reads_matrix.txt.gz,,,,,,,,no pvalues
 GSE124506_reads_org_map.txt.gz,,,,,,,,no pvalues
+GSE41064_cuffdiff_WT_vs_EFG1concentric.txt.gz,p_value,raw,other,same bad,,512,"[409, 103, 91, 93, 91, 88, 98, 98, 110, 110, 111, 110, 132, 118, 122, 115, 122, 126, 130, 134, 149, 184, 149, 147, 162, 142, 151, 150, 165, 208, 180, 157, 150, 193, 171, 165, 188, 178, 173, 161]",
+GSE41064_cuffdiff_WT_vs_EFG1concentric.txt.gz,p_value,fpkm,other,same bad,,511,"[409, 102, 91, 92, 89, 88, 96, 97, 106, 110, 105, 107, 121, 114, 119, 114, 118, 124, 129, 131, 144, 181, 148, 141, 160, 140, 146, 147, 160, 204, 173, 154, 149, 186, 166, 159, 184, 174, 172, 137]",
 GSE41950_csl4-s2-ribominus.csv.gz,pval,raw,other,same bad,,124,"[77, 47, 59, 96, 44, 201, 39, 62, 102, 105, 246, 51, 133, 71, 28, 115, 205, 37, 64, 176, 420, 133, 43, 92, 65, 305, 68, 47, 211, 159, 106, 76, 113, 95, 83, 46, 32, 18, 9, 3571]",
 GSE41950_csl4-s2-ribominus.csv.gz,pval,basemean,other,same bad,,55,"[37, 18, 29, 25, 25, 39, 30, 28, 31, 39, 34, 33, 38, 43, 28, 54, 32, 37, 32, 46, 23, 28, 43, 40, 24, 30, 35, 23, 56, 34, 32, 14, 22, 63, 83, 46, 32, 18, 9, 259]",
 GSE43575_RNAseq030113.txt.gz,,,,,,,,no pvalues
@@ -140,6 +142,7 @@ GSE55328_Cbrb_vs_LadS.csv.gz,pval,raw,other,improvement; effects,,761,"[592, 169
 GSE55328_Cbrb_vs_LadS.csv.gz,pval,basemean,anti-conservative,improvement; effects,0.5351386202450034,754,"[588, 166, 141, 135, 114, 125, 113, 107, 120, 114, 100, 72, 71, 75, 76, 46, 53, 44, 48, 54, 44, 54, 33, 42, 33, 36, 44, 33, 24, 27, 44, 22, 32, 42, 27, 37, 43, 18, 30, 75]",
 GSE56122_LPS-genes.fpkm_tracking.gz,,,,,,,,no pvalues
 GSE57374_qm9414_norm.counts.txt.gz,,,,,,,,no pvalues
+GSE57487_raw_counts.txt.gz,,,,,,,,all p-values are NaN
 GSE57993_peakwise-tails.csv.gz,,,,,,,,no pvalues
 GSE59773_angcuffdiffconserved_genes.fpkm_tracking.gz,,,,,,,,no pvalues
 GSE63509_Raw_read_counts_of_imprinted_genes_in_skeletal_muscle.txt.gz,,,,,,,,no pvalues
@@ -189,11 +192,14 @@ GSE75818_WTKasRep1.csv.gz,,,,,,,,no pvalues
 GSE75818_sigPep.csv.gz,,,,,,,,no pvalues
 GSE77217_expression.txt.gz,p value,raw,other,,,1118,"[848, 270, 295, 187, 226, 189, 113, 107, 142, 78, 115, 116, 59, 94, 53, 62, 100, 56, 73, 33, 81, 56, 70, 80, 61, 48, 61, 48, 33, 27, 51, 25, 47, 50, 35, 28, 49, 43, 28, 39]",
 GSE77257_FPKM_expression_matrix.txt.gz,,,,,,,,no pvalues
+GSE79477_131_vs_132_ANOVA.txt.gz,,,,,,,,all p-values are NaN
 GSE80543_rpkm.txt.gz,,,,,,,,no pvalues
 GSE80737_BR20-20_2028-20_batch_DE.txt.gz,pvalue,raw,conservative,no improvement,,621,"[400, 221, 196, 195, 221, 202, 218, 245, 261, 246, 286, 287, 333, 337, 355, 379, 400, 427, 392, 417, 439, 492, 504, 476, 505, 494, 516, 562, 547, 599, 600, 606, 629, 661, 616, 621, 673, 706, 657, 681]",
 GSE80737_BR20-20_2028-20_batch_DE.txt.gz,pvalue,logcpm,other,no improvement,,603,"[388, 215, 192, 193, 217, 202, 217, 240, 257, 246, 284, 286, 332, 335, 353, 379, 399, 422, 392, 416, 436, 490, 503, 473, 504, 491, 514, 561, 544, 598, 599, 602, 627, 659, 612, 616, 667, 703, 656, 676]",
 GSE81063_MR1T_counts.txt.gz,,,,,,,,no pvalues
 GSE81802_M81_new_viral_genes_RPKM.txt.gz,,,,,,,,no pvalues
+GSE81889_Ctrl_vs_ifnA.differential_gene_expression.out.txt.gz,pvalue,raw,other,improvement; effects,,1160,"[782, 378, 364, 359, 338, 325, 326, 352, 382, 361, 404, 395, 370, 403, 378, 414, 451, 478, 472, 470, 474, 537, 498, 469, 570, 472, 524, 530, 533, 530, 498, 528, 549, 657, 409, 679, 401, 390, 374, 370]",
+GSE81889_Ctrl_vs_ifnA.differential_gene_expression.out.txt.gz,pvalue,basemean,anti-conservative,improvement; effects,0.9868592811765732,956,"[657, 299, 277, 283, 271, 250, 238, 237, 266, 245, 271, 260, 245, 255, 252, 276, 275, 284, 265, 277, 261, 287, 279, 287, 286, 288, 299, 294, 306, 306, 287, 296, 303, 315, 302, 278, 295, 301, 270, 268]",
 sheet-CTRL_vs_Gsk3b_Cuffdiff.txt from GSE84302_CTRL_vs_siGsk3b.xlsx,p value,raw,other,,,915,"[581, 334, 341, 307, 342, 339, 316, 323, 337, 356, 341, 334, 312, 343, 348, 387, 385, 359, 385, 347, 400, 381, 404, 415, 396, 391, 440, 423, 440, 428, 462, 486, 486, 479, 503, 502, 520, 588, 599, 827]",
 GSE86086_Processed_data_Result_DEG_LEEKT.txt.gz,pvalue,,,,,,,p-values truncated or right-skewed
 GSE87266_gene_counts.csv.gz,,,,,,,,no pvalues
