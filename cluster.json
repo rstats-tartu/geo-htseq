@@ -5,12 +5,12 @@
         "time" : 120,
         "mem" : 4000,
         "partition" : "main",
-        "output" : "slurm_%j.log"
+        "output" : "logs/slurm_%j.log"
     },
     "import_suppfiles" :
     {
-        "mem" : 16000,
-        "time": 360
+        "mem" : 32000,
+        "time": 620
     },
     "merge_parsed_suppfiles" :
     {   
