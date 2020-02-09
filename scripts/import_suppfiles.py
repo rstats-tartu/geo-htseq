@@ -55,7 +55,9 @@ def csv_helper(input, input_name, csv):
     comment = None
     sep = r._engine.data.dialect.delimiter
     columns = r._engine.columns
-    if re.search("^#", list(r.get_chunk(0).columns)[0]):
+    with gzip.open(input, "rb") if re.search("gz$", input) else open(input, "r") as h:
+        first_line=h.readline().decode("utf-8").rstrip()
+    if re.search("^#", first_line):
         comment = "#"
         # Get delimiter
         r = pd.read_csv(
