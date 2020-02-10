@@ -23,7 +23,7 @@ gse = re.compile("GSE\d+_")
 pv_str = "p[^a-zA-Z]{0,4}val"
 pv = re.compile(pv_str)
 adj = re.compile("adj|fdr|corr|thresh")
-space = re.compile(" ")
+ws = re.compile(" ")
 fields = ["Type", "Class", "Conversion", "pi0", "FDR_pval", "hist", "note"]
 PValSum = collections.namedtuple("PValSum", fields, defaults=[np.nan] * 7)
 
@@ -69,7 +69,7 @@ def csv_helper(input, input_name, csv):
         )
         sep = r._engine.data.dialect.delimiter
         columns = r._engine.columns
-    if space.search(sep):
+    if ws.search(sep):
         sep = "\s+"
     # Import file
     df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape")
