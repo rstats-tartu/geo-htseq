@@ -192,6 +192,7 @@ GSE75818_WTKasRep1.csv.gz,,,,,,,,no pvalues
 GSE75818_sigPep.csv.gz,,,,,,,,no pvalues
 GSE77217_expression.txt.gz,p value,raw,other,,,1118,"[848, 270, 295, 187, 226, 189, 113, 107, 142, 78, 115, 116, 59, 94, 53, 62, 100, 56, 73, 33, 81, 56, 70, 80, 61, 48, 61, 48, 33, 27, 51, 25, 47, 50, 35, 28, 49, 43, 28, 39]",
 GSE77257_FPKM_expression_matrix.txt.gz,,,,,,,,no pvalues
+GSE78084_Supplementary_file_1_PAR-CLIP_RNA-seq_annotation.txt.gz,ms-lfq -log(p-value) based on multiple t-testing,,,,,,,p-values not in 0 to 1 range
 GSE79477_131_vs_132_ANOVA.txt.gz,,,,,,,,all p-values are NaN
 GSE80543_rpkm.txt.gz,,,,,,,,no pvalues
 GSE80737_BR20-20_2028-20_batch_DE.txt.gz,pvalue,raw,conservative,no improvement,,621,"[400, 221, 196, 195, 221, 202, 218, 245, 261, 246, 286, 287, 333, 337, 355, 379, 400, 427, 392, 417, 439, 492, 504, 476, 505, 494, 516, 562, 547, 599, 600, 606, 629, 661, 616, 621, 673, 706, 657, 681]",
@@ -205,6 +206,8 @@ GSE86086_Processed_data_Result_DEG_LEEKT.txt.gz,pvalue,,,,,,,p-values truncated 
 GSE87266_gene_counts.csv.gz,,,,,,,,no pvalues
 GSE87821_BRG1fl.nucRNAseq.DESeq2_Results.txt.gz,brg1fl.deseq.pvalue,raw,anti-conservative,same good,0.6908029496108153,4555,"[3625, 930, 650, 556, 555, 502, 504, 453, 424, 395, 419, 334, 388, 328, 368, 348, 358, 353, 396, 340, 349, 404, 327, 489, 347, 344, 321, 480, 338, 317, 484, 334, 302, 307, 440, 370, 339, 289, 397, 324]",
 GSE87821_BRG1fl.nucRNAseq.DESeq2_Results.txt.gz,brg1fl.deseq.pvalue,basemean,anti-conservative,same good,0.6224826071036251,4494,"[3596, 898, 615, 520, 521, 466, 455, 418, 380, 359, 365, 300, 326, 275, 285, 267, 296, 293, 274, 271, 276, 304, 267, 263, 282, 279, 254, 234, 279, 250, 241, 253, 241, 237, 247, 279, 270, 233, 276, 241]",
+GSE89665_COMP3_DE_Table.txt.gz,pvalue,raw,other,improvement; effects,,3239,"[2643, 596, 500, 383, 347, 454, 308, 357, 350, 294, 451, 333, 289, 274, 303, 399, 262, 291, 356, 236, 835, 259, 300, 267, 287, 506, 260, 378, 277, 346, 303, 303, 290, 260, 255, 257, 230, 244, 205, 23152]",
+GSE89665_COMP3_DE_Table.txt.gz,pvalue,logcpm,anti-conservative,improvement; effects,0.8332542469393567,2266,"[1900, 366, 296, 271, 246, 225, 208, 227, 210, 219, 203, 204, 226, 205, 199, 209, 220, 219, 194, 186, 193, 209, 213, 207, 229, 215, 209, 217, 222, 231, 218, 210, 222, 206, 207, 218, 202, 219, 205, 252]",
 GSE90766_Huising_mouse_alpha_transdifferentiated_STAR_mm10_RPKM.csv.gz,,,,,,,,no pvalues
 GSE93894_SLX085-02-v4.604p_complete.xls.gz,,,,,,,,no pvalues
 GSE94335_Differential_expression_BUD_vs_vehicle_asthma.txt.gz,pval,raw,anti-conservative,,0.8945297059480642,7205,"[5178, 2027, 1711, 1614, 1504, 1474, 1450, 1425, 1372, 1414, 1343, 1408, 1365, 1275, 1326, 1327, 1257, 1361, 1292, 1263, 1294, 1260, 1248, 1291, 1324, 1306, 1365, 1242, 1246, 1289, 1336, 1297, 1279, 1334, 1275, 1210, 1292, 1309, 1327, 1277]",

@@ -24,6 +24,8 @@ pv_str = "p[^a-zA-Z]{0,4}val"
 pv = re.compile(pv_str)
 adj = re.compile("adj|fdr|corr|thresh")
 ws = re.compile(" ")
+mtabs = re.compile("\w+\t{2,}\w+")
+tab = re.compile("\t")
 fields = ["Type", "Class", "Conversion", "pi0", "FDR_pval", "hist", "note"]
 PValSum = collections.namedtuple("PValSum", fields, defaults=[np.nan] * 7)
 
@@ -59,9 +61,12 @@ def csv_helper(input, input_name, csv):
         with csv as h:
             first_line = h.readline()
     else:
-        with gzip.open(input, "rb") if re.search("gz$", input) else open(input, "r") as h:
+        with gzip.open(input, "rb") if re.search("gz$", input) else open(
+            input, "r"
+        ) as h:
             first_line = h.readline().decode("utf-8").rstrip()
-    if re.search("^#", first_line):
+    more_tabs_than_sep = len(tab.findall(first_line)) > len(re.findall(sep, first_line))
+    if re.search("^#", first_line) or more_tabs_than_sep:
         comment = "#"
         # Get delimiter
         r = pd.read_csv(
@@ -71,6 +76,8 @@ def csv_helper(input, input_name, csv):
         columns = r._engine.columns
     if ws.search(sep):
         sep = "\s+"
+    if mtabs.search(first_line):
+        sep = "\t+"
     # Import file
     df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape")
     # Check and fix column names
