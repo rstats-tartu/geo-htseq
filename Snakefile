@@ -160,7 +160,7 @@ rule import_suppfiles:
     "envs/geo-query.yaml"
   shell:
     """
-    python scripts/import_suppfiles.py --list {input} --out {output} {params}
+    python3 -u scripts/import_suppfiles.py --list {input} --out {output} {params}
     """
 
 
