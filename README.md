@@ -20,7 +20,7 @@ conda create -n snakemake-env -c bioconda snakemake
 * (Fork and) clone this repository 
 
 ```bash
-git clone https://github.com/tpall/geo-rnaseq.git
+git clone https://github.com/tpall/geo-htseq.git
 ```
 
 * Dry run workflow
