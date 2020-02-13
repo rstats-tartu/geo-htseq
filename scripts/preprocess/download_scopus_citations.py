@@ -30,7 +30,7 @@ headers = {"Accept": "application/json", "Encoding": "UTF-8"}
 
 # Run query
 with open(snakemake.output[0], "a") as f:
-    citations = {}  # pd.DataFrame(columns=["PubMedIds", "citations"])
+    citations = {} 
     for chunk in chunked:
         pmids_query = " OR ".join(["PMID({})".format(i) for i in chunk])
         params = {
@@ -43,7 +43,7 @@ with open(snakemake.output[0], "a") as f:
         r.raise_for_status()
         entry = r.json()["search-results"]["entry"]
         citedby_count = {i["pubmed-id"]: int(i["citedby-count"]) for i in entry}
-        citations = citations.update(citedby_count)
+        citations.update(citedby_count)
     df = (
         pd.DataFrame.from_dict(citations, orient="index", columns=["citations"])
         .reset_index()
