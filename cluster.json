@@ -10,7 +10,7 @@
     "import_suppfiles" :
     {
         "mem" : 64000,
-        "time": 180
+        "time": 380
     },
     "merge_parsed_suppfiles" :
     {   
