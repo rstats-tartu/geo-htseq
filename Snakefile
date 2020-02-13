@@ -130,7 +130,7 @@ rule import_suppfiles:
     "envs/geo-query.yaml"
   shell:
     """
-    python3 -u scripts/import_suppfiles.py --list {input} --out {output} {params}
+    python3 -u scripts/preprocess/import_suppfiles.py --list {input} --out {output} {params}
     """
 
 
@@ -143,7 +143,7 @@ rule merge_parsed_suppfiles:
   conda: 
     "envs/geo-query.yaml"
   script:
-    "scripts/concat_tabs.py"
+    "scripts/preprocess/concat_tabs.py"
     
 
 
