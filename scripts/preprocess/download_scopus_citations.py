@@ -30,7 +30,7 @@ headers = {"Accept": "application/json", "Encoding": "UTF-8"}
 
 # Run query
 with open(snakemake.output[0], "a") as f:
-    citations = {} 
+    citations = {}
     for chunk in chunked:
         pmids_query = " OR ".join(["PMID({})".format(i) for i in chunk])
         params = {

@@ -14,4 +14,4 @@ def concatenate_tables(input, sep=","):
 
 
 with open(snakemake.output[0], "w") as out:
-      concatenate_tables(snakemake.input).to_csv(out, index=False)
+    concatenate_tables(snakemake.input).to_csv(out, index=False)
