@@ -149,7 +149,8 @@ rule merge_parsed_suppfiles:
 
 # Download publication metadata
 rule download_publications:
-  input: rules.geo_query.output
+  input: 
+    rules.geo_query.output
   output: 
     "output/publications.csv"
   params: 
@@ -164,7 +165,7 @@ rule download_publications:
 # Download citations
 rule download_citations:
   input: 
-    "output/publications.csv"
+    rules.geo_query.output
   output: 
     "output/scopus_citedbycount.csv"
   params:
