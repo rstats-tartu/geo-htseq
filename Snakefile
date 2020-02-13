@@ -105,36 +105,6 @@ rule download_suppfiles:
     "scripts/preprocess/download_suppfiles.py"
 
 
-# Supplementary files that kill R
-BAD = ["GSE93374_Merged_all_020816_DGE.txt.gz", 
-       "GSE88931_RNA-seq_MergedReadCounts.tsv.gz",
-       "GSE55385_transcripts_GSE.tsv.gz",
-       "GSE74549_ChIP_1kbWindows_correctedReadCount.txt.gz",
-       "GSE77213_Nguyen_GEO_TN03_tallies.xls",
-       "GSE77213_Nguyen_GEO_TN05_tallies_total.xls",
-       "GSE60012_100bpTiles_RRBS_Mouse.txt.gz",
-       "GSE60415_heatmap-upload.xls",
-       "GSE67516_RNA_seq_rep1_diffExp_analysis.xls",
-       "GSE53298_processed_data.xlsx",
-       "GSE53350_SAGE_KomatsuFurukawa_Processed.xls",
-       "GSE60483_AQ_exp.tab.gz",
-       "GSE53260_Supplementary_S2.xls",
-       "GSE53260_Supplementary_S1.xls",
-       "GSE89113_T35_vs_T45.T45.UP.0.05.A3SS.MATS.JunctionCountOnly.txt.gz",
-       "GSE89113_T35_vs_T45.T45.UP.0.05.MXE.MATS.JunctionCountOnly.txt.gz",
-       "GSE89113_T40_vs_T45.A3SS.MATS.JunctionCountOnly.txt.gz",            
-       "GSE89113_T40_vs_T45.T40.UP.0.05.A3SS.MATS.JunctionCountOnly.txt.gz",
-       "GSE89113_T40_vs_T45.T45.UP.0.05.A3SS.MATS.JunctionCountOnly.txt.gz",
-       "GSE89113_T35_vs_T45.A3SS.MATS.JunctionCountOnly.txt.gz",            
-       "GSE89113_T35_vs_T45.MXE.MATS.JunctionCountOnly.txt.gz",             
-       "GSE89113_T25_vs_T40.A3SS.MATS.JunctionCountOnly.txt.gz",            
-       "GSE99484_Sulfolobus_acidocaldarius_DSM_639_CP000077_.gbk.txt.gz",   
-       "GSE121228_gene_expression_anno.txt.gz", 
-       "GSE113074_Raw_combined.annotated_counts.tsv.gz", 
-       "GSE113074_Corrected_combined.annotated_counts.tsv.gz", 
-       "GSE121737_early_and_medium_bud.repGene.txt.gz"]
-
-
 # Import supplementary data
 rule suppfiles_list:
   input: 
