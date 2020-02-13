@@ -2,33 +2,38 @@
     "__default__" :
     {
         "name" : "{rule}",
-        "time" : "02:00:00",
+        "time" : 120,
         "mem" : 4000,
         "partition" : "main",
-        "output" : "slurm_%j.log"
+        "output" : "logs/slurm_%j.log"
     },
     "import_suppfiles" :
     {
-        "mem" : 100000,
-        "time": 180
+        "mem" : 64000,
+        "time": 380
     },
-    "merge_suppdata" :
+    "merge_parsed_suppfiles" :
     {   
-        "mem" : 32000
+        "mem" : 4000,
+        "time": 30
     },
     "download_suppfilenames" :
     {   
-        "time" : 960,
+        "time" : 60,
         "partition": "main"
     },
     "download_suppfiles" :
     {   
-        "time" : 1440,
+        "time" : 120,
         "partition": "main"
+    },
+    "download_publications" :
+    {   
+        "time" : 360
     },
     "report" :
     {
-        "mem" : 32000
+        "mem" : 8000
     },
     "series_matrixfiles" :
     {

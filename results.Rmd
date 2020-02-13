@@ -1,0 +1,341 @@
+```{r include=FALSE, cache=FALSE}
+
+# Load installed libraries
+library(ggplot2)
+library(purrr)
+library(tibble)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(readr)
+library(readxl)
+library(broom)
+library(lubridate)
+library(glue)
+library(stringr)
+library(limma)
+library(ape)
+library(ggtree)
+library(data.table)
+library(bookdown)
+library(viridis)
+library(kableExtra)
+library(knitr)
+library(formattable)
+library(sparkline)
+library(grid)
+library(gridExtra)
+library(Biobase)
+library(hexbin)
+library(here)
+
+#' default pacman and devtools install fails in conda, this should work 
+library(devtools)
+options(unzip = "internal")
+
+if (!require(SRP)) {
+        remotes::install_github("tpall/SRP")
+}
+
+if (!require(entrezquery)) {
+        remotes::install_github("tpall/entrezquery")
+}
+
+library(entrezquery)
+
+# Plot options
+opts_chunk$set(echo = FALSE, 
+               message = FALSE, 
+               warning = FALSE,
+               fig.align = 'center',
+               fig.show = "hold",
+               dev = "svg")
+
+options(htmltools.dir.version = FALSE, 
+        formatR.indent = 2, 
+        width = 55, 
+        digits = 4, 
+        warnPartialMatchAttr = FALSE, 
+        warnPartialMatchDollar = FALSE)
+
+# Set panel label case
+panel_label_case <- "upper"
+
+# Load helper functions
+source("scripts/helpers.R")
+
+# Last date to consider geo series and suppfilenames
+last_date <- ymd("2018-12-31")
+nrowthreshold <- 1000
+pi0threshold <- 0.05
+
+# Folder where downloaded supplementary and matrix files live
+local_suppfile_folder <- "output/suppl" 
+local_matrixfile_folder <- "output/matrix"
+```
+```{r include=FALSE, cache=FALSE}
+
+# Load installed libraries
+library(ggplot2)
+library(purrr)
+library(tibble)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(readr)
+library(readxl)
+library(broom)
+library(lubridate)
+library(glue)
+library(stringr)
+library(limma)
+library(ape)
+library(ggtree)
+library(data.table)
+library(bookdown)
+library(viridis)
+library(kableExtra)
+library(knitr)
+library(formattable)
+library(sparkline)
+library(grid)
+library(gridExtra)
+library(Biobase)
+library(hexbin)
+library(here)
+
+#' default pacman and devtools install fails in conda, this should work 
+library(devtools)
+options(unzip = "internal")
+
+if (!require(SRP)) {
+        remotes::install_github("tpall/SRP")
+}
+
+if (!require(entrezquery)) {
+        remotes::install_github("tpall/entrezquery")
+}
+
+library(entrezquery)
+
+# Plot options
+opts_chunk$set(echo = FALSE, 
+               message = FALSE, 
+               warning = FALSE,
+               fig.align = 'center',
+               fig.show = "hold",
+               dev = "svg")
+
+options(htmltools.dir.version = FALSE, 
+        formatR.indent = 2, 
+        width = 55, 
+        digits = 4, 
+        warnPartialMatchAttr = FALSE, 
+        warnPartialMatchDollar = FALSE)
+
+# Set panel label case
+panel_label_case <- "upper"
+
+# Load helper functions
+source("scripts/helpers.R")
+
+# Last date to consider geo series and suppfilenames
+last_date <- ymd("2018-12-31")
+nrowthreshold <- 1000
+pi0threshold <- 0.05
+
+# Folder where downloaded supplementary and matrix files live
+local_suppfile_folder <- "output/suppl" 
+local_matrixfile_folder <- "output/matrix"
+```
+
+## Results {-}
+
+```{r}
+knitr::read_chunk("scripts/results_query.R")
+knitr::read_chunk("scripts/results_suppfilenames.R")
+knitr::read_chunk("scripts/results_publications.R")
+knitr::read_chunk("scripts/results_pvalues.R")
+knitr::read_chunk("scripts/parse_sample_size_from_series_matrix.R")
+```
+
+
+```{r rna-seq-dynamics}
+
+```
+
+### HT-sequencing expression data in GEO database {-}
+
+To assess the quality of high-throughput sequencing datasets we queried the NCBI GEO database for "expression profiling by high throughput sequencing".
+Query retrieved `r nrow(ds_redline)` datasets.
+GEO database shows exponentially growing number of HT-seq data set submissions between `r year(first_date)` and 2017 (Fig. \@ref(fig:queryfig)). 
+First HT-seq data set was submitted to GEO database at `r first_date`. 
+We limited our query for datasets submitted up to the `r last_date` to reduce the number of recent incomplete submissions.
+
+Approximately `r perc_mmhs` of GEO data sets (`r table(ds_redline$model)[1]`) contain data from mouse or human origin (Fig. \@ref(fig:queryfig), left facet).
+The `r ppub[1]` (`r ppub_n_ci$ci[1]`) of human and mouse data sets are linked to their primary publication. 
+The proportion of datasets with publications is lower when other taxa are used as model organisms `r ppub[2]` (`r ppub_n_ci$ci[2]`)(Fig. \@ref(fig:queryfig), right facet).
+As expected, the gap between published GEO series and published articles is bigger for more recent submissions.
+
+```{r missingsuppfiles}
+
+```
+
+For the human and mouse subset, we were able to identify supplementary files for `r perc_wsuppfile` (`r nrow(suppfilenames_present)`) of GEO series.  
+The data sets lacking public supplementary files nevertheless show `r percent(ppub_n_ci_nopublicsupps$estimate, 0)` publication rate (`r ppub_n_ci_nopublicsupps$ci`) which is similar to data sets with supplementary files. 
+
+(ref:queryfig) __Datasets submitted to NCBI GEO database featuring expression profiling by high-throughput sequencing__. GEO series submission dynamics and associated publications of HT-seq data. Left facet, submissions featuring human or mouse data, N = `r table(ds_redline$model)[1]`. Right facet, submissions of other taxa, N = `r table(ds_redline$model)[2]`. Dashed line, GEO series with publications.
+
+```{r queryfig, fig.cap="(ref:queryfig)"}
+
+```
+
+### Compliance with GEO database submission requirements and data usability for reanalysis {-}
+
+We sought to determine the compliance with the formal requirements for GEO data submission (https://www.ncbi.nlm.nih.gov/geo/info/seq.html). 
+This pertains to the reproducibitly of data analysis. 
+GEO archive has three required components: metadata, processed data, and raw data. 
+Minimally these processed files are required to contain raw or normalized sequence read counts, or peak files of ChIP-Seq data. 
+While, in the presence of raw data, supplementary data is not strictly neccessary for reproducibility, reproducing analysis from the raw data requires the reproduction of the full analysis, starting from re-aligning sequences to the genome, which can be practically unfeasible.
+
+Supplementary HT-seq files uplodaded to NCBI GEO contain most commonly raw or processed sequence data files as a 'RAW.tar' archive and associated automatically generated 'filelist.txt' file (Fig. \@ref(fig:commonfilenames)). 'RAW.tar' archive contains one file per sample and samples can be directly mapped to metadata by using sample name.
+
+(ref:commonfilenames) __Filename extensions and common stubs of supplementary file names from HT-seq datasets submitted to NCBI GEO database__. (`r ref_labels("A", panel_label_case)`) File extensions of supplementary file names. (`r ref_labels("B", panel_label_case)`) Common stubs of supplementary file names. Stubs were obtained by removing GEO id from supplementary file names and converting string to lower case. Stubs with N > 10 occurences are shown.
+
+```{r commonfilenames, fig.cap='(ref:commonfilenames)', fig.asp=0.7}
+
+```
+
+RAW.tar files are included in `r supp_raw_perc` (`r n_raw`) of GEO series, whereas only RAW.tar and filelist.txt is present in `r supp_rawtaronly_perc` (`r nrow(suppfiles_rawtar_only)`) GEO series (Fig. \@ref(fig:commonfilenames) and \@ref(fig:publicationrawtar)).
+
+(ref:publicationrawtar) __Submission and publication of GEO series with only RAW.tar and filelist.txt supplementary files.__
+
+```{r publicationrawtar, fig.cap='(ref:publicationrawtar)'}
+fsupp_rawtar_only
+```
+
+Other common files contain annotations 'readme.txt' and processed data: commonly sequence read counts, gene expression analysis results or ChIP-Seq peak counts. 
+
+Sequence read counts can be either as raw read counts or normalised read counts.
+Gene expression analysis of HT-seq data is commonly performed by fitting models to discrete sequence read count data.
+Normalised sequence read counts are used for plotting and visual evaluation of the analysis results, but cannot be used to directly reproduce gene expression analysis. 
+
+However, tables containing top-ranked genes/features (toptables) from gene expression analysis with complete set of raw P values allow direct evaluation of the data and analysis quality underlying tested hypothesis.
+
+```{r out-strings}
+
+```
+
+
+(ref:filesofinterest) __Distribution of supplementary files per GEO Accession__ before and after filtering supplementary files for download. Left, all supplementary files. Right, supplementary files to be downloaded after filtering for tabular formats. Numbers show total number of files, respectively, before and after filtering.
+
+```{r filesofinterest, fig.cap='(ref:filesofinterest)'}
+
+```
+
+GEO datasets contain most commonly one to two supplementary files per Accession and up to `r tail(suppfall_per_acc$Files, 1)` files per Accession (Fig. \@ref(fig:filesofinterest)).
+To reduce number of files to be downloaded from GEO database, based on file extensions and filenames, we excluded from the dataset files that most plausibly don't contain final processed data in a tabular format, such as binary files, annotations, raw data, graphics, and other non tabular files.
+This filter reduced the number of files by `r files_oi_perc` (Fig. \@ref(fig:filesofinterest)) and GEO series by `r suppf_oi_perc`. 
+Resulting dataset consisted of `r nrow(suppfiles_of_interest)` files from `r n_distinct(suppfiles_of_interest$Accession)` GEO series to be downloaded.
+
+```{r loadst}
+
+```
+
+```{r pvalues}
+
+```
+
+(ref:block) __Retention of HT-seq GEO series and supplementary files in filter for full sets of p values.__ Arrows from left to right, (1) GEO sets with supplementary files, (2) filter out RAW.tar and filelist.txt files from supplementary file names, (3) supplementary files with flat table formats that were downloaded, (4) tables with p values. Number of p value sets is the number of sets with `r glue(">{nrowthreshold}")` features.
+
+```{r block, fig.cap='(ref:block)'}
+source("scripts/diagram.R")
+knitr::include_graphics("figures/diagram.svg")
+```
+
+
+### Processed data
+
+(ref:dims) __Global view on number of samples and features of HT-seq experiments.__ (`r ref_labels("A", panel_label_case)`) Number of features in GEO series where supplementary file with p values was uploaded (dark grey) compared to all GEO series with supplementary files (light grey). (`r ref_labels("B", panel_label_case)`) Number of samples in GEO series where p values were available (dark grey) compared to all series with supplementary files (light grey). (`r ref_labels("C", panel_label_case)`) Mean number of samples was `r round(n_samples$samples_mean)` and median `r n_samples$samples_median`. Most frequent sample size was `r n_samples$samples_Mode`. Mean number of features was `r paste(floor(n_samples$features_mean))` and median `r paste(n_samples$features_median)`. Number of samples was taken from series matrix files and number of features is number of rows in supplementary files. Dashed line denotes cutoff for complete sets of features/p values.
+
+```{r plotdims, fig.cap='(ref:dims)'}
+
+```
+
+(ref:pi0hist) __Proportion of true null hypotheses in P value sets.__ (`r ref_labels("A", panel_label_case)`) Distribution of estimated $\pi0$ values in reported GEO HT-seq P value sets. (`r ref_labels("B", panel_label_case)`) Distribution of $\pi0$ versus number of features. Blue line, loess fit. P value sets with `r glue(">{nrowthreshold}")` features are shown.
+
+```{r pi0hist, fig.cap='(ref:pi0hist)'}
+
+```
+
+(ref:publications) __Journals publishing HT-seq data.__ (`r ref_labels("A", panel_label_case)`) Top 20 journals publishing non-human or -mouse datasets. (`r ref_labels("B", panel_label_case)`) Top 20 journals publishing human or mouse datasets. (`r ref_labels("C", panel_label_case)`) Top 10 journals publishing articles reporting P values in GEO supplementary files.
+
+```{r publications, fig.cap='(ref:publications)'}
+
+```
+
+(ref:citations) __Citation of articles featuring HT-seq data.__ (`r ref_labels("A", panel_label_case)`) Distribution of the number of citations in P value sets displaying anti-conservative histogram compared to other histogram types. (`r ref_labels("B", panel_label_case)`) Relationship between the proportion of true nulls and number of citations. Blue line, linear model fit. Citation data is from Scopus database.
+
+```{r citations, fig.cap='(ref:citations)'}
+
+```
+
+
+(ref:pi0histends) __Phylogenetic tree of P value histograms.__ Tree was obtained by clustering of the empirical cumulative distribution function outputs of P value histograms. Colors show groups obtained by cutting the tree at the height giving six clusters.
+
+```{r pi0histends, fig.cap='(ref:pi0histends)', fig.asp=1}
+
+```
+
+
+(ref:p-treatments-summary) __Sample size in HT-seq GEO series.__ Experimental groups were inferred from GEO series matrix files and mean samples size was calculated from experimental group sizes.
+
+```{r p-treatments-summary, fig.cap='(ref:p-treatments-summary)', fig.asp=1}
+
+```
+
+(ref:p-sample-size-pvalues) __Proportion of true nulls versus sample size.__ Proportion of true nulls was calculated for anti-conservative P value sets.
+
+```{r p-sample-size-pvalues, fig.cap='(ref:p-sample-size-pvalues)', fig.asp=1, out.width=3}
+
+```
+
+
+```{r sparklines}
+
+```
+
+```{r histtypes-tab}
+
+```
+
+
+```{r histtypesbm-tab}
+
+```
+
+```{r typeconversion-tab}
+
+```
+
+
+```{r pvaluespark-tab}
+
+```
+
+
+```{r srp-stats}
+
+```
+
+
+```{r, include=FALSE}
+# Way to add sparkline dependencies
+mtcars %>%
+  group_by(cyl) %>%
+  summarise(hp = spk_chr(hp, type = "box")) %>%
+  formattable() %>%
+  as.htmlwidget() %>%
+  spk_add_deps()
+```
+
