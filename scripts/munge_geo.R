@@ -1,6 +1,7 @@
 
-# Test integer function ---------------------------------------------------
-testInteger <- function(x, id = NULL) {
+#' @description Test integer function 
+#' @param x numeric vector
+test_integer <- function(x, id = NULL) {
   
   if (!is.null(id)) {
     message(id)
@@ -54,14 +55,6 @@ read_excelfs <- function(path) {
   return(tabs)
 }
 
-
-# Find duplicated columns -------------------------------------------------
-
-find_duplicated_columns <- function(x) {
-  hashs <- vapply(x, function(x) digest::digest(x), character(1))
-  duplicated(hashs)
-}
-
 # read_geotabs ------------------------------------------------------------
 #' Import Entrez GEO supplemetary tables
 #' @param path Path to supplementary file.
@@ -87,12 +80,6 @@ read_geotabs <- function(path) {
       return(tab)
     }
     tab <- read_excelfs(path)
-    return(tab)
-  }
-
-  
-  if (stringr::str_detect(path, "gct$")) {
-    tab <- CePa::read.gct(path)
     return(tab)
   }
   
@@ -130,12 +117,34 @@ read_geotabs <- function(path) {
   return(tab)
 }
 
-# check for correctness of p values
+
+#' Fix pvalues coerced to characters
+#' 
+fix_pvalues <- function(x) {
+  if (is.character(x)) {
+    return(as.numeric(stringr::str_replace(x, ",", "\\.")))
+  } else {
+    return(x)
+  }
+}
+
+#' check for correctness of p values
 #' @param x full set of p values, a numeric vector
 check_pvalues <- function(x) {
   x <- range(x, na.rm = TRUE) 
   all(x >= 0 & x <= 1)
   }
+
+
+summarise_expression <- function(x, type = c("basemean", "value", "logcpm", "rpkm"), prex) {
+  type <- match.arg(type, several.ok = TRUE)
+  pvalue <- dplyr::select(x, prex)
+  cols <- map(type, ~ dplyr::select(x, dplyr::matches(ifelse(.x == "value", "^value_\\d", .x))))
+  summaries <- map2_dfc(type, cols, ~ .y %>% 
+                          transmute(!! .x := rowMeans(., na.rm = TRUE)))
+  bind_cols(pvalue, summaries) %>% 
+    map_dfc(~ ifelse(is.nan(.x), NA_real_, .x))
+}  
 
 # get_pvalues_basemean ----------------------------------------------------
 #' Extract p value and when available basemean columns from geo data frames.
@@ -176,11 +185,11 @@ get_pvalues_basemean <- function(x){
   
   x <- x[colns]
   
-  # Now convert column names to lower case
+  # Convert column names to lower case
   colnames(x) <- stringr::str_to_lower(colnames(x))
   
-  pval_regexp <- "p[:punct:]*[:space:]*[:punct:]*[:space:]*val"
-  pval_col <- stringr::str_detect(colns, pval_regexp) & !stringr::str_detect(colns, "adj|fdr|corr")
+  pval_regexp <- "p.*val"
+  pval_col <- stringr::str_detect(colnames(x), pval_regexp) & !stringr::str_detect(colnames(x), "adj|fdr|corr")
   
   # Return NULL if P values not present
   if (!any(pval_col)) {
@@ -191,13 +200,7 @@ get_pvalues_basemean <- function(x){
   #It can be as characters if there is:
   #1) NA in xsl(x) files
   #2) there is a comma used as a decimal marker
-  for (j in 1:length(x[pval_col])) {
-    for (k in 1:ncol(x[pval_col][j])) {
-      if (typeof(x[pval_col][j][,k][[1]]) == "character") {
-        x[pval_col][j][,k][[1]] <- as.numeric(gsub(",",".", x[pval_col][j][,k][[1]]))
-      }
-    }
-  }
+  x <- dplyr::mutate_at(x, colnames(x)[pval_col], fix_pvalues)
   
   # Check if P values are between 0 and 1
   pvals_ok <- vapply(x[pval_col], check_pvalues, logical(1))
@@ -206,118 +209,14 @@ get_pvalues_basemean <- function(x){
     stop("Detected P values not in 0 to 1 range or truncated!")
   }
   
-  # Summarise multiple basemean columns
-  if (any(stringr::str_detect(colns, "base[Mm]ean"))) {
-    x <- dplyr::mutate(x, bmean = rowMeans(dplyr::select(x, dplyr::matches("base[Mm]ean"))))
-  }
-  
-  # Select only basemean and pvalue columns
-  ## changed regexp as matches does not seem to work with named classes with [], eg [:punct:]
-  pval_regexp2 <- "p( )*(.)*(_)*( )*(.)*(_)*val"
-  x <- dplyr::select(x, matches(paste0("bmean|^", pval_regexp2)))
-  
   # Rename pvalue column
   colnames(x)[stringr::str_detect(colnames(x), pval_regexp)] <- "pvalue"
   
-  # Rename basemean column
-  if (any(stringr::str_detect(colnames(x), "bmean"))) {
-    colnames(x)[stringr::str_detect(colnames(x), "bmean")] <- "basemean"
-  } else {
-    x$basemean <- NA
-  }
-  return(x)
+  # Summarise multiple basemean columns
+  summarise_expression(x, c("basemean", "value", "logcpm", "rpkm"), "pvalue")
 }
 
-# munge_geo function ------------------------------------------------------
-
-#' If geo supplementary table has only normalised read counts, return dims.
-#' When table has pvalues return pvalues along with basemean if possible.
-#' When table contains raw read counts, return eset.
-#' @param suppfile GSE supplemental file name
-#' @param eset nested esets
-#' @param path path to GSE supplemental file, defaults to .
-#' @import purrr
-#' @import dplyr
-#' @import Biobase
-#' @import BiocGenerics
-#' @import GEOquery
-munge_geo <- function(eset, suppfile, dir = ".") {
-  
-  ## Assemble path to supplementary file
-  path <- file.path(dir, suppfile)
-  
-  ## Import supplemental file, 
-  supptab <- read_geotabs(path)
-  
-  ## Convert to list if single table
-  if (is.data.frame(supptab) | is.matrix(supptab)) {
-    supptab <- list(supptab) 
-  }
-  
-  ## Check for pvalues
-  pvalues <- purrr::map(supptab, ~try(get_pvalues_basemean(.x)))
-  
-  ## Exclude tables which failed to import
-  pvalues <- pvalues[!purrr::map_lgl(pvalues, ~inherits(.x, "try-error"))]
-  
-  if (any(!purrr::map_lgl(pvalues, is.null))) {
-    supptab <- supptab[purrr::map_lgl(pvalues, is.null)]
-    pvalues <- pvalues[!purrr::map_lgl(pvalues, is.null)]
-    if (length(supptab) == 0) {
-      return(pvalues)
-    }
-  }
-  
-  ## Munge series matrix to eset
-  esets <- eset %>% as.list %>% unlist
-  
-  ## Get sample names from eset
-  titles <- purrr::map(esets, ~as.character(Biobase::pData(.x)[,"title"]))
-  
-  ## Get counts from table
-  counts <- purrr::map(titles, ~get_counts(supptab[[1]], .x))
-  
-  ## Test for integers
-  gplmatch <- purrr::map_lgl(counts, ~testInteger(.x))
-  
-  ## If not integers and no pvalues, return only dim
-  if (sum(gplmatch) == 0) {
-    
-    dims <- unlist(purrr::map(supptab, dim))
-    
-    dims <- dplyr::data_frame(features = dims[1], columns = dims[2])
-    
-    if (all(purrr::map_lgl(pvalues, is.null))) {
-      return(dims)
-    }
-    
-    return(c(pvalues, dims))
-  }
-  
-  ## Return raw read counts
-  exprs <- BiocGenerics::counts[gplmatch][[1]]
-  
-  ## Add feature names
-  rownames(exprs) <- make.names(rownames(exprs), unique = TRUE)
-  
-  ## Create eset
-  title <- Biobase::pData(esets[gplmatch][[1]])[, 1, drop = FALSE]
-  
-  title$title  <- rm_punct_tolower(title$title)
-  
-  exprs <- Biobase::exprs[, title$title]
-  
-  colnames(exprs) <- rownames(title)
-  
-  phenoData <- new("AnnotatedDataFrame", data = Biobase::pData(esets[gplmatch][[1]]))
-  
-  neweset <- Biobase::ExpressionSet(assayData = exprs,
-                                    phenoData = phenoData,
-                                    experimentData = Biobase::experimentData(esets[gplmatch][[1]]),
-                                    annotation = Biobase::annotation(esets[gplmatch][[1]]))
-  
-  return(c(pvalues, neweset))
-}
+#' munge_geo function ------------------------------------------------------
 
 #' Import pvalue column from Entrez GEO supplemental file.
 #' @param suppfile Supplemental file name.
@@ -358,42 +257,5 @@ munge_geo_pvalue <- function(suppfile, n_head = 100) {
   }
   
   ## Collect data into data_frame
-  dplyr::data_frame(sheets, heads, pvalues, features, columns)
-}
-
-
-# munge_geo2 --------------------------------------------------------------
-
-munge_geo2 <- function(countfile, dir = ".") {
-  
-  # Assemble path to supplementary file
-  path <- file.path(dir, countfile)
-  
-  # Import supplemental file
-  supptab <- read_geotabs(path)
-  
-  if (inherits(supptab, "try-error")) {
-    stop("Table import error!")
-  }
-  
-  if (is.data.frame(supptab) | is.matrix(supptab)) {
-    supptab <- list(supptab) 
-  }
-  
-  # Check for pvalues
-  pvalues <- map(supptab, ~try(get_pvalues_basemean(.x)))
-  heads <- map(supptab, head)
-  features <- map_int(supptab, nrow)
-  columns <- map_int(supptab, ncol)
-  supptab_names <- names(supptab)
-  
-  if (length(supptab_names) != 0) {
-    sheets <- as.list(supptab_names)
-  } else {
-    
-    sheets <- list("")
-  }
-  
-  data_frame(sheets, heads, pvalues, features, columns)
-  
+  dplyr::tibble(sheets, heads, pvalues, features, columns)
 }
