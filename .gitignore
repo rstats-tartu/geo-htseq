@@ -22,3 +22,4 @@ packages.bib
 *.log
 *.md
 _bookdown_files
+__pycache__
