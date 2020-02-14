@@ -8,7 +8,7 @@ imported <- imported %>%
   mutate(accession = str_extract(id, "GSE\\d+")) %>% 
   select(accession, everything())
 
-#' Pivo wide
+#' Pivot wide
 pvalues <- imported %>% 
   filter(!is.na(Type)) %>% 
   mutate(Class = str_replace(Class, "conservative", "cons."),
