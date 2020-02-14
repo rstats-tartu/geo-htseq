@@ -21,7 +21,6 @@ wide <- full_join(before, after) %>%
   select(accession, id, starts_with("class"), Conversion, starts_with("pi0"), starts_with("hist"), filter_var, Set)
 
 
-
 #' Generate html table: beware of very large table!
 tab <- wide %>% 
   mutate_at(vars(starts_with("hist")), ~map(.x, ~as.integer(unlist(str_extract_all(.x, "\\d+"))))) %>% 
@@ -29,3 +28,8 @@ tab <- wide %>%
   formattable() %>%
   formattable::as.htmlwidget() %>%
   spk_add_deps()
+
+#' Conversion
+wide %>% 
+  count(Class, Class_after)
+
