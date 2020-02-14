@@ -11,7 +11,7 @@ imported <- imported %>%
 #' Pivo wide
 pvalues <- imported %>% 
   filter(!is.na(Type)) %>% 
-  mutate(Class = str_replace(Class, "anti-conservative", "anti-cons."),
+  mutate(Class = str_replace(Class, "conservative", "cons."),
          Conversion = str_replace(Conversion, "improvement", "impr."))
 before <- pvalues %>% filter(Type == "raw")
 after <- pvalues %>% filter(Type != "raw") %>% 
@@ -22,7 +22,7 @@ wide <- full_join(before, after) %>%
 
 
 
-#' Generate html table
+#' Generate html table: beware of very large table!
 tab <- wide %>% 
   mutate_at(vars(starts_with("hist")), ~map(.x, ~as.integer(unlist(str_extract_all(.x, "\\d+"))))) %>% 
   mutate_at(vars(starts_with("hist")), ~map(.x, spk_chr, type = "bar")) %>%
