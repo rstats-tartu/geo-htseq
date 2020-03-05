@@ -1,8 +1,0 @@
-type, typetext, comment
-0, uniform , No false H0-s can be detected
-1, anti-conservative, Pi0 can be calculated
-2, conservative, Identical comparisons? Adjusted p values?
-3, spiky, Many identical values in the dataset? (low counts resulting in discrete distributions)
-4, other, Test assumptions violated? Adjusted P values?
-5, bimodal, XX
-6, all_effects, YY

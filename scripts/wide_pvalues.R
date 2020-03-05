@@ -2,6 +2,7 @@ library(tidyverse)
 library(sparkline)
 library(formattable)
 
+#' ## P value stats
 #' Import dataset
 imported <- read_csv("output/parsed_suppfiles.csv")
 imported <- imported %>% 
@@ -31,5 +32,45 @@ tab <- wide %>%
 
 #' Conversion
 wide %>% 
-  count(Class, Class_after)
+  count(Class, Class_after) %>% 
+  knitr::kable() %>% 
+  kableExtra::kable_styling()
 
+#' ## Experiment metadata
+#' Importing experiment metadata (dates and etc) 
+document_summaries <- read_csv("output/document_summaries.csv")
+
+#' Importing publications metadata
+publications <- read_csv("output/publications.csv") %>% 
+  rename(PubMedIds = Id)
+
+#' Single-cell experiments
+single_cell <- read_csv("output/single-cell.csv")
+
+#' Citations
+citations <- read_csv("output/scopus_citedbycount.csv")
+
+#' Merging publications with citations
+pubs <- publications %>% 
+  left_join(citations) %>% 
+  select(PubMedIds, PubDate, Source, FullJournalName, ISSN, ESSN, citations) %>% 
+  mutate(ISSN = case_when(
+    is.na(ISSN) ~ ESSN,
+    TRUE ~ ISSN
+   ))
+
+#' ## Updating P values with some metadata
+pvals_wide <- document_summaries %>% 
+  select(accession = Accession, PDAT) %>% 
+  inner_join(wide) %>% 
+  mutate(single_cell = accession %in% single_cell$Accession) %>% 
+  mutate(platform = case_when(
+    filter_var == "basemean" ~ "deseq",
+    filter_var == "aveexpr" ~ "limma",
+    filter_var == "logcpm" ~ "edger",
+    filter_var == "fpkm" & str_detect(Set, "p_value") ~ "cuffdiff",
+    TRUE ~ "other"
+  ))
+
+pvals_wide %>% 
+  count(platform)
