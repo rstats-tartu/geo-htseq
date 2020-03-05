@@ -268,15 +268,27 @@ def get_hist_class(counts, fdr):
     bins = len(counts)
     qc = binom.ppf(1 - 1 / bins * fdr, sum(counts), 1 / bins)
     counts_over_qc = counts > qc
-    for i in counts_over_qc:
-        if all(~counts_over_qc):
-            Class = "uniform"
-        elif not any(counts_over_qc[rle(counts_over_qc)[0][0] + 2 :]):
+    ru = rle(counts_over_qc)
+    over_qc = ru[1][ru[2]]
+    rufl = rle(np.flip(counts_over_qc))
+    over_qc_fl = rufl[1][rufl[2]]
+    if all(~counts_over_qc):
+        Class = "uniform"
+    elif len(over_qc) == 1:
+        over_qc_prop = ru[0][ru[2]] / bins
+        if over_qc == 0 and over_qc_prop < 1 / 3:
             Class = "anti-conservative"
-        elif not any(np.flip(counts_over_qc)[rle(np.flip(counts_over_qc))[0][0] + 2 :]):
+        elif over_qc_fl == 0:
             Class = "conservative"
         else:
             Class = "other"
+    elif len(over_qc) == 2:
+        if over_qc[0] == 0 and over_qc_fl[0] == 0:
+            Class = "bimodal"
+        else:
+            Class = "other"
+    else:
+        Class = "other"
     return Class
 
 
@@ -365,12 +377,19 @@ def estimate_pi0(
 def conversion(x, y):
     classes = pd.DataFrame.from_dict(
         {
-            "uniform": ["same good", "improve, effects", "worsen", "worsen"],
-            "anti-conservative": ["effects lost", "same good", "worsen", "worsen"],
+            "uniform": ["same good", "improve, effects", "worsen", "worsen", "worsen"],
+            "anti-conservative": [
+                "effects lost",
+                "same good",
+                "worsen",
+                "worsen",
+                "worsen",
+            ],
             "conservative": [
                 "improvement; no effects",
                 "improvement; effects",
                 "same bad",
+                "no improvement",
                 "no improvement",
             ],
             "other": [
@@ -378,10 +397,18 @@ def conversion(x, y):
                 "improvement; effects",
                 "no improvement",
                 "same bad",
+                "no improvement",
+            ],
+            "bimodal": [
+                "improvement; no effects",
+                "improvement; effects",
+                "no improvement",
+                "no improvement",
+                "same bad",
             ],
         },
         orient="index",
-        columns=["uniform", "anti-conservative", "conservative", "other"],
+        columns=["uniform", "anti-conservative", "conservative", "other", "bimodal"],
     )
     return classes.loc[x, y]
 
