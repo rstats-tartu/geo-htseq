@@ -125,7 +125,7 @@ rule import_suppfiles:
   output: 
     "output/tmp/parsed_suppfiles_{k}_{n}.csv"
   params:
-    "--var basemean=10 logcpm=1 rpkm=0.5 fpkm=0.5 aveexpr=3.32 --bins 40 --fdr 0.05 -v"
+    "--var basemean=10 logcpm=1 rpkm=1 fpkm=1 aveexpr=3.32 --bins 40 --fdr 0.05 -v"
   conda: 
     "envs/geo-query.yaml"
   shell:
