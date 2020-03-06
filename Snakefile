@@ -75,7 +75,7 @@ rule split_document_summaries:
     mem_mb=2000,
     time=30
   script:
-    "scripts/preprocess/split_document_summaries.py"
+    "scripts/preprocess/split_df.py"
 
 
 # Download supplementary file names
@@ -137,7 +137,7 @@ rule suppfiles_list:
     mem_mb=2000,
     time=30
   script:
-    "scripts/preprocess/split.py"
+    "scripts/preprocess/split_lines.py"
 
 rule import_suppfiles:
   input: 
