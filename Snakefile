@@ -81,12 +81,16 @@ rule download_suppfilenames:
     "output/tmp/document_summaries_{k}.csv"
   output: 
     "output/tmp/suppfilenames_{k}.txt"
+  params:
+    email = EMAIL
   conda:
     "envs/geo-query.yaml"
   resources:
     time = lambda wildcards, attempt: attempt * 120
   script:
-    "scripts/preprocess/download_suppfilenames.py"
+    """
+    python3 -u scripts/preprocess/download_suppfilenames.py --input {input} --out {output} --email {params.email}
+    """
 
 
 # Filter supplementary file names by filename extension
