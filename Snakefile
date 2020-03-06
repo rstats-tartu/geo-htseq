@@ -87,7 +87,7 @@ rule download_suppfilenames:
     "envs/geo-query.yaml"
   resources:
     time = lambda wildcards, attempt: attempt * 120
-  script:
+  shell:
     """
     python3 -u scripts/preprocess/download_suppfilenames.py --list {input} --out {output} --email {params.email}
     """
