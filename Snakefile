@@ -35,7 +35,7 @@ rule geo_query:
   conda:
     "envs/geo-query.yaml"
   resources:
-    mem_mb=2000,
+    mem=2000,
     time=90
   script:
     "scripts/preprocess/geo_query.py"
@@ -55,7 +55,7 @@ rule single_cell:
   conda:
     "envs/geo-query.yaml"
   resources:
-    mem_mb=2000,
+    mem=2000,
     time=30
   script:
     "scripts/preprocess/geo_query.py"
@@ -72,7 +72,7 @@ rule split_document_summaries:
   conda:
     "envs/geo-query.yaml"
   resources:
-    mem_mb=2000,
+    mem=2000,
     time=30
   script:
     "scripts/preprocess/split_df.py"
@@ -87,7 +87,7 @@ rule download_suppfilenames:
   conda:
     "envs/geo-query.yaml"
   resources:
-    mem_mb=2000,
+    mem=2000,
     time=lambda wildcards, attempt: attempt * 120
   script:
     "scripts/preprocess/download_suppfilenames.py"
@@ -102,7 +102,7 @@ rule filter_suppfilenames:
   conda:
     "envs/geo-query.yaml"
   resources:
-    mem_mb=2000,
+    mem=2000,
     time=30
   script:
     "scripts/preprocess/filter_suppfilenames.py"
@@ -117,7 +117,7 @@ rule download_suppfiles:
   conda:
     "envs/geo-query.yaml"
   resources:
-    mem_mb=2000,
+    mem=2000,
     time=lambda wildcards, attempt: attempt * 120
   script:
     "scripts/preprocess/download_suppfiles.py"
@@ -134,7 +134,7 @@ rule suppfiles_list:
   conda: 
     "envs/geo-query.yaml"
   resources:
-    mem_mb=2000,
+    mem=2000,
     time=30
   script:
     "scripts/preprocess/split_lines.py"
@@ -149,7 +149,7 @@ rule import_suppfiles:
   conda: 
     "envs/geo-query.yaml"
   resources:
-    mem_mb=lambda wildcards, attempt: attempt * 16000,
+    mem=lambda wildcards, attempt: attempt * 16000,
     time=lambda wildcards, attempt: attempt * 60
   shell:
     """
@@ -166,7 +166,7 @@ rule merge_parsed_suppfiles:
   conda: 
     "envs/geo-query.yaml"
   resources:
-    mem_mb=4000,
+    mem=4000,
     time=30
   script:
     "scripts/preprocess/concat_tabs.py"
@@ -185,7 +185,7 @@ rule download_publications:
   conda:
     "envs/geo-query.yaml"
   resources:
-    mem_mb=2000,
+    mem=2000,
     time=360
   script:
     "scripts/preprocess/download_publications.py"
@@ -202,7 +202,7 @@ rule download_citations:
   conda:
     "envs/geo-query.yaml"
   resources:
-    mem_mb=2000,
+    mem=2000,
     time=120
   script:
     "scripts/preprocess/download_scopus_citations.py"
