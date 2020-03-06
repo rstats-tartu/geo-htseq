@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 import ftplib
 
 
-def download_suppfiles(input, output, email):
+def download_suppfilenames(input, output, email):
     ds = pd.read_csv(input, index_col="Accession")
     paths = [urlparse(link).path for link in ds["FTPLink"]]
     with ftplib.FTP("ftp.ncbi.nlm.nih.gov") as ftp:
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     parser.add_argument("--email", metavar="EMAIL", help="email address for anonymous FTP")
     args = parser.parse_args()
 
-    download_suppfiles(args.list, args.out, args.email)
+    download_suppfilenames(args.list, args.out, args.email)
 
 
 
