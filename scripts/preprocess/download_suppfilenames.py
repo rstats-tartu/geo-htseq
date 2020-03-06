@@ -28,12 +28,12 @@ def download_suppfiles(input, output, email):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input", metavar="FILE", help="input file to be downloaded")
+    parser.add_argument("--list", metavar="FILE", help="input file with list of files to be downloaded")
     parser.add_argument("--out", metavar="FILE", help="output file")
     parser.add_argument("--email", metavar="EMAIL", help="email address for anonymous FTP")
     args = parser.parse_args()
 
-    download_suppfiles(args.input, args.out, args.email)
+    download_suppfiles(args.list, args.out, args.email)
 
 
 
