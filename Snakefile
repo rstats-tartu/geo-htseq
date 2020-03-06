@@ -88,7 +88,7 @@ rule download_suppfilenames:
     "envs/geo-query.yaml"
   resources:
     mem_mb=2000,
-    time=60
+    time=lambda wildcards, attempt: attempt * 120
   script:
     "scripts/preprocess/download_suppfilenames.py"
 
@@ -118,7 +118,7 @@ rule download_suppfiles:
     "envs/geo-query.yaml"
   resources:
     mem_mb=2000,
-    time=60
+    time=lambda wildcards, attempt: attempt * 120
   script:
     "scripts/preprocess/download_suppfiles.py"
 
