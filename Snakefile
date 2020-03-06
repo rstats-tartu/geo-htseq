@@ -130,15 +130,14 @@ rule suppfiles_list:
   output: 
     expand("output/tmp/suppfilenames_filtered_{{k}}_{n}.txt", n = list(range(1, N, 1)))
   params:
-    n = N,
-    dir = "output"
+    chunks = N
   conda: 
     "envs/geo-query.yaml"
   resources:
     mem_mb=2000,
     time=30
   script:
-    "scripts/split.py"
+    "scripts/preprocess/split.py"
 
 rule import_suppfiles:
   input: 
