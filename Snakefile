@@ -89,7 +89,7 @@ rule download_suppfilenames:
     time = lambda wildcards, attempt: attempt * 120
   script:
     """
-    python3 -u scripts/preprocess/download_suppfilenames.py --input {input} --out {output} --email {params.email}
+    python3 -u scripts/preprocess/download_suppfilenames.py --list {input} --out {output} --email {params.email}
     """
 
 
