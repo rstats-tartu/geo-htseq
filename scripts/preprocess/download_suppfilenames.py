@@ -25,15 +25,17 @@ def download_suppfilenames(input, output, email):
         except ftplib.all_errors as e:
             print("FTP error:", e)
 
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--list", metavar="FILE", help="input file with list of files to be downloaded")
+    parser.add_argument(
+        "--list", metavar="FILE", help="input file with list of files to be downloaded"
+    )
     parser.add_argument("--out", metavar="FILE", help="output file")
-    parser.add_argument("--email", metavar="EMAIL", help="email address for anonymous FTP")
+    parser.add_argument(
+        "--email", metavar="EMAIL", help="email address for anonymous FTP"
+    )
     args = parser.parse_args()
 
     download_suppfilenames(args.list, args.out, args.email)
-
-
-
