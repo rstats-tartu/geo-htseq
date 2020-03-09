@@ -121,8 +121,19 @@ rule download_suppfiles:
     "scripts/preprocess/download_suppfiles.py"
 
 
-# Import supplementary data
+# Split list of supplementary files
 # dir is the location of suppl/ folder
+# Drop some offending files 
+MEM=["GSE84086_T.S.meth.txt.gz", 
+"GSE118184_Organoid.combined.dge.txt.gz", 
+"GSE115746_cells_exon_counts.csv.gz",
+"GSE81750_Mosaic-Seq_15SE_71HS_241sgRNA_K562.full_matrix.final.txt.gz",
+"GSE121891_OB_6_runs.raw.dge.csv.gz",
+"GSE117131_Zhu_SC-10X_mouse_raw-counts.txt.gz"]
+
+TIME=["GSE116470_F_GRCm38.81.P60Cerebellum_ALT.raw.dge.txt.gz", 
+"GSE30839_GSM765295_ribo_mesc_harr150s-profiles.tar.gz"]
+
 rule suppfiles_list:
   input: 
     "output/tmp/suppfilenames_filtered_{k}.txt"
@@ -130,7 +141,8 @@ rule suppfiles_list:
     expand("output/tmp/suppfilenames_filtered_{{k}}_{n}.txt", n = list(range(0, N, 1)))
   params:
     chunks = N,
-    dir = "output"
+    dir = "output",
+    drop = MEM + TIME
   conda: 
     "envs/geo-query.yaml"
   resources:
@@ -139,6 +151,8 @@ rule suppfiles_list:
     "scripts/preprocess/split_lines.py"
 
 
+
+# Import supplementary data
 rule import_suppfiles:
   input: 
     "output/tmp/suppfilenames_filtered_{k}_{n}.txt"
