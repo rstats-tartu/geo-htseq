@@ -53,7 +53,6 @@ imported %>%
   count(Class, Conversion)
 
 
-
 tab_pipe <- . %>% 
   mutate(hist = map(hist, ~as.integer(unlist(str_extract_all(.x, "\\d+")))), 
          hist = map(hist, spk_chr, type = "bar")) %>%

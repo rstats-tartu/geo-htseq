@@ -43,6 +43,7 @@ wide %>%
 #' Importing experiment metadata (dates and etc) 
 document_summaries <- read_csv("output/document_summaries.csv")
 
+
 #' Importing publications metadata
 publications <- read_csv("output/publications.csv") %>% 
   rename(PubMedIds = Id)
@@ -64,7 +65,7 @@ pubs <- publications %>%
 
 #' ## Updating P values with some metadata
 pvals_wide <- document_summaries %>% 
-  select(accession = Accession, PDAT) %>% 
+  select(accession = Accession, PDAT, taxon) %>% 
   inner_join(wide) %>% 
   mutate(single_cell = accession %in% single_cell$Accession) %>% 
   mutate(platform = case_when(
@@ -77,3 +78,7 @@ pvals_wide <- document_summaries %>%
 
 pvals_wide %>% 
   count(platform)
+
+pvals_wide %>% 
+  count(taxon) %>% 
+  arrange(desc(n))
