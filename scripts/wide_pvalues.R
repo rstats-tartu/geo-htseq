@@ -23,18 +23,21 @@ wide <- full_join(before, after) %>%
 
 
 #' Generate html table: beware of very large table!
-tab <- wide %>% 
-  mutate_at(vars(starts_with("hist")), ~map(.x, ~as.integer(unlist(str_extract_all(.x, "\\d+"))))) %>% 
-  mutate_at(vars(starts_with("hist")), ~map(.x, spk_chr, type = "bar")) %>%
-  formattable() %>%
-  formattable::as.htmlwidget() %>%
-  spk_add_deps()
+# tab <- wide %>% 
+#   mutate_at(vars(starts_with("hist")), ~map(.x, ~as.integer(unlist(str_extract_all(.x, "\\d+"))))) %>% 
+#   mutate_at(vars(starts_with("hist")), ~map(.x, spk_chr, type = "bar")) %>%
+#   formattable() %>%
+#   formattable::as.htmlwidget() %>%
+#   spk_add_deps()
 
 #' Conversion
 wide %>% 
   count(Class, Class_after) %>% 
+  group_by(Class) %>% 
+  mutate(`%` = formatC((n / sum(n[!is.na(Class_after)]) * 100), digits = 1, format = "f"),
+         `%` = ifelse(is.na(Class_after), NA, `%`)) %>% 
   knitr::kable() %>% 
-  kableExtra::kable_styling()
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive"), full_width = FALSE)
 
 #' ## Experiment metadata
 #' Importing experiment metadata (dates and etc) 
@@ -69,7 +72,7 @@ pvals_wide <- document_summaries %>%
     filter_var == "aveexpr" ~ "limma",
     filter_var == "logcpm" ~ "edger",
     filter_var == "fpkm" & str_detect(Set, "p_value") ~ "cuffdiff",
-    TRUE ~ "other"
+    TRUE ~ "unknown"
   ))
 
 pvals_wide %>% 
