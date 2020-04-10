@@ -24,3 +24,4 @@ packages.bib
 _bookdown_files
 __pycache__
 *Rproj
+output/downloading_suppfiles_*.done

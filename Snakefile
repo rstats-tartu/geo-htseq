@@ -1,6 +1,6 @@
 import os
 SIMG = "shub://tpall/geo-rnaseq"
-LAST_DATE = "2018-12-31"
+LAST_DATE = "2019-12-31"
 QUERY = 'expression profiling by high throughput sequencing[DataSet Type] AND ("2000-01-01"[PDAT] : "{}"[PDAT])'.format(LAST_DATE)
 EMAIL = "taavi.pall@ut.ee"
 
@@ -35,7 +35,7 @@ rule geo_query:
   conda:
     "envs/geo-query.yaml"
   resources:
-    time = 90
+    runtime = 90
   script:
     "scripts/preprocess/geo_query.py"
 
@@ -54,7 +54,7 @@ rule single_cell:
   conda:
     "envs/geo-query.yaml"
   resources:
-    time = 30
+    runtime = 30
   script:
     "scripts/preprocess/geo_query.py"
 
@@ -70,7 +70,7 @@ rule split_document_summaries:
   conda:
     "envs/geo-query.yaml"
   resources:
-    time = 30
+    runtime = 30
   script:
     "scripts/preprocess/split_df.py"
 
@@ -86,7 +86,7 @@ rule download_suppfilenames:
   conda:
     "envs/geo-query.yaml"
   resources:
-    time = lambda wildcards, attempt: attempt * 120
+    runtime = lambda wildcards, attempt: 100 + (attempt * 20)
   shell:
     """
     python3 -u scripts/preprocess/download_suppfilenames.py --list {input} --out {output} --email {params.email}
@@ -102,7 +102,7 @@ rule filter_suppfilenames:
   conda:
     "envs/geo-query.yaml"
   resources:
-    time = 30
+    runtime = 30
   script:
     "scripts/preprocess/filter_suppfilenames.py"
 
@@ -116,7 +116,7 @@ rule download_suppfiles:
   conda:
     "envs/geo-query.yaml"
   resources:
-    time = lambda wildcards, attempt: attempt * 120
+    runtime = lambda wildcards, attempt: 100 + (attempt * 20)
   script:
     "scripts/preprocess/download_suppfiles.py"
 
@@ -146,7 +146,7 @@ rule suppfiles_list:
   conda: 
     "envs/geo-query.yaml"
   resources:
-    time = 30
+    runtime = 30
   script:
     "scripts/preprocess/split_lines.py"
 
@@ -163,8 +163,8 @@ rule import_suppfiles:
   conda: 
     "envs/geo-query.yaml"
   resources:
-    mem = lambda wildcards, attempt: attempt * 16000,
-    time = lambda wildcards, attempt: attempt * 60
+    mem_mb = lambda wildcards, attempt: 8000 + (attempt * 8000),
+    runtime = lambda wildcards, attempt: 40 + (attempt * 20)
   shell:
     """
     python3 -u scripts/preprocess/import_suppfiles.py --list {input} --out {output} {params}
@@ -180,8 +180,8 @@ rule merge_parsed_suppfiles:
   conda: 
     "envs/geo-query.yaml"
   resources:
-    mem = 4000,
-    time = 30
+    mem_mb = 4000,
+    runtime = 30
   script:
     "scripts/preprocess/concat_tabs.py"
     
@@ -199,7 +199,7 @@ rule download_publications:
   conda:
     "envs/geo-query.yaml"
   resources:
-    time = 360
+    runtime = 360
   script:
     "scripts/preprocess/download_publications.py"
 
@@ -215,7 +215,7 @@ rule download_citations:
   conda:
     "envs/geo-query.yaml"
   resources:
-    time = 120
+    runtime = 120
   script:
     "scripts/preprocess/download_scopus_citations.py"
 
