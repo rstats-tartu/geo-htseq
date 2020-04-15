@@ -37,7 +37,7 @@ rule geo_query:
   resources:
     runtime = 90
   script:
-    "scripts/preprocess/geo_query.py"
+    "scripts/geo_query.py"
 
 
 # Single-cell experiment accessions
@@ -56,7 +56,7 @@ rule single_cell:
   resources:
     runtime = 30
   script:
-    "scripts/preprocess/geo_query.py"
+    "scripts/geo_query.py"
 
 
 # Split GEO document summaries
@@ -72,7 +72,7 @@ rule split_document_summaries:
   resources:
     runtime = 30
   script:
-    "scripts/preprocess/split_df.py"
+    "scripts/split_df.py"
 
 
 # Download supplementary file names
@@ -89,7 +89,7 @@ rule download_suppfilenames:
     runtime = lambda wildcards, attempt: 100 + (attempt * 20)
   shell:
     """
-    python3 -u scripts/preprocess/download_suppfilenames.py --list {input} --out {output} --email {params.email}
+    python3 -u scripts/download_suppfilenames.py --list {input} --out {output} --email {params.email}
     """
 
 
@@ -104,7 +104,7 @@ rule filter_suppfilenames:
   resources:
     runtime = 30
   script:
-    "scripts/preprocess/filter_suppfilenames.py"
+    "scripts/filter_suppfilenames.py"
 
 
 # Download filterd supplementary files
@@ -118,7 +118,7 @@ rule download_suppfiles:
   resources:
     runtime = lambda wildcards, attempt: 100 + (attempt * 20)
   script:
-    "scripts/preprocess/download_suppfiles.py"
+    "scripts/download_suppfiles.py"
 
 
 # Split list of supplementary files
@@ -148,7 +148,7 @@ rule suppfiles_list:
   resources:
     runtime = 30
   script:
-    "scripts/preprocess/split_lines.py"
+    "scripts/split_lines.py"
 
 
 
@@ -167,7 +167,7 @@ rule import_suppfiles:
     runtime = lambda wildcards, attempt: 40 + (attempt * 20)
   shell:
     """
-    python3 -u scripts/preprocess/import_suppfiles.py --list {input} --out {output} {params}
+    python3 -u scripts/import_suppfiles.py --list {input} --out {output} {params}
     """
 
 
@@ -183,7 +183,7 @@ rule merge_parsed_suppfiles:
     mem_mb = 4000,
     runtime = 30
   script:
-    "scripts/preprocess/concat_tabs.py"
+    "scripts/concat_tabs.py"
     
 
 
@@ -201,7 +201,7 @@ rule download_publications:
   resources:
     runtime = 360
   script:
-    "scripts/preprocess/download_publications.py"
+    "scripts/download_publications.py"
 
 
 # Download citations
@@ -217,4 +217,4 @@ rule download_citations:
   resources:
     runtime = 120
   script:
-    "scripts/preprocess/download_scopus_citations.py"
+    "scripts/download_scopus_citations.py"
