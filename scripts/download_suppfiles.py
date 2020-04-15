@@ -4,7 +4,7 @@ import re
 
 p = re.compile("GSE\\d+")
 
-input = snakemake.input["files"]
+input = snakemake.input[0]
 output = snakemake.output[0]
 
 with ftplib.FTP("ftp.ncbi.nlm.nih.gov") as ftp:
