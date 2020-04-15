@@ -124,15 +124,9 @@ rule download_suppfiles:
 # Split list of supplementary files
 # dir is the location of suppl/ folder
 # Drop some offending files 
-OUT=["GSE84086_T.S.meth.txt.gz", 
-"GSE118184_Organoid.combined.dge.txt.gz", 
-"GSE115746_cells_exon_counts.csv.gz",
-"GSE81750_Mosaic-Seq_15SE_71HS_241sgRNA_K562.full_matrix.final.txt.gz",
-"GSE121891_OB_6_runs.raw.dge.csv.gz",
-"GSE117131_Zhu_SC-10X_mouse_raw-counts.txt.gz"]
-
-TIME=["GSE116470_F_GRCm38.81.P60Cerebellum_ALT.raw.dge.txt.gz", 
-"GSE30839_GSM765295_ribo_mesc_harr150s-profiles.tar.gz"]
+BLACKLIST_FILE = "output/blacklist.txt"
+with open(BLACKLIST_FILE) as h:
+    BLACKLIST = [os.path.basename(i.rstrip()) for i in h.readlines()]
 
 rule suppfiles_list:
   input: 
@@ -142,7 +136,7 @@ rule suppfiles_list:
   params:
     chunks = N,
     dir = "output",
-    drop = MEM + TIME
+    blacklist = BLACKLIST
   conda: 
     "envs/geo-query.yaml"
   resources:
@@ -158,7 +152,7 @@ rule import_suppfiles:
   output: 
     "output/tmp/parsed_suppfiles_{k}_{n}.csv"
   params:
-    "--var basemean=10 logcpm=1 rpkm=1 fpkm=1 aveexpr=3.32 --bins 40 --fdr 0.05 -v"
+    "--var basemean=10 logcpm=1 rpkm=1 fpkm=1 aveexpr=3.32 --bins 40 --fdr 0.05 -v --blacklist {}".format(BLACKLIST_FILE)
   conda: 
     "envs/geo-query.yaml"
   resources:
@@ -184,7 +178,6 @@ rule merge_parsed_suppfiles:
   script:
     "scripts/concat_tabs.py"
     
-
 
 # Download publication metadata
 rule download_publications:
