@@ -8,7 +8,7 @@ dir = snakemake.params.get("dir", "")
 blacklist = snakemake.params.get("blacklist", [])
 
 assert len(output) == chunks, "The number of chunks and outputs don't match!"
-assert isinstance(drop, list), "Drop must be list"
+assert isinstance(blacklist, list), "Blacklist must be list"
 
 with open(input) as i:
     lines = i.readlines()
