@@ -532,6 +532,12 @@ if __name__ == "__main__":
     parser.add_argument(
         "--verbose", "-v", help="increase output verbosity", action="count", default=0
     )
+    group.add_argument(
+        "--blacklist",
+        metavar="FILE",
+        type=argparse.FileType("r"),
+        help="file with filenames to skip importing, one per line",
+    )
     args = parser.parse_args()
     var = dict(map(lambda s: s.split("="), args.vars))
     VAR = {k: float(v) for k, v in var.items()}
@@ -547,8 +553,20 @@ if __name__ == "__main__":
             for line in f:
                 input.append(line.rstrip())
 
+    blacklist = []
+    if args.blacklist:
+        with args.blacklist as f:
+            for line in f:
+                file = os.path.basename(line.rstrip())
+                blacklist.append(file)
+
     # Keep only inputs that exist
     input = [i for i in input if os.path.isfile(i)]
+    
+    # Drop files in blacklist
+    if blacklist:
+        input = [i for i in input if os.path.basename(i) not in blacklist]
+
     if len(input) == 0:
         Path(args.out).touch()
         sys.exit()
