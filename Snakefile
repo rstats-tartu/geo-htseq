@@ -218,14 +218,3 @@ rule download_citations:
     runtime = 120
   script:
     "scripts/preprocess/download_scopus_citations.py"
-
-
-# Knit report
-# rule report:
-#   input: "index.Rmd", "introduction.Rmd", "methods.Rmd", "results.Rmd", "discussion.Rmd", "references.Rmd", "output/document_summaries.csv", "output/single-cell.csv", "output/suppfilenames.rds", "output/suppfilenames_filtered.rds", "output/gsem.rds", "output/suppdata.rds", "output/publications.csv", "output/scopus_citedbycount.csv"
-#   output: "_main.html"
-#   singularity: SIMG
-#   shell:
-#     """
-#     Rscript -e "bookdown::render_site(encoding = 'UTF-8')"
-#     """
