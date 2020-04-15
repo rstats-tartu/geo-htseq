@@ -532,7 +532,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--verbose", "-v", help="increase output verbosity", action="count", default=0
     )
-    group.add_argument(
+    parser.add_argument(
         "--blacklist",
         metavar="FILE",
         type=argparse.FileType("r"),
