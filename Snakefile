@@ -30,7 +30,7 @@ rule geo_query:
     api_key = os.environ["NCBI_APIKEY"],
     query = QUERY,
     db = "gds",
-    retmax = 50000,
+    retmax = 40000,
     batch_size = 100
   conda:
     "envs/geo-query.yaml"
@@ -124,7 +124,7 @@ rule download_suppfiles:
 # Split list of supplementary files
 # dir is the location of suppl/ folder
 # Drop some offending files 
-MEM=["GSE84086_T.S.meth.txt.gz", 
+OUT=["GSE84086_T.S.meth.txt.gz", 
 "GSE118184_Organoid.combined.dge.txt.gz", 
 "GSE115746_cells_exon_counts.csv.gz",
 "GSE81750_Mosaic-Seq_15SE_71HS_241sgRNA_K562.full_matrix.final.txt.gz",
@@ -149,7 +149,6 @@ rule suppfiles_list:
     runtime = 30
   script:
     "scripts/split_lines.py"
-
 
 
 # Import supplementary data
