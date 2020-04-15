@@ -130,7 +130,8 @@ with open(BLACKLIST_FILE) as h:
 
 rule suppfiles_list:
   input: 
-    "output/tmp/suppfilenames_filtered_{k}.txt"
+    files = rules.filter_suppfilenames.output,
+    start = rules.download_suppfiles.output
   output: 
     expand("output/tmp/suppfilenames_filtered_{{k}}_{n}.txt", n = list(range(0, N, 1)))
   params:
