@@ -15,6 +15,8 @@ rule all:
     "output/parsed_suppfiles.csv", 
     "output/publications.csv",
     "output/scopus_citedbycount.csv",
+    "output/suppfilenames.txt",
+    "output/suppfilenames_filtered.txt",
     expand(["output/tmp/suppfilenames_filtered_{k}.txt", 
             "output/downloading_suppfiles_{k}.done"], 
             k = list(range(0, K, 1)))
@@ -93,6 +95,19 @@ rule download_suppfilenames:
     """
 
 
+rule suppfilenames:
+  input:
+    expand("output/tmp/suppfilenames_{k}.txt", k = list(range(0, K, 1)))
+  output:
+    "output/suppfilenames.txt"
+  resources:
+    runtime = 20
+  shell:
+    """
+    for file in {input}; do grep "^suppl" $file >> {output}; done
+    """
+
+
 # Filter supplementary file names by filename extension
 rule filter_suppfilenames:
   input: 
@@ -106,6 +121,18 @@ rule filter_suppfilenames:
   script:
     "scripts/filter_suppfilenames.py"
 
+
+rule suppfilenames_filtered:
+  input:
+    expand("output/tmp/suppfilenames_filtered_{k}.txt", k = list(range(0, K, 1)))
+  output:
+    "output/suppfilenames_filtered.txt"
+  resources:
+    runtime = 20
+  shell:
+    """
+    cat {input} > {output}
+    """
 
 # Download filterd supplementary files
 rule download_suppfiles:
