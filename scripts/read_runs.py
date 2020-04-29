@@ -2,7 +2,7 @@ import os
 from Bio import Entrez
 import xml.etree.ElementTree as ET
 import pandas as pd
-import time
+from tqdm import tqdm
 
 
 def chunks(l, n):
@@ -22,6 +22,7 @@ def spotify(accessions, retmax=20):
         db="bioproject", term=" OR ".join(accessions), retmode="text", retmax=retmax
     )
     records = Entrez.read(handle)
+    handle.close()
 
     # Get project acc for ids
     handle = Entrez.esummary(
@@ -31,29 +32,40 @@ def spotify(accessions, retmax=20):
     prjna = [
         ds["Project_Acc"] for ds in records["DocumentSummarySet"]["DocumentSummary"]
     ]
+    handle.close()
 
     # Get run ids
     handle = Entrez.esearch(
         db="sra", term=" OR ".join(prjna), retmode="text", retmax=retmax
     )
     records = Entrez.read(handle)
+    handle.close()
 
     # Get run metadata
-    handle = Entrez.efetch(
-        db="sra", id=",".join(records["IdList"]), rettype="docsum", retmax=retmax
-    )
-    records = Entrez.read(handle)
+    idlist = chunks(records["IdList"], retmax)
+    idlist_dfs = []
+    for chunk in idlist:
+        handle = Entrez.efetch(
+            db="sra", id=",".join(chunk), rettype="docsum", retmax=retmax, retmode="xml"
+        )
+        records = Entrez.parse(handle)
 
-    # Parse run metadata
-    df = pd.DataFrame()
-    for record in records:
-        runs = beetroot(record["Runs"])
-        exps = beetroot(record["ExpXml"])
-        spots = runs[0].attrib
-        spots.update({"name": exps[2].attrib["name"]})
-        spots.update({"platform": list(exps[6].attrib.values())[0]})
-        df = df.append(spots, True)
-    return df[["acc", "name", "total_bases", "total_spots", "platform"]]
+        # Parse run metadata
+        df = pd.DataFrame()
+        for i, record in tqdm(enumerate(records), total=len(chunk)):
+            runs = beetroot(record["Runs"])
+            exps = beetroot(record["ExpXml"])
+            try:
+                spots = runs[0].attrib
+                spots.update({"name": exps[2].attrib["name"]})
+                spots.update({"platform": list(exps[6].attrib.values())[0]})
+                df = df.append(spots, True)
+            except IndexError as e:
+                pass
+        handle.close()
+        idlist_dfs.append(df[["acc", "name", "total_bases", "total_spots", "platform"]])
+
+    return pd.concat(idlist_dfs)
 
 
 if __name__ == "__main__":
@@ -69,9 +81,10 @@ if __name__ == "__main__":
             "Personal API key from NCBI. If not set, only 3 queries per second are allowed. 10 queries per seconds otherwise with a valid API key."
         )
 
+    Entrez.max_tries = snakemake.params.get("max_tries", 3)
+    Entrez.sleep_between_tries = snakemake.params.get("sleep_between_tries", 15)
     retmax = snakemake.params.get("retmax", 100000)
     batch_size = snakemake.params.get("batch_size", 1000)
-    sleep = snakemake.params.get("sleep", 0)
 
     # Parse input to chunks
     acc = pd.read_csv(snakemake.input[0], sep=",")["Accession"]
@@ -80,7 +93,6 @@ if __name__ == "__main__":
     # Fetch and parse summaries
     with open(snakemake.output[0], "a") as output_handle:
         for chunk in chunked_acc:
-            time.sleep(sleep)
             spots = spotify(chunk, retmax=retmax)
             spots.to_csv(
                 output_handle,
