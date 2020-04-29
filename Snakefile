@@ -17,6 +17,7 @@ rule all:
     "output/scopus_citedbycount.csv",
     "output/suppfilenames.txt",
     "output/suppfilenames_filtered.txt",
+    "output/spots.csv",
     expand(["output/tmp/suppfilenames_filtered_{k}.txt", 
             "output/downloading_suppfiles_{k}.done"], 
             k = list(range(0, K, 1)))
