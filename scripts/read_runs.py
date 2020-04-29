@@ -81,7 +81,7 @@ if __name__ == "__main__":
     with open(snakemake.output[0], "a") as output_handle:
         for chunk in chunked_acc:
             time.sleep(sleep)
-            spots = spotify(chunked_acc, retmax=retmax)
+            spots = spotify(chunk, retmax=retmax)
             spots.to_csv(
                 output_handle,
                 sep=",",
