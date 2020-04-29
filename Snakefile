@@ -37,7 +37,7 @@ rule geo_query:
   conda:
     "envs/geo-query.yaml"
   resources:
-    runtime = 90
+    runtime = 120
   script:
     "scripts/geo_query.py"
 
@@ -56,7 +56,7 @@ rule single_cell:
   conda:
     "envs/geo-query.yaml"
   resources:
-    runtime = 30
+    runtime = 120
   script:
     "scripts/geo_query.py"
 
@@ -72,7 +72,7 @@ rule split_document_summaries:
   conda:
     "envs/geo-query.yaml"
   resources:
-    runtime = 30
+    runtime = 120
   script:
     "scripts/split_df.py"
 
@@ -88,24 +88,64 @@ rule download_suppfilenames:
   conda:
     "envs/geo-query.yaml"
   resources:
-    runtime = lambda wildcards, attempt: 100 + (attempt * 20)
+    runtime = lambda wildcards, attempt: 120 + (attempt * 30)
   shell:
     """
     python3 -u scripts/download_suppfilenames.py --list {input} --out {output} --email {params.email}
     """
 
-
+# Merge suppfilenames
 rule suppfilenames:
   input:
     expand("output/tmp/suppfilenames_{k}.txt", k = list(range(0, K, 1)))
   output:
     "output/suppfilenames.txt"
   resources:
-    runtime = 20
+    runtime = 120
   shell:
     """
     for file in {input}; do grep "^suppl" $file >> {output}; done
     """
+
+# Download read run data
+rule download_spots:
+  input: 
+    "output/tmp/document_summaries_{k}.csv"
+  output: 
+    "output/tmp/spots_{k}.csv"
+  params:
+    email = EMAIL,
+    api_key = os.environ["NCBI_APIKEY"],
+    retmax = 100000,
+    batch_size = 1000,
+    sleep = 1/4
+  conda:
+    "envs/geo-query.yaml"
+  resources:
+    runtime = lambda wildcards, attempt: 120 + (attempt * 30)
+  script:
+    "scripts/read_runs.py"
+
+
+rule merge_spots:
+    input:
+        expand("output/tmp/spots_{k}.csv", k = list(range(0, K, 1)))
+    output:
+        "output/spots.csv"
+    resources:
+        runtime = 120
+    run:
+        import pandas as pd
+        with open(snakemake.output[0], "a") as output_handle:
+  	      for file in input:
+        	  spots = pd.read_csv(file, sep=",")
+          	  spots.to_csv(
+                	output_handle,
+                	sep=",",
+                	mode="a",
+                	header=not output_handle.tell(),
+                	index=False,
+           		)	
 
 
 # Filter supplementary file names by filename extension
@@ -117,7 +157,7 @@ rule filter_suppfilenames:
   conda:
     "envs/geo-query.yaml"
   resources:
-    runtime = 30
+    runtime = 120
   script:
     "scripts/filter_suppfilenames.py"
 
@@ -143,7 +183,7 @@ rule download_suppfiles:
   conda:
     "envs/geo-query.yaml"
   resources:
-    runtime = lambda wildcards, attempt: 100 + (attempt * 20)
+    runtime = lambda wildcards, attempt: 120 + (attempt * 30)
   script:
     "scripts/download_suppfiles.py"
 
@@ -168,7 +208,7 @@ rule suppfiles_list:
   conda: 
     "envs/geo-query.yaml"
   resources:
-    runtime = 30
+    runtime = 120
   script:
     "scripts/split_lines.py"
 
@@ -185,7 +225,7 @@ rule import_suppfiles:
     "envs/geo-query.yaml"
   resources:
     mem_mb = lambda wildcards, attempt: 8000 + (attempt * 8000),
-    runtime = lambda wildcards, attempt: 40 + (attempt * 20)
+    runtime = lambda wildcards, attempt: 120 + (attempt * 60)
   shell:
     """
     python3 -u scripts/import_suppfiles.py --list {input} --out {output} {params}
@@ -202,7 +242,7 @@ rule merge_parsed_suppfiles:
     "envs/geo-query.yaml"
   resources:
     mem_mb = 4000,
-    runtime = 30
+    runtime = 120
   script:
     "scripts/concat_tabs.py"
     
@@ -235,6 +275,6 @@ rule download_citations:
   conda:
     "envs/geo-query.yaml"
   resources:
-    runtime = 120
+    runtime = lambda wildcards, attempt: 120 + (attempt * 60)
   script:
     "scripts/download_scopus_citations.py"

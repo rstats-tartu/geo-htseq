@@ -562,7 +562,7 @@ if __name__ == "__main__":
 
     # Keep only inputs that exist
     input = [i for i in input if os.path.isfile(i)]
-    
+
     # Drop files in blacklist
     if blacklist:
         input = [i for i in input if os.path.basename(i) not in blacklist]
