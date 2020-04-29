@@ -83,5 +83,9 @@ if __name__ == "__main__":
             time.sleep(sleep)
             spots = spotify(chunked_acc, retmax=retmax)
             spots.to_csv(
-                output_handle, mode="a", header=not output_handle.tell(), index=False
+                output_handle,
+                sep=",",
+                mode="a",
+                header=not output_handle.tell(),
+                index=False,
             )
