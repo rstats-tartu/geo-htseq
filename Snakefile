@@ -117,9 +117,9 @@ rule download_spots:
   params:
     email = EMAIL,
     api_key = os.environ["NCBI_APIKEY"],
-    retmax = 100000,
-    batch_size = 1000,
-    sleep = 1/4
+    retmax = 10000,
+    batch_size = 200,
+    max_tries = 6
   conda:
     "envs/geo-query.yaml"
   resources:
@@ -137,7 +137,7 @@ rule merge_spots:
         runtime = 120
     run:
         import pandas as pd
-        with open(snakemake.output[0], "a") as output_handle:
+        with open(output, "a") as output_handle:
   	      for file in input:
         	  spots = pd.read_csv(file, sep=",")
           	  spots.to_csv(
