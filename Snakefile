@@ -18,8 +18,8 @@ rule all:
     "output/suppfilenames.txt",
     "output/suppfilenames_filtered.txt",
     "output/spots.csv",
-    expand(["output/tmp/suppfilenames_filtered_{k}.txt", 
-            "output/downloading_suppfiles_{k}.done"], 
+    "output/geo-htseq-until-{}.tar.gz".format(LAST_DATE),
+    expand("output/downloading_suppfiles_{k}.done", 
             k = list(range(0, K, 1)))
 
 
@@ -137,7 +137,7 @@ rule merge_spots:
         runtime = 120
     run:
         import pandas as pd
-        with open(output, "a") as output_handle:
+        with open(output[0], "a") as output_handle:
   	      for file in input:
         	  spots = pd.read_csv(file, sep=",")
           	  spots.to_csv(
@@ -279,3 +279,19 @@ rule download_citations:
     runtime = lambda wildcards, attempt: 120 + (attempt * 60)
   script:
     "scripts/download_scopus_citations.py"
+
+
+rule archive:
+    input:
+        "output/document_summaries.csv",
+        "output/single-cell.csv",
+        "output/parsed_suppfiles.csv", 
+        "output/publications.csv",
+        "output/scopus_citedbycount.csv",
+        "output/suppfilenames.txt",
+        "output/suppfilenames_filtered.txt",
+        "output/spots.csv"
+    output:
+        "output/geo-htseq-until-{}.tar.gz".format(LAST_DATE)
+    shell:
+        "tar -czvf {output[0]} {input}"
