@@ -118,12 +118,12 @@ rule download_spots:
     email = EMAIL,
     api_key = os.environ["NCBI_APIKEY"],
     retmax = 10000,
-    batch_size = 200,
-    max_tries = 6
+    batch_size = 1,
+    max_tries = 4
   conda:
     "envs/geo-query.yaml"
   resources:
-    runtime = lambda wildcards, attempt: 90 + (attempt * 30)
+    runtime = 1440
   script:
     "scripts/read_runs.py"
 
