@@ -119,7 +119,7 @@ rule download_spots:
     api_key = os.environ["NCBI_APIKEY"],
     retmax = 10000,
     batch_size = 1,
-    max_tries = 4
+    max_tries = 6
   conda:
     "envs/geo-query.yaml"
   resources:

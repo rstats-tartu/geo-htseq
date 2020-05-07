@@ -17,6 +17,9 @@ def beetroot(brokenxml):
 
 
 def spotify(accessions, retmax=20):
+
+    print("Working on:", ",".join(accessions))
+    
     # Get ids for accessions
     handle = Entrez.esearch(
         db="bioproject", term=" OR ".join(accessions), retmode="text", retmax=retmax
@@ -52,7 +55,6 @@ def spotify(accessions, retmax=20):
         idlist_dfs.append(df)
     else:
         idlist = chunks(records["IdList"], retmax)
-        print("Get run metadata:", ",".join(records["IdList"]))
         for chunk in idlist:
             handle = Entrez.efetch(
                 db="sra", id=",".join(chunk), rettype="docsum", retmax=retmax, retmode="xml"
