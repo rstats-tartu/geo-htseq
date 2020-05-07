@@ -2,7 +2,8 @@ import os
 from Bio import Entrez
 import xml.etree.ElementTree as ET
 import pandas as pd
-
+import numpy as np
+from tqdm import tqdm
 
 def chunks(l, n):
     for i in range(0, len(l), n):
@@ -16,54 +17,62 @@ def beetroot(brokenxml):
 
 
 def spotify(accessions, retmax=20):
-    
     # Get ids for accessions
     handle = Entrez.esearch(
         db="bioproject", term=" OR ".join(accessions), retmode="text", retmax=retmax
     )
     records = Entrez.read(handle)
     handle.close()
-
+    
     # Get project acc for ids
     handle = Entrez.esummary(
         db="bioproject", id=",".join(records["IdList"]), retmode="text", retmax=retmax
     )
     records = Entrez.read(handle)
-    prjna = [
+    
+    proj_acc = [
         ds["Project_Acc"] for ds in records["DocumentSummarySet"]["DocumentSummary"]
     ]
     handle.close()
-
+    
     # Get run ids
     handle = Entrez.esearch(
-        db="sra", term=" OR ".join(prjna), retmode="text", retmax=retmax
+        db="sra", term=" OR ".join(proj_acc), retmode="text", retmax=retmax
     )
     records = Entrez.read(handle)
     handle.close()
-
+    
     # Get run metadata
-    idlist = chunks(records["IdList"], retmax)
     idlist_dfs = []
-    for chunk in idlist:
-        handle = Entrez.efetch(
-            db="sra", id=",".join(chunk), rettype="docsum", retmax=retmax, retmode="xml"
-        )
-        records = Entrez.parse(handle)
+    var = ["acc", "name", "total_bases", "total_spots", "platform", "no_runs"]
+    # In case of no runs return empty df with run ids in no_runs column
+    if len(records["IdList"]) == 0:
+        df = pd.DataFrame(columns = var, index=[0])
+        df.loc[0, "no_runs"] = ";".join(proj_acc)
+        idlist_dfs.append(df)
+    else:
+        idlist = chunks(records["IdList"], retmax)
+        print("Get run metadata:", ",".join(records["IdList"]))
+        for chunk in idlist:
+            handle = Entrez.efetch(
+                db="sra", id=",".join(chunk), rettype="docsum", retmax=retmax, retmode="xml"
+            )
+            records = Entrez.parse(handle)
 
-        # Parse run metadata
-        df = pd.DataFrame()
-        for i, record in tqdm(enumerate(records), total=len(chunk)):
-            runs = beetroot(record["Runs"])
-            exps = beetroot(record["ExpXml"])
-            try:
-                spots = runs[0].attrib
-                spots.update({"name": exps[2].attrib["name"]})
-                spots.update({"platform": list(exps[6].attrib.values())[0]})
-                df = df.append(spots, True)
-            except IndexError as e:
-                pass
-        handle.close()
-        idlist_dfs.append(df[["acc", "name", "total_bases", "total_spots", "platform"]])
+            # Parse run metadata
+            df = pd.DataFrame(columns = var)
+            for i, record in tqdm(enumerate(records), total=len(chunk)):
+                runs = beetroot(record["Runs"])
+                exps = beetroot(record["ExpXml"])
+                try:
+                    spots = runs[0].attrib
+                    spots.update({"name": exps[2].attrib["name"]})
+                    spots.update({"platform": list(exps[6].attrib.values())[0]})
+                    df = df.append(spots, True)
+                except IndexError as e:
+                    pass
+            handle.close()
+            idlist_dfs.append(df[var])
 
     return pd.concat(idlist_dfs)
 
