@@ -2,7 +2,6 @@ import os
 from Bio import Entrez
 import xml.etree.ElementTree as ET
 import pandas as pd
-from tqdm import tqdm
 
 
 def chunks(l, n):
@@ -17,6 +16,7 @@ def beetroot(brokenxml):
 
 
 def spotify(accessions, retmax=20):
+    
     # Get ids for accessions
     handle = Entrez.esearch(
         db="bioproject", term=" OR ".join(accessions), retmode="text", retmax=retmax
