@@ -52,11 +52,14 @@ def spotify(acc, email, **kwargs):
     root = tree.getroot()
 
     keep = "geo_accession,study_accession,run_accession,sample_name,sample_title,spots,bases,tax_id,organism,LIBRARY_STRATEGY,LIBRARY_SOURCE,LIBRARY_SELECTION,LIBRARY_LAYOUT,PLATFORM,MODEL,err".split(",")
-    err = root.findall(".//ERROR")[0].text
-    if err:
+    
+    if root.findall(".//ERROR"):
+        err = root.findall(".//ERROR")[0].text
         df = pd.DataFrame(columns=keep)
+        df.loc[0,"geo_accession"] = acc
         df.loc[0,"err"] = err
         return df
+    
     platform = [{"PLATFORM": i.tag, "MODEL": i.find("INSTRUMENT_MODEL").text} for i in root.findall(".//EXPERIMENT_PACKAGE/EXPERIMENT/PLATFORM/")]
     design = []
     for e in root.iter("LIBRARY_DESCRIPTOR"):
@@ -100,7 +103,6 @@ if __name__ == "__main__":
     # Fetch and parse summaries
     with open(snakemake.output[0], "a") as output_handle:
         for i, acc in tqdm(enumerate(accessions), total=len(accessions)):
-            print("Working on:", acc)
             spots = spotify(acc, email=email, api_key=api_key, max_tries=max_tries, sleep_between_tries=sleep_between_tries, retmax=retmax)
             spots.to_csv(
                 output_handle,
