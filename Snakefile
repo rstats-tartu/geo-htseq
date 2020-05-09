@@ -6,11 +6,11 @@ EMAIL = "taavi.pall@ut.ee"
 
 onsuccess:
     print("Workflow finished, no error")
-    shell("mail -s "Forkflow finished successfully" {EMAIL} < {log}")
+    shell("mail -s 'Forkflow finished successfully' {EMAIL} < {log}")
 
 onerror:
     print("An error occurred")
-    shell("mail -s "An error occurred" {EMAIL} < {log}")
+    shell("mail -s 'An error occurred' {EMAIL} < {log}")
 
 localrules: all, filter_suppfilenames, suppfiles_list
 
