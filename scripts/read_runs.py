@@ -103,6 +103,7 @@ if __name__ == "__main__":
     # Fetch and parse summaries
     with open(snakemake.output[0], "a") as output_handle:
         for i, acc in tqdm(enumerate(accessions), total=len(accessions)):
+            print(acc)
             spots = spotify(acc, email=email, api_key=api_key, max_tries=max_tries, sleep_between_tries=sleep_between_tries, retmax=retmax)
             spots.to_csv(
                 output_handle,
