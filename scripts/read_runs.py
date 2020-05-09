@@ -51,6 +51,12 @@ def spotify(acc, email, **kwargs):
     tree = ET.ElementTree(ET.fromstring(resp.text))
     root = tree.getroot()
 
+    keep = "geo_accession,study_accession,run_accession,sample_name,sample_title,spots,bases,tax_id,organism,LIBRARY_STRATEGY,LIBRARY_SOURCE,LIBRARY_SELECTION,LIBRARY_LAYOUT,PLATFORM,MODEL,err".split(",")
+    err = root.findall(".//ERROR")[0].text
+    if err:
+        df = pd.DataFrame(columns=keep)
+        df.loc[0,"err"] = err
+        return df
     platform = [{"PLATFORM": i.tag, "MODEL": i.find("INSTRUMENT_MODEL").text} for i in root.findall(".//EXPERIMENT_PACKAGE/EXPERIMENT/PLATFORM/")]
     design = []
     for e in root.iter("LIBRARY_DESCRIPTOR"):
@@ -66,7 +72,7 @@ def spotify(acc, email, **kwargs):
     df = pd.DataFrame([{**a, **b, **c, **d} for a,b,c,d in zip(study, platform, spots, design)])
     df.rename(columns = {"accession": "run_accession"}, inplace=True)
     df.insert(0, "geo_accession", acc)
-    keep = "geo_accession,study_accession,run_accession,sample_name,sample_title,spots,bases,tax_id,organism,LIBRARY_STRATEGY,LIBRARY_SOURCE,LIBRARY_SELECTION,LIBRARY_LAYOUT,PLATFORM,MODEL".split(",")
+    df.insert(0, "err", np.nan)
     return df[keep]
 
 
