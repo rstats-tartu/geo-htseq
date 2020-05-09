@@ -4,6 +4,14 @@ LAST_DATE = "2019-12-31"
 QUERY = 'expression profiling by high throughput sequencing[DataSet Type] AND ("2000-01-01"[PDAT] : "{}"[PDAT])'.format(LAST_DATE)
 EMAIL = "taavi.pall@ut.ee"
 
+onsuccess:
+    print("Workflow finished, no error")
+    shell("mail -s "Forkflow finished successfully" {EMAIL} < {log}")
+
+onerror:
+    print("An error occurred")
+    shell("mail -s "An error occurred" {EMAIL} < {log}")
+
 localrules: all, filter_suppfilenames, suppfiles_list
 
 K = 10
