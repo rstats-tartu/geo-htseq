@@ -6,6 +6,12 @@ import numpy as np
 from tqdm import tqdm
 from requests import Request, Session
 
+def empty_dataframe(acc, err, var):
+    df = pd.DataFrame(columns=var)
+    df.loc[0,"geo_accession"] = acc
+    df.loc[0,"err"] = err
+    return df
+
 def spotify(acc, email, **kwargs):
 
     Entrez.email = email
@@ -14,6 +20,7 @@ def spotify(acc, email, **kwargs):
     Entrez.max_tries = kwargs.pop("max_tries", 3)
     Entrez.sleep_between_tries = kwargs.pop("sleep_between_tries", 15)
     retmax = kwargs.pop("retmax", 20)
+    keep = "geo_accession,study_accession,run_accession,sample_name,sample_title,spots,bases,tax_id,organism,LIBRARY_STRATEGY,LIBRARY_SOURCE,LIBRARY_SELECTION,LIBRARY_LAYOUT,PLATFORM,MODEL,err".split(",")
 
     term = '({}[All Fields]) AND "gsm"[Filter]'.format(acc)
     handle = Entrez.esearch(db="gds", term=term, retmode="text", retmax = retmax)
@@ -29,7 +36,11 @@ def spotify(acc, email, **kwargs):
         records = Entrez.read(handle)
         handle.close()
         gsm_acc = [i["Accession"] for i in records]
-        srx = [i['ExtRelations'][0]['TargetObject'] for i in records]
+        try:
+            srx = [i['ExtRelations'][0]['TargetObject'] for i in records]
+        except IndexError as e:
+            err = "SRA Experiment is not public: {}".format(e)
+            return empty_dataframe(acc, err, keep)
         handle = Entrez.esearch(db="sra", term=" OR ".join(srx), retmode="text", retmax=retmax)
         records = Entrez.read(handle)
         handle.close()
@@ -51,14 +62,11 @@ def spotify(acc, email, **kwargs):
     tree = ET.ElementTree(ET.fromstring(resp.text))
     root = tree.getroot()
 
-    keep = "geo_accession,study_accession,run_accession,sample_name,sample_title,spots,bases,tax_id,organism,LIBRARY_STRATEGY,LIBRARY_SOURCE,LIBRARY_SELECTION,LIBRARY_LAYOUT,PLATFORM,MODEL,err".split(",")
+    
     
     if root.findall(".//ERROR"):
         err = root.findall(".//ERROR")[0].text
-        df = pd.DataFrame(columns=keep)
-        df.loc[0,"geo_accession"] = acc
-        df.loc[0,"err"] = err
-        return df
+        return empty_dataframe(acc, err, keep)
     
     platform = [{"PLATFORM": i.tag, "MODEL": i.find("INSTRUMENT_MODEL").text} for i in root.findall(".//EXPERIMENT_PACKAGE/EXPERIMENT/PLATFORM/")]
     design = []
