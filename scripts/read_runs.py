@@ -4,13 +4,20 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-from requests import Request, Session
+import requests
+
+
+def chunks(l, n):
+    for i in range(0, len(l), n):
+        yield l[i : i + n]
+
 
 def empty_dataframe(acc, err, var):
     df = pd.DataFrame(columns=var)
-    df.loc[0,"geo_accession"] = acc
-    df.loc[0,"err"] = err
+    df.loc[0, "geo_accession"] = acc
+    df.loc[0, "err"] = err
     return df
+
 
 def spotify(acc, email, **kwargs):
 
@@ -20,71 +27,89 @@ def spotify(acc, email, **kwargs):
     Entrez.max_tries = kwargs.pop("max_tries", 3)
     Entrez.sleep_between_tries = kwargs.pop("sleep_between_tries", 15)
     retmax = kwargs.pop("retmax", 20)
-    keep = "geo_accession,study_accession,run_accession,sample_name,sample_title,spots,bases,tax_id,organism,LIBRARY_STRATEGY,LIBRARY_SOURCE,LIBRARY_SELECTION,LIBRARY_LAYOUT,PLATFORM,MODEL,err".split(",")
+    keep = "geo_accession,study_accession,run_accession,sample_name,sample_title,spots,bases,tax_id,organism,LIBRARY_STRATEGY,LIBRARY_SOURCE,LIBRARY_SELECTION,LIBRARY_LAYOUT,PLATFORM,MODEL,err".split(
+        ","
+    )
 
     term = '({}[All Fields]) AND "gsm"[Filter]'.format(acc)
-    handle = Entrez.esearch(db="gds", term=term, retmode="text", retmax = retmax)
-    records=Entrez.read(handle)
+    handle = Entrez.esearch(db="gds", term=term, retmode="text", retmax=retmax)
+    records = Entrez.read(handle)
     handle.close()
-    gsm=records["IdList"]
-    handle = Entrez.elink(dbfrom="gds", id=",".join(gsm), linkname="gds_sra", retmax=retmax)
+    gsm = records["IdList"]
+    handle = Entrez.elink(
+        dbfrom="gds", id=",".join(gsm), linkname="gds_sra", retmax=retmax
+    )
     records = Entrez.read(handle)
     handle.close()
 
     if len(records[0]["LinkSetDb"]) == 0:
-        handle = Entrez.esummary(db="gds", id=",".join(gsm), retmode="text", retmax=retmax)
+        handle = Entrez.esummary(
+            db="gds", id=",".join(gsm), retmode="text", retmax=retmax
+        )
         records = Entrez.read(handle)
         handle.close()
         gsm_acc = [i["Accession"] for i in records]
         try:
-            srx = [i['ExtRelations'][0]['TargetObject'] for i in records]
+            srx = [i["ExtRelations"][0]["TargetObject"] for i in records]
         except IndexError as e:
             err = "SRA Experiment is not public: {}".format(e)
             return empty_dataframe(acc, err, keep)
-        handle = Entrez.esearch(db="sra", term=" OR ".join(srx), retmode="text", retmax=retmax)
+        handle = Entrez.esearch(
+            db="sra", term=" OR ".join(srx), retmode="text", retmax=retmax
+        )
         records = Entrez.read(handle)
         handle.close()
-        uids = records['IdList']
+        uids = records["IdList"]
     else:
         uids = [link["Id"] for link in records[0]["LinkSetDb"][0]["Link"]]
 
     url_endpoint = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
-    params = {"db": "sra", "id": ",".join(uids), "rettype": "full", "retmode": "xml", "email": Entrez.email}
+    params = {"db": "sra", "rettype": "full", "retmode": "xml", "email": Entrez.email}
     if Entrez.api_key:
         params.update({"api_key": Entrez.api_key})
-    method = "GET"
-    if len(uids) > 200:
-        method = "POST"
-    s = Session()
-    req = Request(method, url_endpoint, params=params)
-    prepped = s.prepare_request(req)
-    resp = s.send(prepped)
-    tree = ET.ElementTree(ET.fromstring(resp.text))
-    root = tree.getroot()
 
-    
-    
-    if root.findall(".//ERROR"):
-        err = root.findall(".//ERROR")[0].text
-        return empty_dataframe(acc, err, keep)
-    
-    platform = [{"PLATFORM": i.tag, "MODEL": i.find("INSTRUMENT_MODEL").text} for i in root.findall(".//EXPERIMENT_PACKAGE/EXPERIMENT/PLATFORM/")]
-    design = []
-    for e in root.iter("LIBRARY_DESCRIPTOR"):
-        libdesc = {}
-        libdesc.update({"LIBRARY_STRATEGY": e.find("LIBRARY_STRATEGY").text})
-        libdesc.update({"LIBRARY_SOURCE": e.find("LIBRARY_SOURCE").text})
-        libdesc.update({"LIBRARY_SELECTION": e.find("LIBRARY_SELECTION").text})
-        libdesc.update({"LIBRARY_LAYOUT": e.find("LIBRARY_LAYOUT")[0].tag})
-        design.append(libdesc)
+    dataframes = []
+    for chunk in chunks(uids, 200):
 
-    spots = [i.attrib for i in root.findall(".//EXPERIMENT_PACKAGE/RUN_SET/RUN/Pool/Member")]
-    study = [{"study_accession": i.attrib.pop("accession")} for i in root.findall(".//EXPERIMENT_PACKAGE/EXPERIMENT/STUDY_REF")]
-    df = pd.DataFrame([{**a, **b, **c, **d} for a,b,c,d in zip(study, platform, spots, design)])
-    df.rename(columns = {"accession": "run_accession"}, inplace=True)
-    df.insert(0, "geo_accession", acc)
-    df.insert(0, "err", np.nan)
-    return df[keep]
+        params.update({"id": ",".join(chunk)})
+        resp = requests.get(url_endpoint, params=params)
+        tree = ET.ElementTree(ET.fromstring(resp.text))
+        root = tree.getroot()
+
+        if root.findall(".//ERROR"):
+            err = root.findall(".//ERROR")[0].text
+            return empty_dataframe(acc, err, keep)
+
+        platform = [
+            {"PLATFORM": i.tag, "MODEL": i.find("INSTRUMENT_MODEL").text}
+            for i in root.findall(".//EXPERIMENT_PACKAGE/EXPERIMENT/PLATFORM/")
+        ]
+        design = []
+        for e in root.iter("LIBRARY_DESCRIPTOR"):
+            libdesc = {}
+            libdesc.update({"LIBRARY_STRATEGY": e.find("LIBRARY_STRATEGY").text})
+            libdesc.update({"LIBRARY_SOURCE": e.find("LIBRARY_SOURCE").text})
+            libdesc.update({"LIBRARY_SELECTION": e.find("LIBRARY_SELECTION").text})
+            libdesc.update({"LIBRARY_LAYOUT": e.find("LIBRARY_LAYOUT")[0].tag})
+            design.append(libdesc)
+
+        spots = [
+            i.attrib
+            for i in root.findall(".//EXPERIMENT_PACKAGE/RUN_SET/RUN/Pool/Member")
+        ]
+        study = [
+            {"study_accession": i.attrib.pop("accession")}
+            for i in root.findall(".//EXPERIMENT_PACKAGE/EXPERIMENT/STUDY_REF")
+        ]
+        df = pd.DataFrame(
+            [{**a, **b, **c, **d} for a, b, c, d in zip(study, platform, spots, design)]
+        )
+        df.rename(columns={"accession": "run_accession"}, inplace=True)
+        df.insert(0, "geo_accession", acc)
+        df.insert(0, "err", np.nan)
+        dataframes.append(df[keep])
+
+    return pd.concat(dataframes)
 
 
 if __name__ == "__main__":
@@ -112,7 +137,14 @@ if __name__ == "__main__":
     with open(snakemake.output[0], "a") as output_handle:
         for i, acc in tqdm(enumerate(accessions), total=len(accessions)):
             print(acc)
-            spots = spotify(acc, email=email, api_key=api_key, max_tries=max_tries, sleep_between_tries=sleep_between_tries, retmax=retmax)
+            spots = spotify(
+                acc,
+                email=email,
+                api_key=api_key,
+                max_tries=max_tries,
+                sleep_between_tries=sleep_between_tries,
+                retmax=retmax,
+            )
             spots.to_csv(
                 output_handle,
                 sep=",",
