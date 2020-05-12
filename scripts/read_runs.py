@@ -107,7 +107,7 @@ def spotify(acc, email, **kwargs):
         df.rename(columns={"accession": "run_accession"}, inplace=True)
         df.insert(0, "geo_accession", acc)
         df.insert(0, "err", np.nan)
-        dataframes.append(df[keep])
+        dataframes.append(df.loc[:,df.columns.isin(keep)])
 
     return pd.concat(dataframes)
 
