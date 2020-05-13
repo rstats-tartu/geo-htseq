@@ -5,7 +5,11 @@
 
 Assessing the quality of experiments, both directly and through replication attempts, is becoming a grave concern in biomedicine. This is especially true in omics experiments, where thousands of independent measurements are done in parallel, with the understanding that only a small minority will probe scientifically meaningful effects – a state of affairs conductive to mistaking false positives for scientific discoveries.  
 
-Here, we assessed the quality of the high-throughput sequencing experiments submitted to Entrez GEO database until 2018-12-31.
+Here, we assessed the quality of the high-throughput sequencing experiments submitted to Entrez GEO database until 2019-12-31.
+
+### Descripton of the workflow ###
+
+NCBI GEO datasets queries were performed using Bio.Entrez python package and by sending requests to NCBI Entrez public API. FTP links from GEO datasets document summaries were used to download supplementary files lists. Supplementary files were filtered for downloading, based on file extensions, to keep file names with "tab", "xlsx", "diff", "tsv", "xls", "csv", "txt", "rtf", and "tar" file extensions. Downloaded files were imported using python pandas package, and searched for unadjusted P value sets. Unadjusted P value sets and summarised expression level of associated genomic features were identified using column names. Identified raw P value sets were first classified based on their histogram shape. Raw P value sets with anti-conservative shape were used to calculate pi0 statistic. When expression level data were present and identifiable in imported tables, raw P values were further filtered to remove uninformative features using following thresholds basemean=10, logcpm=1, rpkm=1, fpkm=1, aveexpr=3.32. Differential expression analysis platform were inferred using column name pattern for cuffdiff, DESeq/DESeq2, EdgeR, and limma, all other unidentified sets were binned as unknown/unidentified. Publication data were downloaded from NCBI PubMed database. Citation data were downloaded from Elevier Scopus database. Sequence read library statistics were downloaded from NCBI SRA database. The code is available as a snakemake workflow on [tpall/geo-htseq](https://github.com/tpall/geo-htseq) Github repo.
 
 ### How do I get set up? ###
 
