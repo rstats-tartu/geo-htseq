@@ -130,7 +130,7 @@ if __name__ == "__main__":
     retmax = snakemake.params.get("retmax", 100000)
 
     # Parse GEO accessions to list
-    docsums = pd.read_csv(snakemake.input[0], sep=",")["Accession"]
+    docsums = pd.read_csv(snakemake.input[0], sep=",")
     original = docsums[~docsums.gdsType.str.contains("reanalysis")]
     accessions = original["Accession"].to_list()
 
