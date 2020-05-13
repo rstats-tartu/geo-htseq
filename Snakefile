@@ -1,5 +1,4 @@
 import os
-SIMG = "shub://tpall/geo-rnaseq"
 LAST_DATE = "2019-12-31"
 QUERY = 'expression profiling by high throughput sequencing[DataSet Type] AND ("2000-01-01"[PDAT] : "{}"[PDAT])'.format(LAST_DATE)
 EMAIL = "taavi.pall@ut.ee"
