@@ -1,6 +1,0 @@
-new_session: yes
-before_chapter_script: "scripts/_common.R"
-language:
-  ui:
-    chapter_name: ""
-

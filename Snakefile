@@ -1,8 +1,15 @@
 import os
-SIMG = "shub://tpall/geo-rnaseq"
-LAST_DATE = "2018-12-31"
+LAST_DATE = "2019-12-31"
 QUERY = 'expression profiling by high throughput sequencing[DataSet Type] AND ("2000-01-01"[PDAT] : "{}"[PDAT])'.format(LAST_DATE)
 EMAIL = "taavi.pall@ut.ee"
+
+onsuccess:
+    print("Workflow finished, no error")
+    shell("mail -s 'Forkflow finished successfully' {EMAIL} < {log}")
+
+onerror:
+    print("An error occurred")
+    shell("mail -s 'An error occurred' {EMAIL} < {log}")
 
 localrules: all, filter_suppfilenames, suppfiles_list
 
@@ -15,8 +22,11 @@ rule all:
     "output/parsed_suppfiles.csv", 
     "output/publications.csv",
     "output/scopus_citedbycount.csv",
-    expand(["output/tmp/suppfilenames_filtered_{k}.txt", 
-            "output/downloading_suppfiles_{k}.done"], 
+    "output/suppfilenames.txt",
+    "output/suppfilenames_filtered.txt",
+    "output/spots.csv",
+    "output/geo-htseq-until-{}.tar.gz".format(LAST_DATE),
+    expand("output/downloading_suppfiles_{k}.done", 
             k = list(range(0, K, 1)))
 
 
@@ -30,12 +40,14 @@ rule geo_query:
     api_key = os.environ["NCBI_APIKEY"],
     query = QUERY,
     db = "gds",
-    retmax = 30000,
+    retmax = 40000,
     batch_size = 100
   conda:
     "envs/geo-query.yaml"
+  resources:
+    runtime = 120
   script:
-    "scripts/preprocess/geo_query.py"
+    "scripts/geo_query.py"
 
 
 # Single-cell experiment accessions
@@ -47,12 +59,14 @@ rule single_cell:
     api_key = os.environ["NCBI_APIKEY"],
     query = QUERY + ' AND "single-cell"[All Fields]',
     db = "gds",
-    retmax = 2000,
+    retmax = 5000,
     columns = ["Accession"]
   conda:
     "envs/geo-query.yaml"
+  resources:
+    runtime = 120
   script:
-    "scripts/preprocess/geo_query.py"
+    "scripts/geo_query.py"
 
 
 # Split GEO document summaries
@@ -65,8 +79,10 @@ rule split_document_summaries:
     chunks = K
   conda:
     "envs/geo-query.yaml"
+  resources:
+    runtime = 120
   script:
-    "scripts/preprocess/split_document_summaries.py"
+    "scripts/split_df.py"
 
 
 # Download supplementary file names
@@ -75,10 +91,68 @@ rule download_suppfilenames:
     "output/tmp/document_summaries_{k}.csv"
   output: 
     "output/tmp/suppfilenames_{k}.txt"
+  params:
+    email = EMAIL
   conda:
     "envs/geo-query.yaml"
+  resources:
+    runtime = lambda wildcards, attempt: 90 + (attempt * 30)
+  shell:
+    """
+    python3 -u scripts/download_suppfilenames.py --list {input} --out {output} --email {params.email}
+    """
+
+# Merge suppfilenames
+rule suppfilenames:
+  input:
+    expand("output/tmp/suppfilenames_{k}.txt", k = list(range(0, K, 1)))
+  output:
+    "output/suppfilenames.txt"
+  resources:
+    runtime = 120
+  shell:
+    """
+    for file in {input}; do grep "^suppl" $file >> {output}; done
+    """
+
+# Download read run data
+rule download_spots:
+  input: 
+    "output/tmp/document_summaries_{k}.csv"
+  output: 
+    "output/tmp/spots_{k}.csv"
+  params:
+    email = EMAIL,
+    api_key = os.environ["NCBI_APIKEY"],
+    retmax = 100000,
+    max_tries = 6
+  conda:
+    "envs/geo-query.yaml"
+  resources:
+    runtime = 1440
   script:
-    "scripts/preprocess/download_suppfilenames.py"
+    "scripts/read_runs.py"
+
+
+rule merge_spots:
+    input:
+        expand("output/tmp/spots_{k}.csv", k = list(range(0, K, 1)))
+    output:
+        "output/spots.csv"
+    resources:
+        runtime = 120
+    run:
+        import pandas as pd
+        with open(output[0], "a") as output_handle:
+  	      for file in input:
+        	  spots = pd.read_csv(file, sep=",")
+          	  spots.to_csv(
+                	output_handle,
+                	sep=",",
+                	mode="a",
+                	header=not output_handle.tell(),
+                	index=False,
+           		)	
 
 
 # Filter supplementary file names by filename extension
@@ -89,9 +163,23 @@ rule filter_suppfilenames:
     "output/tmp/suppfilenames_filtered_{k}.txt"
   conda:
     "envs/geo-query.yaml"
+  resources:
+    runtime = 120
   script:
-    "scripts/preprocess/filter_suppfilenames.py"
+    "scripts/filter_suppfilenames.py"
 
+
+rule suppfilenames_filtered:
+  input:
+    expand("output/tmp/suppfilenames_filtered_{k}.txt", k = list(range(0, K, 1)))
+  output:
+    "output/suppfilenames_filtered.txt"
+  resources:
+    runtime = 20
+  shell:
+    """
+    cat {input} > {output}
+    """
 
 # Download filterd supplementary files
 rule download_suppfiles:
@@ -101,36 +189,53 @@ rule download_suppfiles:
     touch("output/downloading_suppfiles_{k}.done")
   conda:
     "envs/geo-query.yaml"
+  resources:
+    runtime = lambda wildcards, attempt: 90 + (attempt * 30)
   script:
-    "scripts/preprocess/download_suppfiles.py"
+    "scripts/download_suppfiles.py"
+
+
+# Split list of supplementary files
+# dir is the location of suppl/ folder
+# Drop some offending files 
+BLACKLIST_FILE = "output/blacklist.txt"
+with open(BLACKLIST_FILE) as h:
+    BLACKLIST = [os.path.basename(i.rstrip()) for i in h.readlines()]
+
+rule suppfiles_list:
+  input: 
+    rules.filter_suppfilenames.output,
+    rules.download_suppfiles.output
+  output: 
+    expand("output/tmp/suppfilenames_filtered_{{k}}_{n}.txt", n = list(range(0, N, 1)))
+  params:
+    chunks = N,
+    dir = "output",
+    blacklist = BLACKLIST
+  conda: 
+    "envs/geo-query.yaml"
+  resources:
+    runtime = 120
+  script:
+    "scripts/split_lines.py"
 
 
 # Import supplementary data
-rule suppfiles_list:
-  input: 
-    "output/tmp/suppfilenames_filtered_{k}.txt"
-  output: 
-    expand("output/tmp/suppfilenames_filtered_{{k}}_{n}.txt", n = list(range(1, N, 1)))
-  params:
-    n = N,
-    dir = "output"
-  conda: 
-    "envs/geo-query.yaml"
-  script:
-    "scripts/split.py"
-
 rule import_suppfiles:
   input: 
     "output/tmp/suppfilenames_filtered_{k}_{n}.txt"
   output: 
     "output/tmp/parsed_suppfiles_{k}_{n}.csv"
   params:
-    "--var basemean=10 logcpm=1 rpkm=0.5 fpkm=0.5 aveexpr=3.32 --bins 40 --fdr 0.05 -v"
+    "--var basemean=10 logcpm=1 rpkm=1 fpkm=1 aveexpr=3.32 --bins 40 --fdr 0.05 -v --blacklist {}".format(BLACKLIST_FILE)
   conda: 
     "envs/geo-query.yaml"
+  resources:
+    mem_mb = lambda wildcards, attempt: 8000 + (attempt * 8000),
+    runtime = lambda wildcards, attempt: 120 + (attempt * 60)
   shell:
     """
-    python3 -u scripts/preprocess/import_suppfiles.py --list {input} --out {output} {params}
+    python3 -u scripts/import_suppfiles.py --list {input} --out {output} {params}
     """
 
 
@@ -142,10 +247,12 @@ rule merge_parsed_suppfiles:
     "output/parsed_suppfiles.csv"
   conda: 
     "envs/geo-query.yaml"
+  resources:
+    mem_mb = 4000,
+    runtime = 120
   script:
-    "scripts/preprocess/concat_tabs.py"
+    "scripts/concat_tabs.py"
     
-
 
 # Download publication metadata
 rule download_publications:
@@ -158,8 +265,10 @@ rule download_publications:
     api_key = os.environ["NCBI_APIKEY"]
   conda:
     "envs/geo-query.yaml"
+  resources:
+    runtime = 360
   script:
-    "scripts/preprocess/download_publications.py"
+    "scripts/download_publications.py"
 
 
 # Download citations
@@ -172,16 +281,23 @@ rule download_citations:
     api_key = os.environ["ELSEVIER_GEOSEQ"]
   conda:
     "envs/geo-query.yaml"
+  resources:
+    runtime = lambda wildcards, attempt: 120 + (attempt * 60)
   script:
-    "scripts/preprocess/download_scopus_citations.py"
+    "scripts/download_scopus_citations.py"
 
 
-# Knit report
-# rule report:
-#   input: "index.Rmd", "introduction.Rmd", "methods.Rmd", "results.Rmd", "discussion.Rmd", "references.Rmd", "output/document_summaries.csv", "output/single-cell.csv", "output/suppfilenames.rds", "output/suppfilenames_filtered.rds", "output/gsem.rds", "output/suppdata.rds", "output/publications.csv", "output/scopus_citedbycount.csv"
-#   output: "_main.html"
-#   singularity: SIMG
-#   shell:
-#     """
-#     Rscript -e "bookdown::render_site(encoding = 'UTF-8')"
-#     """
+rule archive:
+    input:
+        "output/document_summaries.csv",
+        "output/single-cell.csv",
+        "output/parsed_suppfiles.csv", 
+        "output/publications.csv",
+        "output/scopus_citedbycount.csv",
+        "output/suppfilenames.txt",
+        "output/suppfilenames_filtered.txt",
+        "output/spots.csv"
+    output:
+        "output/geo-htseq-until-{}.tar.gz".format(LAST_DATE)
+    shell:
+        "tar -czvf {output[0]} {input}"
