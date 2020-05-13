@@ -129,9 +129,10 @@ if __name__ == "__main__":
     sleep_between_tries = snakemake.params.get("sleep_between_tries", 15)
     retmax = snakemake.params.get("retmax", 100000)
 
-    # Parse input to chunks
-    accessions = pd.read_csv(snakemake.input[0], sep=",")["Accession"]
-    accessions = accessions.to_list()
+    # Parse GEO accessions to list
+    docsums = pd.read_csv(snakemake.input[0], sep=",")["Accession"]
+    original = docsums[~docsums.gdsType.str.contains("reanalysis")]
+    accessions = original["Accession"].to_list()
 
     # Fetch and parse summaries
     with open(snakemake.output[0], "a") as output_handle:
