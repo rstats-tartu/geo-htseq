@@ -79,9 +79,9 @@ def spotify(acc, email, **kwargs):
         params.update({"id": ",".join(chunk)})
         for x in range(0, 4):  # try 4 times
             try:
+                str_error = None
                 resp = requests.get(url_endpoint, params=params)
                 tree = ET.ElementTree(ET.fromstring(resp.text, parser=parser))
-                str_error = None
             except Exception as str_error:
                 pass
 
