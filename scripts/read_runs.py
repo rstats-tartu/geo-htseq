@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 import requests
+from time import sleep
 
 
 def chunks(l, n):
@@ -76,8 +77,19 @@ def spotify(acc, email, **kwargs):
     for chunk in chunks(uids, 200):
 
         params.update({"id": ",".join(chunk)})
-        resp = requests.get(url_endpoint, params=params)
-        tree = ET.ElementTree(ET.fromstring(resp.text, parser=parser))
+        for x in range(0, 4):  # try 4 times
+            try:
+                resp = requests.get(url_endpoint, params=params)
+                tree = ET.ElementTree(ET.fromstring(resp.text, parser=parser))
+                str_error = None
+            except Exception as str_error:
+                pass
+
+            if str_error:
+                sleep(5)  # wait for seconds before trying to fetch the data again
+            else:
+                break
+        
         root = tree.getroot()
 
         if root.findall(".//ERROR"):
