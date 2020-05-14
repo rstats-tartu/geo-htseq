@@ -73,24 +73,11 @@ def spotify(acc, email, **kwargs):
         params.update({"api_key": Entrez.api_key})
 
     dataframes = []
-    parser = ET.XMLParser(encoding="utf-8")
     for chunk in chunks(uids, 200):
 
         params.update({"id": ",".join(chunk)})
-        for x in range(0, 4):  # try 4 times
-            try:
-                str_error = None
-                resp = requests.get(url_endpoint, params=params)
-                tree = ET.ElementTree(ET.fromstring(resp.text, parser=parser))
-            except Exception as str_error:
-                pass
-
-            if str_error:
-                sleep(5)  # wait for seconds before trying to fetch the data again
-            else:
-                break
-        
-        root = tree.getroot()
+        resp = requests.get(url_endpoint, params=params)
+        root = ET.fromstring(resp.text)
 
         if root.findall(".//ERROR"):
             err = root.findall(".//ERROR")[0].text
