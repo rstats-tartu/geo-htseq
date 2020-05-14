@@ -72,11 +72,12 @@ def spotify(acc, email, **kwargs):
         params.update({"api_key": Entrez.api_key})
 
     dataframes = []
+    parser = ET.XMLParser(encoding="utf-8")
     for chunk in chunks(uids, 200):
 
         params.update({"id": ",".join(chunk)})
         resp = requests.get(url_endpoint, params=params)
-        tree = ET.ElementTree(ET.fromstring(resp.text))
+        tree = ET.ElementTree(ET.fromstring(resp.text, parser=parser))
         root = tree.getroot()
 
         if root.findall(".//ERROR"):
@@ -110,7 +111,7 @@ def spotify(acc, email, **kwargs):
         df.rename(columns={"accession": "run_accession"}, inplace=True)
         df.insert(0, "geo_accession", acc)
         df.insert(0, "err", np.nan)
-        dataframes.append(df.loc[:,df.columns.isin(keep)])
+        dataframes.append(df.loc[:, df.columns.isin(keep)])
 
     return pd.concat(dataframes)
 
