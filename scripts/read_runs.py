@@ -53,10 +53,9 @@ def spotify(acc, email, **kwargs):
         records = Entrez.read(handle)
         handle.close()
         gsm_acc = [i["Accession"] for i in records]
-        try:
-            srx = [i["ExtRelations"][0]["TargetObject"] for i in records if len(i["ExtRelations"]) > 0]
-        except IndexError as e:
-            err = "SRA Experiment is not public: {}".format(e)
+        srx = [i["ExtRelations"][0]["TargetObject"] for i in records if len(i["ExtRelations"]) > 0]
+        if len(srx) == 0:
+            err = "Raw data not available for this record"
             return empty_dataframe(acc, err, keep)
         handle = Entrez.esearch(
             db="sra", term=" OR ".join(srx), retmode="text", retmax=retmax
