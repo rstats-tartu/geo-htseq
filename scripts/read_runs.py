@@ -54,7 +54,7 @@ def spotify(acc, email, **kwargs):
         handle.close()
         gsm_acc = [i["Accession"] for i in records]
         try:
-            srx = [i["ExtRelations"][0]["TargetObject"] for i in records]
+            srx = [i["ExtRelations"][0]["TargetObject"] for i in records if len(i["ExtRelations"]) > 0]
         except IndexError as e:
             err = "SRA Experiment is not public: {}".format(e)
             return empty_dataframe(acc, err, keep)
