@@ -67,6 +67,13 @@ def spotify(acc, email, **kwargs):
     else:
         uids = [link["Id"] for link in records[0]["LinkSetDb"][0]["Link"]]
 
+    if len(uids) == 0:
+        try:
+            err = records["WarningList"]["OutputMessage"][0]
+        except Exception:
+            err = "No items found"
+        return empty_dataframe(acc, err, keep)
+
     url_endpoint = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
     params = {"db": "sra", "rettype": "full", "retmode": "xml", "email": Entrez.email}
     if Entrez.api_key:
