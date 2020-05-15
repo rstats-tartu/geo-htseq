@@ -6,6 +6,7 @@ import numpy as np
 from tqdm import tqdm
 import requests
 from time import sleep
+import random
 
 
 def chunks(l, n):
@@ -37,9 +38,14 @@ def spotify(acc, email, **kwargs):
     records = Entrez.read(handle)
     handle.close()
     gsm = records["IdList"]
+
     if len(gsm) == 0:
         err = "No Series matrix ids. Possibly, raw data are available on Series record"
         return empty_dataframe(acc, err, keep)
+    
+    if len(gsm) > 600:
+        gsm = random.sample(gsm, 600)
+    
     handle = Entrez.elink(
         dbfrom="gds", id=",".join(gsm), linkname="gds_sra", retmax=retmax
     )
