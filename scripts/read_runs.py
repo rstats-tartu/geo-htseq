@@ -88,12 +88,20 @@ def spotify(acc, email, **kwargs):
     for chunk in chunks(uids, 200):
 
         params.update({"id": ",".join(chunk)})
-        resp = requests.get(url_endpoint, params=params)
+        try:
+            print("Hi! I'm here!")
+            resp = requests.get(url_endpoint, params=params)
+        except Exception as e:
+            err = e
+            dataframes.append(empty_dataframe(acc, err, keep))
+            continue
+
         root = ET.fromstring(resp.text)
 
         if root.findall(".//ERROR"):
             err = root.findall(".//ERROR")[0].text
-            return empty_dataframe(acc, err, keep)
+            dataframes.append(empty_dataframe(acc, err, keep))
+            continue
 
         platform = [
             {"PLATFORM": i.tag, "MODEL": i.find("INSTRUMENT_MODEL").text}
@@ -123,8 +131,9 @@ def spotify(acc, email, **kwargs):
         df.insert(0, "geo_accession", acc)
         df.insert(0, "err", np.nan)
         dataframes.append(df.loc[:, df.columns.isin(keep)])
-
-    return pd.concat(dataframes)
+    concatenated = pd.concat(dataframes)
+    reordered = [c for c in keep if c in concatenated.columns]
+    return concatenated[reordered]
 
 
 if __name__ == "__main__":
