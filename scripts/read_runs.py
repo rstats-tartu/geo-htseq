@@ -89,7 +89,6 @@ def spotify(acc, email, **kwargs):
 
         params.update({"id": ",".join(chunk)})
         try:
-            print("Hi! I'm here!")
             resp = requests.get(url_endpoint, params=params)
         except Exception as e:
             err = e
