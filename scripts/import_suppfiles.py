@@ -354,6 +354,20 @@ def estimate_pi0(
             if smooth_log_pi0:
                 pi0 = np.exp(pi0)
             pi0 = min(pi0, 1.0)
+        elif method == "lfdr":
+            """Estimate proportion of null p-values
+            by average local FDR
+            Belinda Phipson and Gordon Smyth
+            23 May 2012. Last revised 30 July 2012."""
+            n = len(pv)
+            i = np.array(list(range(1, n + 1)))
+            i.sort()
+            i = i[::-1]
+            pv.sort()
+            pv = pv[::-1]
+            q = [min(i, 1) for i in n / np.array(i) * np.array(pv)]
+            n1 = n + 1
+            pi0 = sum(np.array(i) * q) / n / n1 * 2
         elif method == "bootstrap":
             raise NotImplementedError
             """minpi0 = min(pi0)
@@ -424,6 +438,7 @@ def summarise_pvalues(
         "rpkm": 0.5,
         "aveexpr": np.log2(10),
     },
+    pi0_method="lfdr",
     verbose=True,
 ):
     breaks = np.linspace(0, 1, bins)
@@ -463,7 +478,7 @@ def summarise_pvalues(
         pi0 = []
         for i, c in zip(pv_sets, Class):
             if c in ["uniform", "anti-conservative"]:
-                pi0_est = estimate_pi0(i["pvalue"], verbose=verbose)
+                pi0_est = estimate_pi0(i["pvalue"], method=pi0_method, verbose=verbose)
                 pi0.append(pi0_est)
             else:
                 pi0.append(np.nan)
@@ -528,6 +543,12 @@ if __name__ == "__main__":
         type=float,
         default=0.05,
         help="false discovery rate, float, default is 0.05",
+    )
+    parser.add_argument(
+        "--pi0method",
+        type=str,
+        default="lfdr",
+        help="method to calculate pi0, string, default is 'lfdr'",
     )
     parser.add_argument(
         "--verbose", "-v", help="increase output verbosity", action="count", default=0
@@ -600,6 +621,7 @@ if __name__ == "__main__":
                     bins=BINS,
                     fdr=FDR,
                     var={k: v for k, v in VAR.items() if "value" not in k},
+                    pi0_method=args.pi0method,
                     verbose=args.verbose,
                 )
                 if not v.empty
