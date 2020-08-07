@@ -10,7 +10,7 @@ keep = "|".join(
     ["\." + i + "(.gz)?$" for i in "tab xlsx diff tsv xls csv txt rtf tar".split(" ")]
 )
 keep = re.compile(keep)
-drop = "filelist.txt|raw.tar$|readme|csfasta|(big)?wig|bed(graph)?|(broad_)?lincs"
+drop = "series_matrix\.txt\.gz|filelist\.txt|\.raw\.tar$|readme|\.bam|\.sam|\.csfasta|\.fa(sta)?|(big)?wig|\.bed(graph)?|(broad_)?lincs"
 drop = re.compile(drop)
 
 with open(input) as i:
