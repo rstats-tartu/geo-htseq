@@ -229,7 +229,7 @@ rule import_suppfiles:
   output: 
     "output/tmp/parsed_suppfiles_{k}_{n}.csv"
   params:
-    "--var basemean=10 logcpm=1 rpkm=1 fpkm=1 aveexpr=3.32 --bins 40 --fdr 0.05 -v --blacklist {}".format(BLACKLIST_FILE)
+    "--var basemean=10 logcpm=1 rpkm=1 fpkm=1 aveexpr=3.32 --bins 40 --fdr 0.05 --pi0method lfdr -v --blacklist {}".format(BLACKLIST_FILE)
   conda: 
     "envs/geo-query.yaml"
   resources:
