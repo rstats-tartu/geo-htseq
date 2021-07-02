@@ -131,7 +131,7 @@ rule download_spots:
   conda:
     "envs/geo-query.yaml"
   resources:
-    runtime = 1440
+    runtime = 2440
   script:
     "scripts/read_runs.py"
 
@@ -192,7 +192,7 @@ rule download_suppfiles:
   conda:
     "envs/geo-query.yaml"
   resources:
-    runtime = lambda wildcards, attempt: 90 + (attempt * 30)
+    runtime = 1440 #lambda wildcards, attempt: 90 + (attempt * 30)
   script:
     "scripts/download_suppfiles.py"
 
