@@ -60,10 +60,11 @@ def csv_helper(input, input_name, csv, verbose=0):
     if isinstance(input, (tarfile.ExFileObject)):
         with csv as h:
             first_line = h.readline()
+    elif re.search("gz$", input):
+        with gzip.open(input, "rb") as h:
+            first_line = h.readline().decode("utf-8").rstrip()
     else:
-        with gzip.open(input, "rb", encoding="utf-8") if re.search("gz$", input) else open(
-            input, "r"
-        ) as h:
+        with open(input, "r") as h:
             first_line = h.readline().rstrip()
     more_tabs_than_sep = len(tab.findall(first_line)) > len(re.findall(sep, first_line))
     if re.search("^#", first_line) or more_tabs_than_sep:
