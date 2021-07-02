@@ -51,7 +51,7 @@ def find_header(df, n=20):
     return idx
 
 
-def csv_helper(input, input_name, csv):
+def csv_helper(input, input_name, csv, verbose=0):
     # Get comments and set rows to skip
     r = pd.read_csv(csv, sep=None, engine="python", iterator=True, nrows=1000)
     comment = None
@@ -61,10 +61,10 @@ def csv_helper(input, input_name, csv):
         with csv as h:
             first_line = h.readline()
     else:
-        with gzip.open(input, "rb") if re.search("gz$", input) else open(
+        with gzip.open(input, "rb", encoding="utf-8") if re.search("gz$", input) else open(
             input, "r"
         ) as h:
-            first_line = h.readline().decode("utf-8").rstrip()
+            first_line = h.readline().rstrip()
     more_tabs_than_sep = len(tab.findall(first_line)) > len(re.findall(sep, first_line))
     if re.search("^#", first_line) or more_tabs_than_sep:
         comment = "#"
@@ -104,12 +104,12 @@ def csv_helper(input, input_name, csv):
     if unnamed[-1] & sum(unnamed) == 1:
         if any([pv.search(i) for i in df.columns]):
             df.columns = [df.columns[-1]] + list(df.columns[:-1])
-    if args.verbose > 1:
+    if verbose > 1:
         print("df after import:\n", df)
     return {os.path.basename(input_name): df}
 
 
-def excel_helper(input, input_name):
+def excel_helper(input, input_name, verbose=0):
     tabs = {}
     if input_name.endswith(".gz"):
         with gzip.open(input) as gz:
@@ -119,7 +119,7 @@ def excel_helper(input, input_name):
     sheets = wb.sheet_names
     for sheet in sheets:
         df = wb.parse(sheet, comment="#")
-        if args.verbose > 1:
+        if verbose > 1:
             print("df after import:\n", df)
         if not df.empty:
             pu = sum(["Unnamed" in i for i in list(df.columns)]) / len(df.columns)
