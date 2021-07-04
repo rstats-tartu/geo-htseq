@@ -131,7 +131,7 @@ rule download_spots:
   conda:
     "envs/geo-query.yaml"
   resources:
-    runtime = 1440
+    runtime = 2440
   script:
     "scripts/read_runs.py"
 
@@ -192,7 +192,7 @@ rule download_suppfiles:
   conda:
     "envs/geo-query.yaml"
   resources:
-    runtime = lambda wildcards, attempt: 90 + (attempt * 30)
+    runtime = 1440 #lambda wildcards, attempt: 90 + (attempt * 30)
   script:
     "scripts/download_suppfiles.py"
 
@@ -229,7 +229,7 @@ rule import_suppfiles:
   output: 
     "output/tmp/parsed_suppfiles_{k}_{n}.csv"
   params:
-    "--var basemean=10 logcpm=1 rpkm=1 fpkm=1 aveexpr=3.32 --bins 40 --fdr 0.05 -v --blacklist {}".format(BLACKLIST_FILE)
+    "--var basemean=10 logcpm=1 rpkm=1 fpkm=1 aveexpr=3.32 --bins 40 --fdr 0.05 --pi0method lfdr -v --blacklist {}".format(BLACKLIST_FILE)
   conda: 
     "envs/geo-query.yaml"
   resources:
