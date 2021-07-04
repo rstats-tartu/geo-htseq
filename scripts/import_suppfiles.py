@@ -12,6 +12,7 @@ import numpy as np
 from scipy.stats import binom
 from pandas.api.types import is_string_dtype
 from pathlib import Path
+import numbers
 
 
 xls = re.compile("xls")
@@ -118,6 +119,7 @@ def excel_helper(input, input_name, verbose=0):
     else:
         wb = pd.ExcelFile(input)
     sheets = wb.sheet_names
+    sheets = [i for i in sheets if "README" not in i]
     for sheet in sheets:
         df = wb.parse(sheet, comment="#")
         if verbose > 1:
@@ -189,7 +191,7 @@ def import_tar(input):
 
 
 def filter_pvalue_tables(input, pv=None, adj=None):
-    return {k: v for k, v in input.items() if any([raw_pvalues(i) for i in v.columns])}
+    return {k: v for k, v in input.items() if any([raw_pvalues(i) for i in v.columns if not isinstance(i, numbers.Number)])}
 
 
 def fix_column_dtype(df):
@@ -205,6 +207,7 @@ def fix_column_dtype(df):
 def summarise_pvalue_tables(
     df, var=["basemean", "value", "fpkm", "logcpm", "rpkm", "aveexpr"]
 ):
+    df = df.filter(regex='^\D')
     df.columns = map(str.lower, df.columns)
     pval_cols = [i for i in df.columns if raw_pvalues(i)]
     pvalues = df[pval_cols].copy()
