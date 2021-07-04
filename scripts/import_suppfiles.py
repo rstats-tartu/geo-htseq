@@ -249,9 +249,9 @@ def summarise_pvalue_tables(
 
 # https://stackoverflow.com/a/32681075/1657871
 def rle(inarray):
-    """ run length encoding. Partial credit to R rle function. 
-            Multi datatype arrays catered for including non Numpy
-            returns: tuple (runlengths, startpositions, values) """
+    """run length encoding. Partial credit to R rle function.
+    Multi datatype arrays catered for including non Numpy
+    returns: tuple (runlengths, startpositions, values)"""
     ia = np.asarray(inarray)  # force numpy
     n = len(ia)
     if n == 0:
