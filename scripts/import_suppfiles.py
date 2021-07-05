@@ -608,7 +608,7 @@ if __name__ == "__main__":
             {
                 parse_key(k, filename): v
                 for k, v in frames.items()
-                if "note" in v.columns
+                if all(i in fields for i in v.columns)
             }
         )
         frames = filter_pvalue_tables(frames, pv, adj)
