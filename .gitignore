@@ -25,3 +25,5 @@ _bookdown_files
 __pycache__
 *Rproj
 output/downloading_suppfiles_*.done
+*.csv
+*.tar.gz
