@@ -189,12 +189,14 @@ rule download_suppfiles:
     rules.filter_suppfilenames.output
   output: 
     touch("output/downloading_suppfiles_{k}.done")
+  log:
+    "logs/download_suppfiles_{k}.log"
   conda:
     "envs/geo-query.yaml"
   resources:
     runtime = 1440 #lambda wildcards, attempt: 90 + (attempt * 30)
-  script:
-    "scripts/download_suppfiles.py"
+  shell:
+    "python scripts/download_suppfiles.py 2> {log}"
 
 
 # Split list of supplementary files

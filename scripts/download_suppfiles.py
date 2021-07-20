@@ -14,6 +14,8 @@ with ftplib.FTP("ftp.ncbi.nlm.nih.gov") as ftp:
         with open(input) as i:
             for line in i:
                 path = "output/" + line.rstrip()
+                if "filelist.txt" in path:
+                    continue
                 if not os.path.isfile(path):
                     filename = os.path.basename(path)
                     id = p.search(filename).group(0)
