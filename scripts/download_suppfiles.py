@@ -1,11 +1,13 @@
 import ftplib
 import os
 import re
+import sys
+
+
 
 p = re.compile("GSE\\d+")
 
-input = snakemake.input[0]
-output = snakemake.output[0]
+input = sys.argv[1]
 
 with ftplib.FTP("ftp.ncbi.nlm.nih.gov") as ftp:
 

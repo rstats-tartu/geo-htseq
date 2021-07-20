@@ -196,7 +196,7 @@ rule download_suppfiles:
   resources:
     runtime = 1440 #lambda wildcards, attempt: 90 + (attempt * 30)
   shell:
-    "python scripts/download_suppfiles.py 2> {log}"
+    "python scripts/download_suppfiles.py {input[0]} 2> {log}"
 
 
 # Split list of supplementary files
