@@ -15,7 +15,7 @@ from pathlib import Path
 import numbers
 
 
-xls = re.compile("xls")
+xls = re.compile("xls|xml")
 keep = "|".join(
     ["\." + i + "(.gz)?$" for i in "tab xlsx diff tsv xls csv txt rtf".split(" ")]
 )
