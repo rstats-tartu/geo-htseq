@@ -61,8 +61,8 @@ def csv_helper(input, input_name, csv, verbose=0):
     if isinstance(input, (tarfile.ExFileObject)):
         with csv as h:
             first_line = h.readline()
-    elif re.search("gz$", input):
-        with gzip.open(input, "rb") as h:
+    elif input_name.endswith("gz") or isinstance(input, (gzip.GzipFile)):
+        with gzip.open(input) as h:
             first_line = h.readline().decode("utf-8").rstrip()
     else:
         with open(input, "r") as h:
@@ -113,9 +113,8 @@ def csv_helper(input, input_name, csv, verbose=0):
 
 def excel_helper(input, input_name, verbose=0):
     tabs = {}
-    if input_name.endswith(".gz"):
-        with gzip.open(input) as gz:
-            wb = pd.ExcelFile(gz)
+    if input_name.endswith("gz") or isinstance(input, (gzip.GzipFile)):
+        wb = pd.ExcelFile(gzip.open(input))
     else:
         wb = pd.ExcelFile(input)
     sheets = wb.sheet_names
