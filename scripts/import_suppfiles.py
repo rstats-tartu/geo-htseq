@@ -218,7 +218,10 @@ def fix_column_dtype(df):
 def summarise_pvalue_tables(
     df, var=["basemean", "value", "fpkm", "logcpm", "rpkm", "aveexpr"]
 ):
+    # Drop columns with numeric column names
     df = df.filter(regex="^\D")
+    # Drop columns with NaN column names 
+    df = df.loc[:, df.columns.notnull()]
     df.columns = map(str.lower, df.columns)
     pval_cols = [i for i in df.columns if raw_pvalues(i)]
     pvalues = df[pval_cols].copy()
