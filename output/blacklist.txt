@@ -66,3 +66,6 @@ GSE81750_Mosaic-Seq_15SE_71HS_241sgRNA_K562.full_matrix.final.txt.gz
 GSE121891_OB_6_runs.raw.dge.csv.gz
 GSE117131_Zhu_SC-10X_mouse_raw-counts.txt.gz
 GSE30839_GSM765295_ribo_mesc_harr150s-profiles.tar.gz
+GSE113074_RAW.tar
+GSE134163_RAW.tar
+GSE118987_RAW.tar

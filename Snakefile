@@ -1,5 +1,5 @@
 import os
-LAST_DATE = "2019-12-31"
+LAST_DATE = "2020-12-31"
 QUERY = 'expression profiling by high throughput sequencing[DataSet Type] AND ("2000-01-01"[PDAT] : "{}"[PDAT])'.format(LAST_DATE)
 EMAIL = "taavi.pall@ut.ee"
 
@@ -13,7 +13,7 @@ onerror:
 
 localrules: all, filter_suppfilenames, suppfiles_list
 
-K = 10
+K = 15
 N = 10
 rule all:
   input: 
@@ -233,8 +233,8 @@ rule import_suppfiles:
   conda: 
     "envs/geo-query.yaml"
   resources:
-    mem_mb = lambda wildcards, attempt: 8000 + (attempt * 8000),
-    runtime = lambda wildcards, attempt: 120 + (attempt * 60)
+    mem_mb = 32000,
+    runtime = 480
   shell:
     """
     python3 -u scripts/import_suppfiles.py --list {input} --out {output} {params}
