@@ -1,3 +1,4 @@
+from time import sleep
 import pandas as pd
 from Bio import Entrez
 
@@ -60,8 +61,10 @@ if api_key is None:
     print(
         "Personal API key from NCBI. If not set, only 3 queries per second are allowed. 10 queries per seconds otherwise with a valid API key."
     )
+    sleeptime = 1/3
 else:
     Entrez.api_key = api_key
+    sleeptime = 1/10
 
 db = "pubmed"
 batch_size = snakemake.params.get("batch_size", 1)
@@ -85,3 +88,4 @@ with open(snakemake.output[0], "a") as f:
                     lambda x: ";".join(pd.Series(x, dtype="str"))
                 )
         docsums.to_csv(f, mode="a", header=not f.tell(), index=False)
+        sleep(sleeptime)
