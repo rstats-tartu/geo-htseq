@@ -1,6 +1,7 @@
 import os
 from Bio import Entrez
 import xml.etree.ElementTree as ET
+from xml.etree.ElementTree import ParseError
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
@@ -88,6 +89,7 @@ def spotify(acc, email, **kwargs):
     for chunk in chunks(uids, 200):
 
         params.update({"id": ",".join(chunk)})
+
         try:
             resp = requests.get(url_endpoint, params=params)
         except Exception as e:
@@ -95,7 +97,15 @@ def spotify(acc, email, **kwargs):
             dataframes.append(empty_dataframe(acc, err, keep))
             continue
 
-        root = ET.fromstring(resp.text)
+        try:
+            root = ET.fromstring(resp.text)
+        except ParseError:
+            root = ET.fromstring(resp.text, ET.XMLParser("UTF-8"))
+        except ParseError as e:
+            print("Failed to parse", acc)
+            print("Error was:", e)
+            print("Response text to parse:\n", resp.text)
+            raise
 
         if root.findall(".//ERROR"):
             err = root.findall(".//ERROR")[0].text
