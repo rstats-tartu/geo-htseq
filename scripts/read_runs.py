@@ -101,11 +101,12 @@ def spotify(acc, email, **kwargs):
             root = ET.fromstring(resp.text)
         except ParseError:
             root = ET.fromstring(resp.text, ET.XMLParser("UTF-8"))
-        except ParseError as e:
+        except ParseError as err:
             print("Failed to parse", acc)
-            print("Error was:", e)
+            print("Error was:", err)
             print("Response text to parse:\n", resp.text)
-            raise
+            dataframes.append(empty_dataframe(acc, err, keep))
+            continue
 
         if root.findall(".//ERROR"):
             err = root.findall(".//ERROR")[0].text
