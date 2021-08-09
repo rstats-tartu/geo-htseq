@@ -99,8 +99,6 @@ def spotify(acc, email, **kwargs):
 
         try:
             root = ET.fromstring(resp.text)
-        except ParseError:
-            root = ET.fromstring(resp.text, ET.XMLParser("UTF-8"))
         except ParseError as err:
             print("Failed to parse", acc)
             print("Error was:", err)
