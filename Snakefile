@@ -264,7 +264,8 @@ rule download_publications:
     "output/publications.csv"
   params: 
     email = EMAIL,
-    api_key = os.environ["NCBI_APIKEY"]
+    api_key = os.environ["NCBI_APIKEY"],
+    batch_size = 500
   conda:
     "envs/geo-query.yaml"
   resources:
