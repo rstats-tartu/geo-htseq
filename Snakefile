@@ -40,8 +40,8 @@ rule geo_query:
     api_key = os.environ["NCBI_APIKEY"],
     query = QUERY,
     db = "gds",
-    retmax = 40000,
-    batch_size = 100
+    retmax = 100000,
+    batch_size = 500
   conda:
     "envs/geo-query.yaml"
   resources:
@@ -59,7 +59,7 @@ rule single_cell:
     api_key = os.environ["NCBI_APIKEY"],
     query = QUERY + ' AND "single-cell"[All Fields]',
     db = "gds",
-    retmax = 5000,
+    retmax = 25000,
     columns = ["Accession"]
   conda:
     "envs/geo-query.yaml"
@@ -233,7 +233,7 @@ rule import_suppfiles:
   conda: 
     "envs/geo-query.yaml"
   resources:
-    mem_mb = 32000,
+    mem_mb = 64000,
     runtime = 480
   shell:
     """
