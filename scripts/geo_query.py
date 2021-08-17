@@ -72,7 +72,7 @@ chunked_ids = chunks(ids["IdList"], batch_size)
 # Fetch and parse summaries
 with open(snakemake.output[0], "a") as f:
     for chunk in chunked_ids:
-        summary = Entrez.esummary(db=db, id=",".join(chunk), retmode="xml")
+        summary = Entrez.esummary(db=db, id=",".join(chunk), retmode="xml", retmax=batch_size)
         records = Entrez.parse(summary)
         docsums = pd.DataFrame(columns=columns)
         for record in records:
