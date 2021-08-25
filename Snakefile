@@ -91,6 +91,8 @@ rule download_suppfilenames:
     "output/tmp/document_summaries_{k}.csv"
   output: 
     "output/tmp/suppfilenames_{k}.txt"
+  log:
+    "logs/download_suppfilenames_{k}.log"
   params:
     email = EMAIL
   conda:
@@ -99,7 +101,7 @@ rule download_suppfilenames:
     runtime = lambda wildcards, attempt: 90 + (attempt * 30)
   shell:
     """
-    python3 -u scripts/download_suppfilenames.py --list {input} --out {output} --email {params.email}
+    python3 -u scripts/download_suppfilenames.py --list {input} --out {output} --email {params.email} 2> {log}
     """
 
 # Merge suppfilenames
