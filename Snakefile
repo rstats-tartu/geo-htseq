@@ -103,7 +103,7 @@ rule download_suppfilenames:
     runtime = lambda wildcards, attempt: 90 + (attempt * 30)
   shell:
     """
-    python3 -u scripts/download_suppfilenames.py --input {input} --output {output} --email {params.email} --dirs {params.dirs} size = {params.size} 2> {log}
+    python3 -u scripts/download_suppfilenames.py --input {input} --output {output} --email {params.email} --dirs {params.dirs} --size {params.size} 2> {log}
     """
 
 # Merge suppfilenames
