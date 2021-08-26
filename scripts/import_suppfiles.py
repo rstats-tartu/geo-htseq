@@ -220,7 +220,7 @@ def summarise_pvalue_tables(
 ):
     # Drop columns with numeric column names
     df = df.filter(regex="^\D")
-    # Drop columns with NaN column names 
+    # Drop columns with NaN column names
     df = df.loc[:, df.columns.notnull()]
     df.columns = map(str.lower, df.columns)
     pval_cols = [i for i in df.columns if raw_pvalues(i)]

@@ -43,10 +43,10 @@ def spotify(acc, email, **kwargs):
     if len(gsm) == 0:
         err = "No Series matrix ids. Possibly, raw data are available on Series record"
         return empty_dataframe(acc, err, keep)
-    
+
     if len(gsm) > 600:
         gsm = random.sample(gsm, 600)
-    
+
     handle = Entrez.elink(
         dbfrom="gds", id=",".join(gsm), linkname="gds_sra", retmax=retmax
     )
@@ -60,7 +60,11 @@ def spotify(acc, email, **kwargs):
         records = Entrez.read(handle)
         handle.close()
         gsm_acc = [i["Accession"] for i in records]
-        srx = [i["ExtRelations"][0]["TargetObject"] for i in records if len(i["ExtRelations"]) > 0]
+        srx = [
+            i["ExtRelations"][0]["TargetObject"]
+            for i in records
+            if len(i["ExtRelations"]) > 0
+        ]
         if len(srx) == 0:
             err = "Raw data not available for this record"
             return empty_dataframe(acc, err, keep)

@@ -61,10 +61,10 @@ if api_key is None:
     print(
         "Personal API key from NCBI. If not set, only 3 queries per second are allowed. 10 queries per seconds otherwise with a valid API key."
     )
-    sleeptime = 1/3
+    sleeptime = 1 / 3
 else:
     Entrez.api_key = api_key
-    sleeptime = 1/10
+    sleeptime = 1 / 10
 
 db = "pubmed"
 batch_size = snakemake.params.get("batch_size", 1)
