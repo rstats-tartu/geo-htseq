@@ -6,7 +6,7 @@ import ftplib
 
 def chunks(lst, size):
     """Yield successive n-sized chunks from lst."""
-    n = len(lst) // size
+    n = len(lst) // int(size)
     for i in range(0, len(lst), n):
         yield lst[i : i + n]
 
@@ -62,6 +62,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--size",
         metavar="INT",
+        type=int,
         help="batch size",
     )
     args = parser.parse_args()
