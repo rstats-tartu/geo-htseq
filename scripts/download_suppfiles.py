@@ -11,7 +11,7 @@ def chunks(lst, size):
         yield lst[i : i + n]
 
 
-def download_suppfiles(input, email, size=200):
+def download_suppfiles(input, email, size=200, dir=""):
     p = re.compile("GSE\\d+")
     with open(input, "r") as i:
         filenames = i.readlines()
@@ -21,7 +21,7 @@ def download_suppfiles(input, email, size=200):
             try:
                 ftp.login("anonymous", email)
                 for line in chunk:
-                    path = "output/" + line.rstrip()
+                    path = os.path.join(dir, line.rstrip())
                     if not os.path.isfile(path):
                         filename = os.path.basename(path)
                         id = p.search(filename).group(0)
@@ -51,6 +51,7 @@ if __name__ == "__main__":
         "--email", metavar="EMAIL", help="email address for anonymous FTP"
     )
     parser.add_argument("--size", metavar="INT", help="batch size")
+    parser.add_argument("--dir", metavar="DIR", help="target directory")
     args = parser.parse_args()
 
     download_suppfiles(**args.__dict__)
