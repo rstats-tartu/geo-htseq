@@ -92,16 +92,18 @@ rule download_suppfilenames:
   output: 
     "output/tmp/suppfilenames_{k}.txt"
   log:
-    "logs/download_suppfilenames_{k}.log"
+    "log/download_suppfilenames_{k}.log"
   params:
-    email = EMAIL
+    email = EMAIL,
+    dirs = "suppl",
+    size = 200,
   conda:
     "envs/geo-query.yaml"
   resources:
     runtime = lambda wildcards, attempt: 90 + (attempt * 30)
   shell:
     """
-    python3 -u scripts/download_suppfilenames.py --list {input} --out {output} --email {params.email} 2> {log}
+    python3 -u scripts/download_suppfilenames.py --input {input} --output {output} --email {params.email} --dirs {params.dirs} size = {params.size} 2> {log}
     """
 
 # Merge suppfilenames
@@ -195,13 +197,14 @@ rule download_suppfiles:
     "log/download_suppfiles_{k}.log"
   params:
     email = EMAIL,
+    size = 200,
   conda:
     "envs/geo-query.yaml"
   resources:
     runtime = 1440 #lambda wildcards, attempt: 90 + (attempt * 30)
   shell:
     """
-    python3 -u scripts/download_suppfiles.py --list {input} --email {params.email} 2> {log}
+    python3 -u scripts/download_suppfiles.py --input {input} --email {params.email} --size {params.size} 2> {log}
     """
 
 
@@ -236,16 +239,18 @@ rule import_suppfiles:
     "output/tmp/suppfilenames_filtered_{k}_{n}.txt"
   output: 
     "output/tmp/parsed_suppfiles_{k}_{n}.csv"
+  log:
+    "log/import_suppfiles_{k}_{n}.log"
   params:
-    "--var basemean=10 logcpm=1 rpkm=1 fpkm=1 aveexpr=3.32 --bins 40 --fdr 0.05 --pi0method lfdr -v --blacklist {}".format(BLACKLIST_FILE)
+    f"--var basemean=10 logcpm=1 rpkm=1 fpkm=1 aveexpr=3.32 --bins 40 --fdr 0.05 --pi0method lfdr -v --blacklist {BLACKLIST_FILE}"
   conda: 
     "envs/geo-query.yaml"
   resources:
     mem_mb = 64000,
-    runtime = 480
+    runtime = 480,
   shell:
     """
-    python3 -u scripts/import_suppfiles.py --list {input} --out {output} {params}
+    python3 -u scripts/import_suppfiles.py --list {input} --out {output} {params} 2> {log}
     """
 
 
