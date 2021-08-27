@@ -198,7 +198,7 @@ rule download_suppfiles:
   params:
     email = EMAIL,
     size = 200,
-    dir = "",
+    dir = ".",
   conda:
     "envs/geo-query.yaml"
   resources:

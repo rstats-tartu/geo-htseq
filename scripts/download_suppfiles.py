@@ -12,7 +12,7 @@ def chunks(lst, size):
         yield lst[i : i + n]
 
 
-def download_suppfiles(input, email, size=200, dir=""):
+def download_suppfiles(input, email, size=200, dir="."):
     p = re.compile("GSE\\d+")
     with open(input, "r") as i:
         filenames = i.readlines()
