@@ -216,7 +216,7 @@ BLACKLIST_FILE = "output/blacklist.txt"
 with open(BLACKLIST_FILE) as h:
     BLACKLIST = [os.path.basename(i.rstrip()) for i in h.readlines()]
 
-rule suppfiles_list:
+rule split_suppfiles_list_for_import:
   input: 
     rules.filter_suppfilenames.output,
     rules.download_suppfiles.output
