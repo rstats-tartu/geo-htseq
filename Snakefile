@@ -224,7 +224,7 @@ rule suppfiles_list:
     expand("output/tmp/suppfilenames_filtered_{{k}}_{n}.txt", n = list(range(0, N, 1)))
   params:
     chunks = N,
-    dir = "output",
+    dir = ".",
     blacklist = BLACKLIST
   conda: 
     "envs/geo-query.yaml"
