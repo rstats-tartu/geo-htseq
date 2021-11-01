@@ -11,7 +11,7 @@ onerror:
     print("An error occurred")
     shell("mail -s 'An error occurred' {EMAIL} < {log}")
 
-localrules: all, filter_suppfilenames, suppfiles_list
+localrules: all, filter_suppfilenames
 
 K = 15
 N = 10
