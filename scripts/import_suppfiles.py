@@ -16,10 +16,8 @@ import numbers
 
 
 xls = re.compile("xls")
-keep = "|".join(
-    ["\." + i + "(.gz)?$" for i in "tab xlsx diff tsv xls csv txt rtf".split(" ")]
-)
-keep = re.compile(keep)
+drop = "series_matrix\.txt\.gz|filelist\.txt|readme|\.bam|\.sam|\.csfasta|\.fa(sta)?|\.f(a|n)a|(big)?wig|\.bed(graph)?|(broad_)?lincs"
+drop = re.compile(drop)
 gse = re.compile("GSE\d+_")
 pv_str = "p[^a-zA-Z]{0,4}val"
 pv = re.compile(pv_str)
@@ -192,7 +190,7 @@ def import_tar(input):
     with tarfile.open(input, "r:*") as tar:
         for member in tar:
             if member.isfile():
-                if keep.search(member.name):
+                if not drop.search(member.name):
                     out.update(import_flat(member, tar))
     return out
 
@@ -542,7 +540,7 @@ if __name__ == "__main__":
         type=argparse.FileType("r"),
         help="file with paths to input files, one per line",
     )
-    parser.add_argument("--out", metavar="FILE", help="output file")
+    parser.add_argument("--out", metavar="FILE", help="output file", required=True)
     parser.add_argument(
         "--vars",
         metavar="KEY=VALUE",

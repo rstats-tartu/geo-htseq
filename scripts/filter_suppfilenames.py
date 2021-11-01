@@ -6,10 +6,6 @@ assert os.stat(snakemake.input[0]).st_size > 0, "File is empty!"
 input = snakemake.input[0]
 output = snakemake.output[0]
 
-keep = "|".join(
-    ["\." + i + "(\.gz)?$" for i in "tab xlsx diff tsv xls csv txt rtf tar".split(" ")]
-)
-keep = re.compile(keep)
 drop = "series_matrix\.txt\.gz|filelist\.txt|readme|\.bam|\.sam|\.csfasta|\.fa(sta)?|\.f(a|n)a|(big)?wig|\.bed(graph)?|(broad_)?lincs"
 drop = re.compile(drop)
 
