@@ -23,7 +23,7 @@ def download_suppfiles(input, email, size=200, dir="."):
                 ftp.login("anonymous", email)
                 for line in chunk:
                     path = os.path.join(dir, line.rstrip())
-                    if not os.path.isfile(path):
+                    if not os.path.isfile(path) or os.path.getsize(path) == 0:
                         filename = os.path.basename(path)
                         id = p.search(filename).group(0)
                         dir = (
