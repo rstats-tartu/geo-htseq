@@ -4,7 +4,7 @@ import os
 input = snakemake.input[0]
 output = snakemake.output
 chunks = int(snakemake.params.get("chunks", 1))
-dir = snakemake.params.get("dir", "")
+dir = snakemake.params.get("dir", ".")
 blacklist = snakemake.params.get("blacklist", [])
 
 assert len(output) == chunks, "The number of chunks and outputs don't match!"

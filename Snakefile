@@ -1,5 +1,5 @@
 import os
-LAST_DATE = "2019-12-31"
+LAST_DATE = "2020-12-31"
 QUERY = 'expression profiling by high throughput sequencing[DataSet Type] AND ("2000-01-01"[PDAT] : "{}"[PDAT])'.format(LAST_DATE)
 EMAIL = "taavi.pall@ut.ee"
 
@@ -11,9 +11,9 @@ onerror:
     print("An error occurred")
     shell("mail -s 'An error occurred' {EMAIL} < {log}")
 
-localrules: all, filter_suppfilenames, suppfiles_list
+localrules: all, filter_suppfilenames
 
-K = 10
+K = 15
 N = 10
 rule all:
   input: 
@@ -40,8 +40,8 @@ rule geo_query:
     api_key = os.environ["NCBI_APIKEY"],
     query = QUERY,
     db = "gds",
-    retmax = 40000,
-    batch_size = 100
+    retmax = 100000,
+    batch_size = 500
   conda:
     "envs/geo-query.yaml"
   resources:
@@ -59,7 +59,7 @@ rule single_cell:
     api_key = os.environ["NCBI_APIKEY"],
     query = QUERY + ' AND "single-cell"[All Fields]',
     db = "gds",
-    retmax = 5000,
+    retmax = 25000,
     columns = ["Accession"]
   conda:
     "envs/geo-query.yaml"
@@ -91,15 +91,19 @@ rule download_suppfilenames:
     "output/tmp/document_summaries_{k}.csv"
   output: 
     "output/tmp/suppfilenames_{k}.txt"
+  log:
+    "log/download_suppfilenames_{k}.log"
   params:
-    email = EMAIL
+    email = EMAIL,
+    dirs = "suppl",
+    size = 200,
   conda:
     "envs/geo-query.yaml"
   resources:
     runtime = lambda wildcards, attempt: 90 + (attempt * 30)
   shell:
     """
-    python3 -u scripts/download_suppfilenames.py --list {input} --out {output} --email {params.email}
+    python3 -u scripts/download_suppfilenames.py --input {input} --output {output} --email {params.email} --dirs {params.dirs} --size {params.size} 2> {log}
     """
 
 # Merge suppfilenames
@@ -190,13 +194,19 @@ rule download_suppfiles:
   output: 
     touch("output/downloading_suppfiles_{k}.done")
   log:
-    "logs/download_suppfiles_{k}.log"
+    "log/download_suppfiles_{k}.log"
+  params:
+    email = EMAIL,
+    size = 200,
+    dir = ".",
   conda:
     "envs/geo-query.yaml"
   resources:
     runtime = 1440 #lambda wildcards, attempt: 90 + (attempt * 30)
   shell:
-    "python scripts/download_suppfiles.py {input[0]} 2> {log}"
+    """
+    python3 -u scripts/download_suppfiles.py --input {input} --email {params.email} --size {params.size} --dir {params.dir} 2> {log}
+    """
 
 
 # Split list of supplementary files
@@ -206,7 +216,7 @@ BLACKLIST_FILE = "output/blacklist.txt"
 with open(BLACKLIST_FILE) as h:
     BLACKLIST = [os.path.basename(i.rstrip()) for i in h.readlines()]
 
-rule suppfiles_list:
+rule split_suppfiles_list_for_import:
   input: 
     rules.filter_suppfilenames.output,
     rules.download_suppfiles.output
@@ -214,7 +224,7 @@ rule suppfiles_list:
     expand("output/tmp/suppfilenames_filtered_{{k}}_{n}.txt", n = list(range(0, N, 1)))
   params:
     chunks = N,
-    dir = "output",
+    dir = ".",
     blacklist = BLACKLIST
   conda: 
     "envs/geo-query.yaml"
@@ -230,16 +240,18 @@ rule import_suppfiles:
     "output/tmp/suppfilenames_filtered_{k}_{n}.txt"
   output: 
     "output/tmp/parsed_suppfiles_{k}_{n}.csv"
+  log:
+    "log/import_suppfiles_{k}_{n}.log"
   params:
-    "--var basemean=10 logcpm=1 rpkm=1 fpkm=1 aveexpr=3.32 --bins 40 --fdr 0.05 --pi0method lfdr -v --blacklist {}".format(BLACKLIST_FILE)
+    f"--var basemean=10 logcpm=1 rpkm=1 fpkm=1 aveexpr=3.32 --bins 40 --fdr 0.05 --pi0method lfdr -v --blacklist {BLACKLIST_FILE}"
   conda: 
     "envs/geo-query.yaml"
   resources:
-    mem_mb = lambda wildcards, attempt: 8000 + (attempt * 8000),
-    runtime = lambda wildcards, attempt: 120 + (attempt * 60)
+    mem_mb = 64000,
+    runtime = 480,
   shell:
     """
-    python3 -u scripts/import_suppfiles.py --list {input} --out {output} {params}
+    python3 -u scripts/import_suppfiles.py --list {input} --out {output} {params} 2> {log}
     """
 
 
@@ -266,7 +278,8 @@ rule download_publications:
     "output/publications.csv"
   params: 
     email = EMAIL,
-    api_key = os.environ["NCBI_APIKEY"]
+    api_key = os.environ["NCBI_APIKEY"],
+    batch_size = 500
   conda:
     "envs/geo-query.yaml"
   resources:

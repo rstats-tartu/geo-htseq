@@ -15,11 +15,9 @@ from pathlib import Path
 import numbers
 
 
-xls = re.compile("xls|xml")
-keep = "|".join(
-    ["\." + i + "(.gz)?$" for i in "tab xlsx diff tsv xls csv txt rtf".split(" ")]
-)
-keep = re.compile(keep)
+xls = re.compile("xls")
+drop = "series_matrix\.txt\.gz|filelist\.txt|readme|\.bam|\.sam|\.csfasta|\.fa(sta)?|\.f(a|n)a|(big)?wig|\.bed(graph)?|(broad_)?lincs"
+drop = re.compile(drop)
 gse = re.compile("GSE\d+_")
 pv_str = "p[^a-zA-Z]{0,4}val"
 pv = re.compile(pv_str)
@@ -28,7 +26,7 @@ ws = re.compile(" ")
 mtabs = re.compile("\w+\t{2,}\w+")
 tab = re.compile("\t")
 fields = ["Type", "Class", "Conversion", "pi0", "FDR_pval", "hist", "note"]
-PValSum = collections.namedtuple("PValSum", fields, defaults=[np.nan] * 7)
+PValSum = collections.namedtuple("PValSum", fields, defaults=[np.nan] * len(fields))
 
 
 def raw_pvalues(i):
@@ -61,8 +59,8 @@ def csv_helper(input, input_name, csv, verbose=0):
     if isinstance(input, (tarfile.ExFileObject)):
         with csv as h:
             first_line = h.readline()
-    elif re.search("gz$", input):
-        with gzip.open(input, "rb") as h:
+    elif input_name.endswith("gz") or isinstance(input, (gzip.GzipFile)):
+        with gzip.open(input) as h:
             first_line = h.readline().decode("utf-8").rstrip()
     else:
         with open(input, "r") as h:
@@ -81,7 +79,11 @@ def csv_helper(input, input_name, csv, verbose=0):
     if mtabs.search(first_line):
         sep = "\t+"
     # Import file
-    df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape")
+    if isinstance(input, (tarfile.ExFileObject)) and input_name.endswith("gz"):
+        with gzip.open(input) as h:
+            df = pd.read_csv(h, sep=sep, comment=comment, encoding="unicode_escape")
+    else:
+        df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape")
     # Check and fix column names
     # Case of extra level of delimiters in column names
     if len(df.columns) > len(columns):
@@ -113,9 +115,8 @@ def csv_helper(input, input_name, csv, verbose=0):
 
 def excel_helper(input, input_name, verbose=0):
     tabs = {}
-    if input_name.endswith(".gz"):
-        with gzip.open(input) as gz:
-            wb = pd.ExcelFile(gz)
+    if input_name.endswith("gz") or isinstance(input, (gzip.GzipFile)):
+        wb = pd.ExcelFile(gzip.open(input))
     else:
         wb = pd.ExcelFile(input)
     sheets = wb.sheet_names
@@ -138,7 +139,11 @@ def read_csv(input, tar=None):
     if isinstance(input, (tarfile.TarInfo)):
         input_name = os.path.basename(input.name)
         with tar.extractfile(input) as h:
-            csv = io.StringIO(h.read().decode("unicode_escape"))
+            if input_name.endswith("gz"):
+                with gzip.open(h) as gz:
+                    csv = io.StringIO(gz.read().decode("unicode_escape"))
+            else:
+                csv = io.StringIO(h.read().decode("unicode_escape"))
         with tar.extractfile(input) as h:
             out = csv_helper(h, input_name, csv)
     else:
@@ -185,13 +190,17 @@ def import_tar(input):
     with tarfile.open(input, "r:*") as tar:
         for member in tar:
             if member.isfile():
-                if keep.search(member.name):
+                if not drop.search(member.name):
                     out.update(import_flat(member, tar))
     return out
 
 
 def filter_pvalue_tables(input, pv=None, adj=None):
-    return {k: v for k, v in input.items() if any([raw_pvalues(i) for i in v.columns if not isinstance(i, numbers.Number)])}
+    return {
+        k: v
+        for k, v in input.items()
+        if any([raw_pvalues(i) for i in v.columns if not isinstance(i, numbers.Number)])
+    }
 
 
 def fix_column_dtype(df):
@@ -207,7 +216,10 @@ def fix_column_dtype(df):
 def summarise_pvalue_tables(
     df, var=["basemean", "value", "fpkm", "logcpm", "rpkm", "aveexpr"]
 ):
-    df = df.filter(regex='^\D')
+    # Drop columns with numeric column names
+    df = df.filter(regex="^\D")
+    # Drop columns with NaN column names
+    df = df.loc[:, df.columns.notnull()]
     df.columns = map(str.lower, df.columns)
     pval_cols = [i for i in df.columns if raw_pvalues(i)]
     pvalues = df[pval_cols].copy()
@@ -528,7 +540,7 @@ if __name__ == "__main__":
         type=argparse.FileType("r"),
         help="file with paths to input files, one per line",
     )
-    parser.add_argument("--out", metavar="FILE", help="output file")
+    parser.add_argument("--out", metavar="FILE", help="output file", required=True)
     parser.add_argument(
         "--vars",
         metavar="KEY=VALUE",
@@ -604,38 +616,31 @@ if __name__ == "__main__":
             frames = import_tar(path)
         else:
             frames = import_flat(path)
-        out.update(
-            {
-                parse_key(k, filename): v
-                for k, v in frames.items()
-                if all(i in fields for i in v.columns)
-            }
-        )
-        frames = filter_pvalue_tables(frames, pv, adj)
-        if len(frames) == 0:
-            out.update(note(filename, "no pvalues"))
-            continue
-        else:
-            frames = {
-                k: summarise_pvalue_tables(v, var=VAR.keys()) for k, v in frames.items()
-            }
-            pv_stats = {
-                k: summarise_pvalues(
-                    v,
-                    bins=BINS,
-                    fdr=FDR,
-                    var={k: v for k, v in VAR.items() if "value" not in k},
-                    pi0_method=args.pi0method,
-                    verbose=args.verbose,
-                )
-                if not v.empty
-                else pd.DataFrame(
-                    PValSum(note="all p-values are NaN")._asdict(), index=[0]
-                )
-                for k, v in frames.items()
-            }
-            for k, v in pv_stats.items():
-                out.update({parse_key(k, filename): v})
+        frames = {
+            k: summarise_pvalue_tables(v, var=VAR.keys())
+            if any(
+                [raw_pvalues(i) for i in v.columns if not isinstance(i, numbers.Number)]
+            )
+            else pd.DataFrame(PValSum(note="no pvalues")._asdict(), index=[0])
+            for k, v in frames.items()
+        }
+        pv_stats = {
+            k: v
+            if all(i in fields for i in v.columns)
+            else pd.DataFrame(PValSum(note="all p-values are NaN")._asdict(), index=[0])
+            if v.empty
+            else summarise_pvalues(
+                v,
+                bins=BINS,
+                fdr=FDR,
+                var={k: v for k, v in VAR.items() if "value" not in k},
+                pi0_method=args.pi0method,
+                verbose=args.verbose,
+            )
+            for k, v in frames.items()
+        }
+        for k, v in pv_stats.items():
+            out.update({parse_key(k, filename): v})
 
     result = pd.concat(
         [df for df in out.values()],

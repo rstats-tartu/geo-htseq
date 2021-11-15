@@ -1,6 +1,7 @@
 import os
 from Bio import Entrez
 import xml.etree.ElementTree as ET
+from xml.etree.ElementTree import ParseError
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
@@ -42,10 +43,10 @@ def spotify(acc, email, **kwargs):
     if len(gsm) == 0:
         err = "No Series matrix ids. Possibly, raw data are available on Series record"
         return empty_dataframe(acc, err, keep)
-    
+
     if len(gsm) > 600:
         gsm = random.sample(gsm, 600)
-    
+
     handle = Entrez.elink(
         dbfrom="gds", id=",".join(gsm), linkname="gds_sra", retmax=retmax
     )
@@ -59,7 +60,11 @@ def spotify(acc, email, **kwargs):
         records = Entrez.read(handle)
         handle.close()
         gsm_acc = [i["Accession"] for i in records]
-        srx = [i["ExtRelations"][0]["TargetObject"] for i in records if len(i["ExtRelations"]) > 0]
+        srx = [
+            i["ExtRelations"][0]["TargetObject"]
+            for i in records
+            if len(i["ExtRelations"]) > 0
+        ]
         if len(srx) == 0:
             err = "Raw data not available for this record"
             return empty_dataframe(acc, err, keep)
@@ -88,6 +93,7 @@ def spotify(acc, email, **kwargs):
     for chunk in chunks(uids, 200):
 
         params.update({"id": ",".join(chunk)})
+
         try:
             resp = requests.get(url_endpoint, params=params)
         except Exception as e:
@@ -95,7 +101,14 @@ def spotify(acc, email, **kwargs):
             dataframes.append(empty_dataframe(acc, err, keep))
             continue
 
-        root = ET.fromstring(resp.text)
+        try:
+            root = ET.fromstring(resp.text)
+        except ParseError as err:
+            print("Failed to parse", acc)
+            print("Error was:", err)
+            print("Response text to parse:\n", resp.text)
+            dataframes.append(empty_dataframe(acc, err, keep))
+            continue
 
         if root.findall(".//ERROR"):
             err = root.findall(".//ERROR")[0].text
