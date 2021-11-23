@@ -16,7 +16,7 @@ import numbers
 
 
 xls = re.compile("xls")
-drop = "series_matrix\.txt\.gz|filelist\.txt|readme|\.bam|\.sam|\.csfasta|\.fa(sta)?|\.f(a|n)a|(big)?wig|\.bed(graph)?|(broad_)?lincs"
+drop = "series_matrix\.txt\.gz$|filelist\.txt$|readme|\.bam(\.tdf|$)|\.bai(\.gz|$)|\.sam(\.gz|$)|\.csfasta|\.fa(sta)?(\.gz|\.bz2|\.txt\.gz|$)|\.f(a|n)a(\.gz|$)|(big)?wig|\.bw(\.|$)|\.bed(graph)?(\.tdf|\.gz|\.bz2|\.tar\.gz|\.txt\.gz|$)|(broad_)?lincs"
 drop = re.compile(drop)
 gse = re.compile("GSE\d+_")
 pv_str = "p[^a-zA-Z]{0,4}val"
@@ -27,10 +27,10 @@ mtabs = re.compile("\w+\t{2,}\w+")
 tab = re.compile("\t")
 fields = ["Type", "Class", "Conversion", "pi0", "FDR_pval", "hist", "note"]
 PValSum = collections.namedtuple("PValSum", fields, defaults=[np.nan] * len(fields))
-narrowPeak = ["chrom", "chromStart", "chromEnd", "name", "score", "strand", "signalValue", "pValue", "qValue", "peak"] # BED6+4
-broadPeak = ["chrom", "chromStart", "chromEnd", "name", "score", "strand", "signalValue", "pValue", "qValue"] # BED6+3
-gappedPeak = ["chrom", "chromStart", "chromEnd", "name", "score", "strand"," thickStart", "thickEnd", "itemRgb", "blockCount", "blockSizes", "blockStarts", "signalValue", "pValue", "qValue"] # BED12+3
-peak = re.compile("(narrow|broad|gapped)Peak")
+narrowpeak = ["chrom", "chromStart", "chromEnd", "name", "score", "strand", "signalValue", "pValue", "qValue", "peak"] # BED6+4
+broadpeak = ["chrom", "chromStart", "chromEnd", "name", "score", "strand", "signalValue", "pValue", "qValue"] # BED6+3
+gappedpeak = ["chrom", "chromStart", "chromEnd", "name", "score", "strand"," thickStart", "thickEnd", "itemRgb", "blockCount", "blockSizes", "blockStarts", "signalValue", "pValue", "qValue"] # BED12+3
+peak = re.compile("(narrow|broad|gapped)peak")
 
 
 
@@ -180,7 +180,7 @@ def import_flat(input, tar=None):
             if is_empty:
                 raise Exception("empty table")
             else:
-                peakfile=peak.search(input)
+                peakfile=peak.search(input.lower())
                 if peakfile:
                     input=os.path.basename(input)
                     d[input].loc[-1]=d[input].columns
