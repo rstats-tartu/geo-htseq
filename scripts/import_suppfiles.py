@@ -27,6 +27,11 @@ mtabs = re.compile("\w+\t{2,}\w+")
 tab = re.compile("\t")
 fields = ["Type", "Class", "Conversion", "pi0", "FDR_pval", "hist", "note"]
 PValSum = collections.namedtuple("PValSum", fields, defaults=[np.nan] * len(fields))
+narrowPeak = ["chrom", "chromStart", "chromEnd", "name", "score", "strand", "signalValue", "pValue", "qValue", "peak"] # BED6+4
+broadPeak = ["chrom", "chromStart", "chromEnd", "name", "score", "strand", "signalValue", "pValue", "qValue"] # BED6+3
+gappedPeak = ["chrom", "chromStart", "chromEnd", "name", "score", "strand"," thickStart", "thickEnd", "itemRgb", "blockCount", "blockSizes", "blockStarts", "signalValue", "pValue", "qValue"] # BED12+3
+peak = re.compile("(narrow|broad|gapped)Peak")
+
 
 
 def raw_pvalues(i):
@@ -175,6 +180,12 @@ def import_flat(input, tar=None):
             if is_empty:
                 raise Exception("empty table")
             else:
+                peakfile=peak.search(input)
+                if peakfile:
+                    input=os.path.basename(input)
+                    d[input].loc[-1]=d[input].columns
+                    d[input]=d[input].sort_index().reset_index(drop=True)
+                    d[input].columns=eval(peakfile.group(0))
                 out.update(d)
     except Exception as e:
         if tar:
