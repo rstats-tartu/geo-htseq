@@ -36,7 +36,7 @@ def download_suppfiles(input, email, size=200, dir="."):
                         )
                         ftp.cwd(dir)
                         if ftp.size(filename) < 1e9:
-                            with open(filename, "wb") as file:
+                            with open(path, "wb") as file:
                                 ftp.retrbinary("RETR " + filename, file.write, 1024)
             except ftplib.all_errors as e:
                 print("FTP error:", e)
