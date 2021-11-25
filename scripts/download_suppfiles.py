@@ -22,24 +22,29 @@ def download_suppfiles(input, email, size=200, dir="."):
             try:
                 ftp.login("anonymous", email)
                 for line in chunk:
-                    path = os.path.join(dir, line.rstrip())
-                    if not os.path.isfile(path) or os.path.getsize(path) == 0:
-                        filename = os.path.basename(path)
-                        id = p.search(filename).group(0)
-                        ftpdir = (
-                            "/geo/series/"
-                            + id[0:-3]
-                            + "nnn/"
-                            + id
-                            + "/"
-                            + os.path.dirname(line.rstrip())
-                        )
-                        ftp.cwd(ftpdir)
-                        if ftp.size(filename) < 1e9:
-                            with open(path, "wb") as file:
-                                ftp.retrbinary("RETR " + filename, file.write, 1024)
+                    try:
+                        path = os.path.join(dir, line.rstrip())
+                        if not os.path.isfile(path) or os.path.getsize(path) == 0:
+                            filename = os.path.basename(path)
+                            id = p.search(filename).group(0)
+                            ftpdir = (
+                                "/geo/series/"
+                                + id[0:-3]
+                                + "nnn/"
+                                + id
+                                + "/"
+                                + os.path.dirname(line.rstrip())
+                            )
+                            ftp.cwd(ftpdir)
+                            if ftp.size(filename) < 1e9:
+                                with open(path, "wb") as file:
+                                    ftp.retrbinary("RETR " + filename, file.write, 1024)
+                    except ftplib.all_errors as e:
+                        print("FTP error:", e)
+                        continue
             except ftplib.all_errors as e:
                 print("FTP error:", e)
+                continue
 
 
 if __name__ == "__main__":
