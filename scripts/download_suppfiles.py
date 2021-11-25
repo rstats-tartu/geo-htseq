@@ -26,7 +26,7 @@ def download_suppfiles(input, email, size=200, dir="."):
                     if not os.path.isfile(path) or os.path.getsize(path) == 0:
                         filename = os.path.basename(path)
                         id = p.search(filename).group(0)
-                        dir = (
+                        ftpdir = (
                             "/geo/series/"
                             + id[0:-3]
                             + "nnn/"
@@ -34,7 +34,7 @@ def download_suppfiles(input, email, size=200, dir="."):
                             + "/"
                             + os.path.dirname(line.rstrip())
                         )
-                        ftp.cwd(dir)
+                        ftp.cwd(ftpdir)
                         if ftp.size(filename) < 1e9:
                             with open(path, "wb") as file:
                                 ftp.retrbinary("RETR " + filename, file.write, 1024)
