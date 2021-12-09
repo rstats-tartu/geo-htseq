@@ -197,7 +197,8 @@ rule download_suppfiles:
     "log/download_suppfiles_{k}.log"
   params:
     email = EMAIL,
-    size = 200,
+    maxfilesize=int(1e9),
+    batchsize = 200,
     dir = ".",
   conda:
     "envs/geo-query.yaml"
@@ -205,7 +206,7 @@ rule download_suppfiles:
     runtime = 1440 #lambda wildcards, attempt: 90 + (attempt * 30)
   shell:
     """
-    python3 -u scripts/download_suppfiles.py --input {input} --email {params.email} --size {params.size} --dir {params.dir} 2> {log}
+    python3 -u scripts/download_suppfiles.py --input {input} --email {params.email} --maxfilesize {params.maxfilesize} --batchsize {params.batchsize} --dir {params.dir} 2> {log}
     """
 
 

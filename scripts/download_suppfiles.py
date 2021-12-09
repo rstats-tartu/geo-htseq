@@ -5,19 +5,20 @@ import argparse
 from typing import Type
 
 
-def chunks(lst, size):
+def chunks(lst, batchsize):
     """Yield successive n-sized chunks from lst."""
-    n = max([len(lst) // int(size), 1])
+    n = max([len(lst) // int(batchsize), 1])
     for i in range(0, len(lst), n):
         yield lst[i : i + n]
 
 
 class download_suppfiles:
-    def __init__(self, input=None, file=None, email=None, size=200, dir="."):
+    def __init__(self, input=None, file=None, email=None, maxfilesize=1e9, batchsize=200, dir="."):
         self.input = input
         self.file = file
         self.email = email
-        self.size = size
+        self.maxfilesize=maxfilesize
+        self.batchsize = batchsize
         self.dir = dir
         self.p = re.compile("GSE\\d+")
 
@@ -32,7 +33,7 @@ class download_suppfiles:
         p = self.p
         with open(self.input, "r") as i:
             filenames = i.readlines()
-        filenames = chunks(filenames, self.size)
+        filenames = chunks(filenames, self.batchsize)
         for chunk in filenames:
             with ftplib.FTP("ftp.ncbi.nlm.nih.gov") as ftp:
                 try:
@@ -52,7 +53,7 @@ class download_suppfiles:
                                     + os.path.dirname(line.rstrip())
                                 )
                                 ftp.cwd(ftpdir)
-                                if ftp.size(filename) < 1e9:
+                                if ftp.size(filename) < self.maxfilesize:
                                     with open(path, "wb") as file:
                                         ftp.retrbinary(
                                             "RETR " + filename, file.write, 1024
@@ -86,7 +87,7 @@ class download_suppfiles:
                             + os.path.dirname(line.rstrip())
                         )
                         ftp.cwd(ftpdir)
-                        if ftp.size(filename) < 1e9:
+                        if ftp.size(filename) < self.maxfilesize:
                             with open(path, "wb") as file:
                                 ftp.retrbinary("RETR " + filename, file.write, 1024)
                 except ftplib.all_errors as e:
@@ -112,7 +113,10 @@ if __name__ == "__main__":
         required=True,
     )
     parser.add_argument(
-        "--size", metavar="INT", type=int, help="batch size", default=200
+        "--maxfilesize", metavar="INT", type=int, help="maximum supplementary file size to be downloaded", default=1e9
+    )
+    parser.add_argument(
+        "--batchsize", metavar="INT", type=int, help="batch size", default=200
     )
     parser.add_argument("--dir", metavar="DIR", help="target directory", default=".")
     args = parser.parse_args()

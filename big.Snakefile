@@ -14,7 +14,8 @@ rule download_suppfiles_onebyone:
     temp("suppl/{suppfilename}")
   params:
     email = EMAIL,
-    size = 200,
+    maxfilesize=int(1e10),
+    batchsize = 200,
     dir = ".",
   conda:
     "envs/geo-query.yaml"
@@ -22,7 +23,7 @@ rule download_suppfiles_onebyone:
     runtime = 120
   shell:
     """
-    python3 -u scripts/download_suppfiles.py --file {output[0]} --email {params.email} --size {params.size} --dir {params.dir}
+    python3 -u scripts/download_suppfiles.py --file {output[0]} --email {params.email} --maxfilesize {params.maxfilesize} --batchsize {params.batchsize}  --dir {params.dir}
     """
 
 # Split list of supplementary files
