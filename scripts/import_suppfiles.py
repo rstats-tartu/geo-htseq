@@ -27,11 +27,47 @@ mtabs = re.compile("\w+\t{2,}\w+")
 tab = re.compile("\t")
 fields = ["Type", "Class", "Conversion", "pi0", "FDR_pval", "hist", "note"]
 PValSum = collections.namedtuple("PValSum", fields, defaults=[np.nan] * len(fields))
-narrowpeak = ["chrom", "chromStart", "chromEnd", "name", "score", "strand", "signalValue", "pValue", "qValue", "peak"] # BED6+4
-broadpeak = ["chrom", "chromStart", "chromEnd", "name", "score", "strand", "signalValue", "pValue", "qValue"] # BED6+3
-gappedpeak = ["chrom", "chromStart", "chromEnd", "name", "score", "strand"," thickStart", "thickEnd", "itemRgb", "blockCount", "blockSizes", "blockStarts", "signalValue", "pValue", "qValue"] # BED12+3
+narrowpeak = [
+    "chrom",
+    "chromStart",
+    "chromEnd",
+    "name",
+    "score",
+    "strand",
+    "signalValue",
+    "pValue",
+    "qValue",
+    "peak",
+]  # BED6+4
+broadpeak = [
+    "chrom",
+    "chromStart",
+    "chromEnd",
+    "name",
+    "score",
+    "strand",
+    "signalValue",
+    "pValue",
+    "qValue",
+]  # BED6+3
+gappedpeak = [
+    "chrom",
+    "chromStart",
+    "chromEnd",
+    "name",
+    "score",
+    "strand",
+    " thickStart",
+    "thickEnd",
+    "itemRgb",
+    "blockCount",
+    "blockSizes",
+    "blockStarts",
+    "signalValue",
+    "pValue",
+    "qValue",
+]  # BED12+3
 peak = re.compile("(narrow|broad|gapped)peak")
-
 
 
 def raw_pvalues(i):
@@ -180,12 +216,12 @@ def import_flat(input, tar=None):
             if is_empty:
                 raise Exception("empty table")
             else:
-                peakfile=peak.search(input.lower())
+                peakfile = peak.search(input.lower())
                 if peakfile:
-                    input=os.path.basename(input)
-                    d[input].loc[-1]=d[input].columns
-                    d[input]=d[input].sort_index().reset_index(drop=True)
-                    d[input].columns=eval(peakfile.group(0))
+                    input = os.path.basename(input)
+                    d[input].loc[-1] = d[input].columns
+                    d[input] = d[input].sort_index().reset_index(drop=True)
+                    d[input].columns = eval(peakfile.group(0))
                 out.update(d)
     except Exception as e:
         if tar:
@@ -203,6 +239,9 @@ def import_tar(input):
             if member.isfile():
                 if not drop.search(member.name):
                     out.update(import_flat(member, tar))
+                else:
+                    key = os.path.basename(member.name)
+                    out.update(note(key, "not imported"))
     return out
 
 
@@ -628,7 +667,9 @@ if __name__ == "__main__":
         else:
             frames = import_flat(path)
         frames = {
-            k: summarise_pvalue_tables(v, var=VAR.keys())
+            k: v
+            if all(i in fields for i in v.columns)
+            else summarise_pvalue_tables(v, var=VAR.keys())
             if any(
                 [raw_pvalues(i) for i in v.columns if not isinstance(i, numbers.Number)]
             )
