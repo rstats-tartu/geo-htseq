@@ -6,7 +6,7 @@ with open("output/sample_of_giga_suppfiles.txt", "r") as f:
 EMAIL="taavi.pall@ut.ee"
 
 rule all:
-    input: expand(["suppl/{suppfilename}", "output/tmp/parsed_suppfiles__{suppfilename}__.csv"], suppfilename=SUPPFILENAMES), "output/parsed_suppfiles__giga__.csv"
+    input: expand(["output/tmp/parsed_suppfiles__{suppfilename}__.csv"], suppfilename=SUPPFILENAMES), "output/parsed_suppfiles__giga__.csv"
 
 # Download filterd supplementary files
 rule download_suppfiles_onebyone:
@@ -38,7 +38,7 @@ rule import_suppfiles_onebyone:
   input: 
     "suppl/{suppfilename}"
   output: 
-    temp("output/tmp/parsed_suppfiles__{suppfilename}__.csv")
+    "output/tmp/parsed_suppfiles__{suppfilename}__.csv"
   log:
     "log/import__{suppfilename}__.log"
   params:
