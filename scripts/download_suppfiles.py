@@ -30,7 +30,6 @@ class download_suppfiles:
             raise TypeError(
                 "Please supply file with list of supplementary files to be downloaded."
             )
-        p = self.p
         with open(self.input, "r") as i:
             filenames = i.readlines()
         filenames = chunks(filenames, self.batchsize)
@@ -40,24 +39,7 @@ class download_suppfiles:
                     ftp.login("anonymous", self.email)
                     for line in chunk:
                         try:
-                            path = os.path.join(self.dir, line.rstrip())
-                            if not os.path.isfile(path) or os.path.getsize(path) == 0:
-                                filename = os.path.basename(path)
-                                id = p.search(filename).group(0)
-                                ftpdir = (
-                                    "/geo/series/"
-                                    + id[0:-3]
-                                    + "nnn/"
-                                    + id
-                                    + "/"
-                                    + os.path.dirname(line.rstrip())
-                                )
-                                ftp.cwd(ftpdir)
-                                if ftp.size(filename) < self.maxfilesize:
-                                    with open(path, "wb") as file:
-                                        ftp.retrbinary(
-                                            "RETR " + filename, file.write, 1024
-                                        )
+                            self.retr_ncbi(ftp, line)
                         except ftplib.all_errors as e:
                             print("FTP error:", e)
                             continue
@@ -65,35 +47,41 @@ class download_suppfiles:
                     print("FTP error:", e)
                     continue
 
+
     def from_filename(self):
         if self.file is None:
             raise TypeError("Please supply supplementary file name to be downloaded.")
-        p = self.p
-        line = self.file
         with ftplib.FTP("ftp.ncbi.nlm.nih.gov") as ftp:
             try:
                 ftp.login("anonymous", self.email)
                 try:
-                    path = os.path.join(self.dir, line.rstrip())
-                    if not os.path.isfile(path) or os.path.getsize(path) == 0:
-                        filename = os.path.basename(path)
-                        id = p.search(filename).group(0)
-                        ftpdir = (
-                            "/geo/series/"
-                            + id[0:-3]
-                            + "nnn/"
-                            + id
-                            + "/"
-                            + os.path.dirname(line.rstrip())
-                        )
-                        ftp.cwd(ftpdir)
-                        if ftp.size(filename) < self.maxfilesize:
-                            with open(path, "wb") as file:
-                                ftp.retrbinary("RETR " + filename, file.write, 1024)
+                    line = self.file
+                    self.retr_ncbi(ftp, line)
                 except ftplib.all_errors as e:
                     print("FTP error:", e)
             except ftplib.all_errors as e:
                 print("FTP error:", e)
+
+    def retr_ncbi(self, ftp, line):
+        path = os.path.join(self.dir, line.rstrip())
+        if os.path.exists(path):
+            restarg = {'rest': str(os.path.getsize(path))}
+        else:
+            restarg = {}
+        filename = os.path.basename(path)
+        id = self.p.search(filename).group(0)
+        ftpdir = (
+                        "/geo/series/"
+                        + id[0:-3]
+                        + "nnn/"
+                        + id
+                        + "/"
+                        + os.path.dirname(line.rstrip())
+                    )
+        ftp.cwd(ftpdir)
+        if ftp.size(filename) < self.maxfilesize:
+            with open(path, "wb") as file:
+                ftp.retrbinary("RETR " + filename, file.write, 1024, **restarg)
 
 
 if __name__ == "__main__":
