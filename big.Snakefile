@@ -1,12 +1,12 @@
 import os
 
-with open("testdownloads.txt", "r") as f:
+with open("output/sample_of_giga_suppfiles.txt", "r") as f:
     SUPPFILENAMES=[os.path.basename(line.rstrip()) for line in f.readlines()]
 
 EMAIL="taavi.pall@ut.ee"
 
 rule all:
-    input: expand(["suppl/{suppfilename}", "output/tmp/parsed_suppfiles__{suppfilename}__.csv"], suppfilename=SUPPFILENAMES), "output/parsed_suppfiles__BIG__.csv"
+    input: expand(["suppl/{suppfilename}", "output/tmp/parsed_suppfiles__{suppfilename}__.csv"], suppfilename=SUPPFILENAMES), "output/parsed_suppfiles__giga__.csv"
 
 # Download filterd supplementary files
 rule download_suppfiles_onebyone:
