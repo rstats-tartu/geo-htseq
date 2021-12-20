@@ -1,30 +1,31 @@
 import os
+import re
+from snakemake.remote.FTP import RemoteProvider as FTPRemoteProvider
 
-with open("output/sample_of_giga_suppfiles.txt", "r") as f:
+with open("testdownloads.txt", "r") as f:
     SUPPFILENAMES=[os.path.basename(line.rstrip()) for line in f.readlines()]
 
 EMAIL="taavi.pall@ut.ee"
+FTP = FTPRemoteProvider(username="anonymous", password=EMAIL)
+p = re.compile("GSE\\d+")
+
+def get_url(wildcards):
+    id = p.search(wildcards.suppfilename).group(0)
+    return os.path.join("ftp.ncbi.nlm.nih.gov", "geo/series", id[0:-3] + "nnn", id, "suppl", wildcards.suppfilename)
 
 rule all:
     input: expand(["output/tmp/parsed_suppfiles__{suppfilename}__.csv"], suppfilename=SUPPFILENAMES), "output/parsed_suppfiles__giga__.csv"
 
 # Download filterd supplementary files
-rule download_suppfiles_onebyone:
-  output: 
-    temp("suppl/{suppfilename}")
-  params:
-    email = EMAIL,
-    maxfilesize=int(1e10),
-    batchsize = 200,
-    dir = ".",
-  conda:
-    "envs/geo-query.yaml"
-  resources:
-    runtime = 120
-  shell:
-    """
-    python3 -u scripts/download_suppfiles.py --file {output[0]} --email {params.email} --maxfilesize {params.maxfilesize} --batchsize {params.batchsize}  --dir {params.dir}
-    """
+rule download_suppfiles:
+    input: lambda wildcards: FTP.remote(get_url(wildcards), keep_local=True, immediate_close=True)
+    output: 
+        temp("suppl/{suppfilename}")
+    resources:
+        runtime = 120
+    shell:
+        "mv {input} {output}"
+
 
 # Split list of supplementary files
 # dir is the location of suppl/ folder
@@ -34,7 +35,7 @@ with open(BLACKLIST_FILE) as h:
     BLACKLIST = [os.path.basename(i.rstrip()) for i in h.readlines()]
 
 # Import supplementary data
-rule import_suppfiles_onebyone:
+rule import_suppfiles:
   input: 
     "suppl/{suppfilename}"
   output: 
@@ -53,7 +54,7 @@ rule import_suppfiles_onebyone:
     python3 -u scripts/import_suppfiles.py --file {input} --out {output} {params} 2> {log}
     """
 
-rule merge_onebyone_parsed_suppfiles:
+rule merge_parsed_suppfiles:
   input: 
     expand("output/tmp/parsed_suppfiles__{suppfilename}__.csv", suppfilename=SUPPFILENAMES)
   output: 

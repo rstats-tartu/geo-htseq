@@ -5,19 +5,14 @@ import argparse
 from typing import Type
 
 
-def chunks(lst, batchsize):
-    """Yield successive n-sized chunks from lst."""
-    n = max([len(lst) // int(batchsize), 1])
-    for i in range(0, len(lst), n):
-        yield lst[i : i + n]
-
-
 class download_suppfiles:
-    def __init__(self, input=None, file=None, email=None, maxfilesize=1e9, batchsize=200, dir="."):
+    def __init__(
+        self, input=None, file=None, email=None, maxfilesize=1e9, batchsize=200, dir="."
+    ):
         self.input = input
         self.file = file
         self.email = email
-        self.maxfilesize=maxfilesize
+        self.maxfilesize = maxfilesize
         self.batchsize = batchsize
         self.dir = dir
         self.p = re.compile("GSE\\d+")
@@ -26,62 +21,70 @@ class download_suppfiles:
             raise TypeError("Please supply email address.")
 
     def from_list(self):
-        if self.input is None:
-            raise TypeError(
-                "Please supply file with list of supplementary files to be downloaded."
-            )
-        with open(self.input, "r") as i:
-            filenames = i.readlines()
-        filenames = chunks(filenames, self.batchsize)
-        for chunk in filenames:
+        assert (
+            self.input
+        ), "Please supply file with list of supplementary files to be downloaded."
+        chunks = self.chunks()
+        for chunk in chunks:
             with ftplib.FTP("ftp.ncbi.nlm.nih.gov") as ftp:
-                try:
-                    ftp.login("anonymous", self.email)
-                    for line in chunk:
-                        try:
-                            self.retr_ncbi(ftp, line)
-                        except ftplib.all_errors as e:
-                            print("FTP error:", e)
-                            continue
-                except ftplib.all_errors as e:
-                    print("FTP error:", e)
-                    continue
-
+                ftp.login("anonymous", self.email)
+                for line in chunk:
+                    try:
+                        self.retr_ncbi(ftp, line)
+                    except ftplib.all_errors as e:
+                        print("FTP error:", e)
+                        continue
 
     def from_filename(self):
-        if self.file is None:
-            raise TypeError("Please supply supplementary file name to be downloaded.")
+        assert self.file, "Please supply supplementary file name to be downloaded."
         with ftplib.FTP("ftp.ncbi.nlm.nih.gov") as ftp:
+            ftp.login("anonymous", self.email)
             try:
-                ftp.login("anonymous", self.email)
-                try:
-                    line = self.file
-                    self.retr_ncbi(ftp, line)
-                except ftplib.all_errors as e:
-                    print("FTP error:", e)
+                self.retr_ncbi(ftp, self.file)
             except ftplib.all_errors as e:
                 print("FTP error:", e)
 
     def retr_ncbi(self, ftp, line):
         path = os.path.join(self.dir, line.rstrip())
-        if os.path.exists(path):
-            restarg = {'rest': str(os.path.getsize(path))}
-        else:
-            restarg = {}
         filename = os.path.basename(path)
         id = self.p.search(filename).group(0)
         ftpdir = (
-                        "/geo/series/"
-                        + id[0:-3]
-                        + "nnn/"
-                        + id
-                        + "/"
-                        + os.path.dirname(line.rstrip())
-                    )
+            "/geo/series/"
+            + id[0:-3]
+            + "nnn/"
+            + id
+            + "/"
+            + os.path.dirname(line.rstrip())
+        )
         ftp.cwd(ftpdir)
-        if ftp.size(filename) < self.maxfilesize:
-            with open(path, "wb") as file:
-                ftp.retrbinary("RETR " + filename, file.write, 1024, **restarg)
+        remote_size = ftp.size(filename)
+        if remote_size <= self.maxfilesize:
+            if self.missing_or_incomplete(path, remote_size):
+                with open(path, "wb") as file:
+                    file.seek(0, os.SEEK_END)
+                    if file.tell() == 0:
+                        restarg = {}
+                    else:
+                        restarg = {"rest": str(file.tell())}
+                    ftp.retrbinary("RETR " + filename, file.write, 1024, **restarg)
+        else:
+            print(
+                f"File size ({filename}={remote_size}) bigger than set maxfilesize threshold ({self.maxfilesize}), not downloading."
+            )
+
+    def missing_or_incomplete(self, localfile, remotesize):
+        return (
+            os.path.getsize(localfile) < remotesize
+            if os.path.isfile(localfile)
+            else True
+        )
+
+    def chunks(self):
+        with open(self.input, "r") as i:
+            lst = i.readlines()
+        n = max([len(lst) // int(self.batchsize), 1])
+        for i in range(0, len(lst), n):
+            yield lst[i : i + n]
 
 
 if __name__ == "__main__":
@@ -101,7 +104,11 @@ if __name__ == "__main__":
         required=True,
     )
     parser.add_argument(
-        "--maxfilesize", metavar="INT", type=int, help="maximum supplementary file size to be downloaded", default=1e9
+        "--maxfilesize",
+        metavar="INT",
+        type=int,
+        help="maximum supplementary file size to be downloaded",
+        default=1e9,
     )
     parser.add_argument(
         "--batchsize", metavar="INT", type=int, help="batch size", default=200
