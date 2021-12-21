@@ -16,7 +16,7 @@ import numbers
 
 
 xls = re.compile("xls")
-drop = "series_matrix\.txt\.gz$|filelist\.txt$|readme|\.bam(\.tdf|$)|\.bai(\.gz|$)|\.sam(\.gz|$)|\.csfasta|\.fa(sta)?(\.gz|\.bz2|\.txt\.gz|$)|\.f(a|n)a(\.gz|$)|(big)?wig|\.bw(\.|$)|\.bed(graph)?(\.tdf|\.gz|\.bz2|\.tar\.gz|\.txt\.gz|$)|(broad_)?lincs"
+drop = "series_matrix\.txt\.gz$|filelist\.txt$|readme|\.bam(\.tdf|$)|\.bai(\.gz|$)|\.sam(\.gz|$)|\.csfasta|\.fa(sta)?(\.gz|\.bz2|\.txt\.gz|$)|\.f(a|n)a(\.gz|$)|(big)?wig|\.bw(\.|$)|\.bed(graph)?(\.tdf|\.gz|\.bz2|\.tar\.gz|\.txt\.gz|$)|(broad_)?lincs|\.tdf$"
 drop = re.compile(drop)
 gse = re.compile("GSE\d+_")
 pv_str = "p[^a-zA-Z]{0,4}val"
@@ -85,32 +85,27 @@ class ImportSuppfiles(object):
                 if is_empty:
                     raise Exception("empty table")
                 else:
-                    peakfile = peak.search(input.lower())
+                    peakfile = peak.search(input.name.lower() if tar else input.lower())
                     if peakfile:
-                        input = os.path.basename(input)
+                        input = os.path.basename(input.name if tar else input)
                         d[input].loc[-1] = d[input].columns
                         d[input] = d[input].sort_index().reset_index(drop=True)
                         d[input].columns = eval(peakfile.group(0))
                     out.update(d)
         except Exception as e:
-            if tar:
-                key = os.path.basename(input.name)
-            else:
-                key = os.path.basename(input)
+            key = os.path.basename(input.name if tar else input)
             out.update(note(key, e))
         return self.out.update(out)
 
     def from_tar(self, input):
-        out = {}
         with tarfile.open(input, "r:*") as tar:
             for member in tar:
                 if member.isfile():
                     if not drop.search(member.name):
-                        out.update(self.from_flat(member, tar))
+                        self.from_flat(member, tar)
                     else:
                         key = os.path.basename(member.name)
-                        out.update(note(key, "not imported"))
-        return self.out.update(out)
+                        self.out.update(note(key, "not imported"))
 
     def find_header(self, df, n=20):
         head = df.head(n)
@@ -583,6 +578,104 @@ def parse_key(k, filename):
     return key
 
 
+def parse_suppfiles(
+    file=None,
+    list=None,
+    blacklist=None,
+    vars=["basemean=10", "fpkm=0.5", "logcpm=-0.3", "rpkm=0.5", "aveexpr=3.32"],
+    fdr=0.5,
+    pi0method="lfdr",
+    bins=30,
+    verbose=0,
+    **kwargs,
+):
+    def single_true(iterable):
+        i = iter(iterable)
+        return any(i) and not any(i)
+
+    assert single_true(
+        [file, list]
+    ), "Provide either supplementary file name (file) or file with supplementary file names (list)."
+
+    var = dict(map(lambda s: s.split("="), vars))
+    VAR = {k: float(v) for k, v in var.items()}
+    VAR.update({"value": VAR["fpkm"]})
+    BINS = bins + 1
+    FDR = fdr
+
+    if file:
+        input = file
+    elif list:
+        input = []
+        with list as f:
+            for line in f:
+                input.append(line.rstrip())
+
+    blacklist = []
+    if blacklist:
+        with blacklist as f:
+            for line in f:
+                file = os.path.basename(line.rstrip())
+                blacklist.append(file)
+
+    # Keep only inputs that exist
+    input = [i for i in input if os.path.isfile(i)]
+
+    # Drop files in blacklist
+    if blacklist:
+        input = [i for i in input if os.path.basename(i) not in blacklist]
+
+    if len(input) == 0:
+        Path(out).touch()
+        sys.exit()
+    res = {}
+    for path in input:
+        if verbose > 0:
+            print("working on", path)
+        filename = os.path.basename(path)
+        frames = ImportSuppfiles()
+        if tarfile.is_tarfile(path):
+            frames.from_tar(path)
+        else:
+            frames.from_flat(path)
+        frames = {
+            k: v
+            if all(i in fields for i in v.columns)
+            else summarise_pvalue_tables(v, var=VAR.keys())
+            if any(
+                [raw_pvalues(i) for i in v.columns if not isinstance(i, numbers.Number)]
+            )
+            else pd.DataFrame(PValSum(note="no pvalues")._asdict(), index=[0])
+            for k, v in frames.out.items()
+        }
+        pv_stats = {
+            k: v
+            if all(i in fields for i in v.columns)
+            else pd.DataFrame(PValSum(note="all p-values are NaN")._asdict(), index=[0])
+            if v.empty
+            else summarise_pvalues(
+                v,
+                bins=BINS,
+                fdr=FDR,
+                var={k: v for k, v in VAR.items() if "value" not in k},
+                pi0_method=pi0method,
+                verbose=verbose,
+            )
+            for k, v in frames.items()
+        }
+        for k, v in pv_stats.items():
+            res.update({parse_key(k, filename): v})
+
+    result = pd.concat(
+        [df for df in res.values()],
+        keys=[k for k in res.keys()],
+        names=["id"],
+        sort=False,
+    )
+
+    return result
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -630,79 +723,8 @@ if __name__ == "__main__":
         help="file with filenames to skip importing, one per line",
     )
     args = parser.parse_args()
-    var = dict(map(lambda s: s.split("="), args.vars))
-    VAR = {k: float(v) for k, v in var.items()}
-    VAR.update({"value": VAR["fpkm"]})
-    BINS = args.bins + 1
-    FDR = args.fdr
+    
+    df = parse_suppfiles(**args.__dict__)
 
-    if args.file:
-        input = args.file
-    elif args.list:
-        input = []
-        with args.list as f:
-            for line in f:
-                input.append(line.rstrip())
-
-    blacklist = []
-    if args.blacklist:
-        with args.blacklist as f:
-            for line in f:
-                file = os.path.basename(line.rstrip())
-                blacklist.append(file)
-
-    # Keep only inputs that exist
-    input = [i for i in input if os.path.isfile(i)]
-
-    # Drop files in blacklist
-    if blacklist:
-        input = [i for i in input if os.path.basename(i) not in blacklist]
-
-    if len(input) == 0:
-        Path(args.out).touch()
-        sys.exit()
-    out = {}
-    for path in input:
-        if args.verbose > 0:
-            print("working on", path)
-        filename = os.path.basename(path)
-        if tarfile.is_tarfile(path):
-            frames = import_tar(path)
-        else:
-            frames = import_flat(path)
-        frames = {
-            k: v
-            if all(i in fields for i in v.columns)
-            else summarise_pvalue_tables(v, var=VAR.keys())
-            if any(
-                [raw_pvalues(i) for i in v.columns if not isinstance(i, numbers.Number)]
-            )
-            else pd.DataFrame(PValSum(note="no pvalues")._asdict(), index=[0])
-            for k, v in frames.items()
-        }
-        pv_stats = {
-            k: v
-            if all(i in fields for i in v.columns)
-            else pd.DataFrame(PValSum(note="all p-values are NaN")._asdict(), index=[0])
-            if v.empty
-            else summarise_pvalues(
-                v,
-                bins=BINS,
-                fdr=FDR,
-                var={k: v for k, v in VAR.items() if "value" not in k},
-                pi0_method=args.pi0method,
-                verbose=args.verbose,
-            )
-            for k, v in frames.items()
-        }
-        for k, v in pv_stats.items():
-            out.update({parse_key(k, filename): v})
-
-    result = pd.concat(
-        [df for df in out.values()],
-        keys=[k for k in out.keys()],
-        names=["id"],
-        sort=False,
-    )
     with open(args.out, "w") as f:
-        result.reset_index(level="id").to_csv(f, index=False)
+        df.reset_index(level="id").to_csv(f, index=False)
