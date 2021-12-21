@@ -4,6 +4,12 @@ import re
 import argparse
 from typing import Type
 
+def missing_or_incomplete(localfile, remotesize):
+    return (
+        os.path.getsize(localfile) < remotesize
+        if os.path.isfile(localfile)
+        else True
+    )
 
 class download_suppfiles:
     def __init__(
@@ -59,7 +65,7 @@ class download_suppfiles:
         ftp.cwd(ftpdir)
         remote_size = ftp.size(filename)
         if remote_size <= self.maxfilesize:
-            if self.missing_or_incomplete(path, remote_size):
+            if missing_or_incomplete(path, remote_size):
                 with open(path, "wb") as file:
                     file.seek(0, os.SEEK_END)
                     if file.tell() == 0:
@@ -71,13 +77,6 @@ class download_suppfiles:
             print(
                 f"File size ({filename}={remote_size}) bigger than set maxfilesize threshold ({self.maxfilesize}), not downloading."
             )
-
-    def missing_or_incomplete(self, localfile, remotesize):
-        return (
-            os.path.getsize(localfile) < remotesize
-            if os.path.isfile(localfile)
-            else True
-        )
 
     def chunks(self):
         with open(self.input, "r") as i:
