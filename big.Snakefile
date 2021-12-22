@@ -2,7 +2,7 @@ import os
 import re
 from snakemake.remote.FTP import RemoteProvider as FTPRemoteProvider
 
-with open("testdownloads.txt", "r") as f:
+with open("output/sample_of_giga_suppfiles.txt", "r") as f:
     SUPPFILENAMES=[os.path.basename(line.rstrip()) for line in f.readlines()]
 
 EMAIL="taavi.pall@ut.ee"
