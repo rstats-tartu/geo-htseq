@@ -22,7 +22,7 @@ rule download_suppfiles:
     output: 
         temp("suppl/{suppfilename}")
     resources:
-        runtime = 120
+        runtime = lambda wildcards: 120 + int(60 * input.size // 1e9)
     shell:
         "mv {input} {output}"
 
@@ -48,7 +48,7 @@ rule import_suppfiles:
     "envs/geo-query.yaml"
   resources:
     mem_mb = lambda wildcards, input: max([int(4 * (input.size // 1e6)), 4000]),
-    runtime = 120,
+    runtime = lambda wildcards: 120 + int(60 * input.size // 1e9),
   shell:
     """
     python3 -u scripts/import_suppfiles.py --file {input} --out {output} {params} 2> {log}
@@ -63,6 +63,6 @@ rule merge_parsed_suppfiles:
     "envs/geo-query.yaml"
   resources:
     mem_mb = 4000,
-    runtime = 120
+    runtime = 120,
   script:
     "scripts/concat_tabs.py"
