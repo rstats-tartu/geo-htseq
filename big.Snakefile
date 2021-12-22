@@ -6,25 +6,24 @@ with open("output/sample_of_giga_suppfiles.txt", "r") as f:
     SUPPFILENAMES=[os.path.basename(line.rstrip()) for line in f.readlines()]
 
 EMAIL="taavi.pall@ut.ee"
-FTP = FTPRemoteProvider(username="anonymous", password=EMAIL)
-p = re.compile("GSE\\d+")
-
-def get_url(wildcards):
-    id = p.search(wildcards.suppfilename).group(0)
-    return os.path.join("ftp.ncbi.nlm.nih.gov", "geo/series", id[0:-3] + "nnn", id, "suppl", wildcards.suppfilename)
 
 rule all:
     input: expand(["output/tmp/parsed_suppfiles__{suppfilename}__.csv"], suppfilename=SUPPFILENAMES), "output/parsed_suppfiles__giga__.csv"
 
 # Download filterd supplementary files
 rule download_suppfiles:
-    input: lambda wildcards: FTP.remote(get_url(wildcards), keep_local=True, immediate_close=True)
     output: 
         temp("suppl/{suppfilename}")
+    log:
+        "log/download__{suppfilename}__.log"
+    conda: 
+        "envs/geo-query.yaml"
     resources:
-        runtime = lambda wildcards: 120 + int(60 * input.size // 1e9)
+        runtime = lambda wildcards, attempt: attempt * 120
     shell:
-        "mv {input} {output}"
+        """
+        python3 -u scripts/download_suppfiles.py --file {output[0]} --email {EMAIL} --maxfilesize 10000000000 2> {log}
+        """
 
 
 # Split list of supplementary files
@@ -48,7 +47,7 @@ rule import_suppfiles:
     "envs/geo-query.yaml"
   resources:
     mem_mb = lambda wildcards, input: max([int(4 * (input.size // 1e6)), 4000]),
-    runtime = lambda wildcards: 120 + int(60 * input.size // 1e9),
+    runtime = lambda wildcards, input: 120 + int(60 * input.size // 1e9),
   shell:
     """
     python3 -u scripts/import_suppfiles.py --file {input} --out {output} {params} 2> {log}
