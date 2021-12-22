@@ -586,7 +586,7 @@ def parse_suppfiles(
     fdr=0.5,
     pi0method="lfdr",
     bins=30,
-    verbose=0,
+    verbose=False,
     **kwargs,
 ):
     def single_true(iterable):
@@ -625,13 +625,13 @@ def parse_suppfiles(
     if blacklist:
         input = [i for i in input if os.path.basename(i) not in blacklist]
 
-    if len(input) == 0:
-        Path(out).touch()
-        sys.exit()
+    assert len(input) > 0, "No files to process."
+
+    if verbose:
+        print("Working on ", input)
+
     res = {}
     for path in input:
-        if verbose > 0:
-            print("working on", path)
         filename = os.path.basename(path)
         frames = ImportSuppfiles()
         if tarfile.is_tarfile(path):
@@ -714,7 +714,7 @@ if __name__ == "__main__":
         help="method to calculate pi0, string, default is 'lfdr'",
     )
     parser.add_argument(
-        "--verbose", "-v", help="increase output verbosity", action="count", default=0
+        "--verbose", "-v", help="increase output verbosity", action="store_true"
     )
     parser.add_argument(
         "--blacklist",
@@ -723,7 +723,7 @@ if __name__ == "__main__":
         help="file with filenames to skip importing, one per line",
     )
     args = parser.parse_args()
-    
+
     df = parse_suppfiles(**args.__dict__)
 
     with open(args.out, "w") as f:
