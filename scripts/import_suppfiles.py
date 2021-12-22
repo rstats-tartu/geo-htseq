@@ -295,7 +295,7 @@ def summarise_pvalue_tables(
     pvalues_check = fix_column_dtype(pvalues)
     for v in var:
         label = v
-        if v is "value":
+        if v == "value":
             v = "^value_\d"
             label = "fpkm"
         exprs = df.filter(regex=v, axis=1)

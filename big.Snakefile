@@ -1,11 +1,11 @@
 import os
 import re
-from snakemake.remote.FTP import RemoteProvider as FTPRemoteProvider
 
 with open("output/sample_of_giga_suppfiles.txt", "r") as f:
     SUPPFILENAMES=[os.path.basename(line.rstrip()) for line in f.readlines()]
 
 EMAIL="taavi.pall@ut.ee"
+p = re.compile("GSE\\d+")
 
 rule all:
     input: expand(["output/tmp/parsed_suppfiles__{suppfilename}__.csv"], suppfilename=SUPPFILENAMES), "output/parsed_suppfiles__giga__.csv"
@@ -16,13 +16,14 @@ rule download_suppfiles:
         temp("suppl/{suppfilename}")
     log:
         "log/download__{suppfilename}__.log"
-    conda: 
-        "envs/geo-query.yaml"
+    params:
+        id=lambda wildcards: p.search(wildcards.suppfilename).group(0),
+        stub=lambda wildcards: p.search(wildcards.suppfilename).group(0)[0:-3],
     resources:
         runtime = lambda wildcards, attempt: attempt * 120
     shell:
         """
-        python3 -u scripts/download_suppfiles.py --file {output[0]} --email {EMAIL} --maxfilesize 10000000000 2> {log}
+        curl -sS -o {output[0]} --user anonymous:{EMAIL} ftp://ftp.ncbi.nlm.nih.gov/geo/series/{params.stub}nnn/{params.id}/{output[0]} 2> {log}
         """
 
 
@@ -42,7 +43,7 @@ rule import_suppfiles:
   log:
     "log/import__{suppfilename}__.log"
   params:
-    f"--var basemean=10 logcpm=1 rpkm=1 fpkm=1 aveexpr=3.32 --bins 40 --fdr 0.05 --pi0method lfdr -v --blacklist {BLACKLIST_FILE}"
+    f"--var basemean=10 logcpm=1 rpkm=1 fpkm=1 aveexpr=3.32 --bins 40 --fdr 0.05 --pi0method lfdr --blacklist {BLACKLIST_FILE}"
   conda: 
     "envs/geo-query.yaml"
   resources:
