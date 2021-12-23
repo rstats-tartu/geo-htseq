@@ -48,7 +48,7 @@ rule import_suppfiles:
     "envs/geo-query.yaml"
   resources:
     mem_mb = lambda wildcards, input: max([int(4 * (input.size // 1e6)), 4000]),
-    runtime = lambda wildcards, input: 120 + int(60 * input.size // 1e9),
+    runtime = lambda wildcards, attempt, input: attempt * (120 + int(120 * input.size // 1e9)),
   shell:
     """
     python3 -u scripts/import_suppfiles.py --file {input} --out {output} {params} 2> {log}
