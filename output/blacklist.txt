@@ -1,3 +1,6 @@
+GSE71831_RAW.tar
+GSE82144_RAW.tar
+GSE147756_RAW.tar
 GSE105010_inDropsExpMatrix_noQ.txt.gz
 GSE111764_PrincipalClusteringDigitalExpressionMatrix.dge.txt.gz
 GSE102827_MATRIX.csv.gz
@@ -69,3 +72,5 @@ GSE30839_GSM765295_ribo_mesc_harr150s-profiles.tar.gz
 GSE113074_RAW.tar
 GSE134163_RAW.tar
 GSE118987_RAW.tar
+GSE107327_total_RNA_rpm.csv.gz
+GSE94631_RAW.tar

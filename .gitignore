@@ -6,7 +6,7 @@
 .dropbox
 figures/
 output/*.rds
-output/suppl/
+suppl/
 output/matrix
 output/logs
 output/plots
@@ -27,3 +27,4 @@ __pycache__
 output/downloading_suppfiles_*.done
 *.csv
 *.tar.gz
+slurm*
