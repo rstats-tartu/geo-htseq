@@ -1,8 +1,14 @@
 import os
 import re
 
-with open("output/sample_of_giga_suppfiles.txt", "r") as f:
-    SUPPFILENAMES=[os.path.basename(line.rstrip()) for line in f.readlines()]
+# Drop some offending files 
+BLACKLIST_FILE = "output/blacklist.txt"
+with open(BLACKLIST_FILE) as h:
+    BLACKLIST = [os.path.basename(line.rstrip()) for line in h.readlines()]
+
+SUPPFILENAMES_FILE = "output/sample_of_giga_suppfiles.txt"
+with open(SUPPFILENAMES_FILE, "r") as f:
+    SUPPFILENAMES=[os.path.basename(line.rstrip()) for line in f.readlines() if os.path.basename(line.rstrip()) not in BLACKLIST]
 
 EMAIL="taavi.pall@ut.ee"
 p = re.compile("GSE\\d+")
@@ -26,13 +32,6 @@ rule download_suppfiles:
         curl -sS -o {output[0]} --user anonymous:{EMAIL} ftp://ftp.ncbi.nlm.nih.gov/geo/series/{params.stub}nnn/{params.id}/{output[0]} 2> {log}
         """
 
-
-# Split list of supplementary files
-# dir is the location of suppl/ folder
-# Drop some offending files 
-BLACKLIST_FILE = "output/blacklist.txt"
-with open(BLACKLIST_FILE) as h:
-    BLACKLIST = [os.path.basename(i.rstrip()) for i in h.readlines()]
 
 # Import supplementary data
 rule import_suppfiles:
