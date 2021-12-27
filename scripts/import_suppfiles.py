@@ -16,7 +16,7 @@ import numbers
 
 
 xls = re.compile("xls")
-drop = "series_matrix\.txt\.gz$|filelist\.txt$|readme|\.bam(\.tdf|$)|\.bai(\.gz|$)|\.sam(\.gz|$)|\.csfasta|\.fa(sta)?(\.gz|\.bz2|\.txt\.gz|$)|\.f(a|n)a(\.gz|$)|(big)?wig|\.bw(\.|$)|\.bed(graph)?(\.tdf|\.gz|\.bz2|\.tar\.gz|\.txt\.gz|$)|(broad_)?lincs|\.tdf$"
+drop = "series_matrix\.txt\.gz$|filelist\.txt$|readme|\.bam(\.tdf|$)|\.bai(\.gz|$)|\.sam(\.gz|$)|\.csfasta|\.fa(sta)?(\.gz|\.bz2|\.txt\.gz|$)|\.f(a|n)a(\.gz|$)|(big)?[Ww]ig|\.bw(\.|$)|\.bed([Gg]raph)?(\.tdf|\.gz|\.bz2|\.tar\.gz|\.txt\.gz|$)|(broad_)?lincs|\.tdf$|\.hic$|\.rds$"
 drop = re.compile(drop)
 gse = re.compile("GSE\d+_")
 pv_str = "p[^a-zA-Z]{0,4}val"
