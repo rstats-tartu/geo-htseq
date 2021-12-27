@@ -16,7 +16,7 @@ import numbers
 
 
 xls = re.compile("xls")
-drop = "series_matrix\.txt\.gz$|filelist\.txt$|readme|\.bam(\.tdf|$)|\.bai(\.gz|$)|\.sam(\.gz|$)|\.csfasta|\.fa(sta)?(\.gz|\.bz2|\.txt\.gz|$)|\.f(a|n)a(\.gz|$)|(big)?[Ww]ig|\.bw(\.|$)|\.bed([Gg]raph)?(\.tdf|\.gz|\.bz2|\.tar\.gz|\.txt\.gz|$)|(broad_)?lincs|\.tdf$|\.hic$|\.rds$"
+drop = "series_matrix\.txt\.gz$|filelist\.txt$|readme|\.bam(\.tdf|$)|\.bai(\.gz|$)|\.sam(\.gz|$)|\.csfasta|\.fa(sta)?(\.gz|\.bz2|\.txt\.gz|$)|\.f(a|n)a(\.gz|$)|(big)?[Ww]ig|\.bw(\.|$)|\.bed([Gg]raph)?(\.tdf|\.gz|\.bz2|\.tar\.gz|\.txt\.gz|$)|(broad_)?lincs|\.tdf$|\.hic$|\.rds$|README"
 drop = re.compile(drop)
 gse = re.compile("GSE\d+_")
 pv_str = "p[^a-zA-Z]{0,4}val"
@@ -75,37 +75,39 @@ class ImportSuppfiles(object):
         self.out = {}
 
     def from_flat(self, input, tar=None):
-        out = {}
-        try:
-            if xls.search(input.name if tar else input):
-                out.update(self.read_excel(input, tar=tar))
-            else:
-                d = self.read_csv(input, tar=tar)
-                is_empty = [v.empty for v in d.values()][0]
-                if is_empty:
-                    raise Exception("empty table")
-                else:
-                    peakfile = peak.search(input.name.lower() if tar else input.lower())
-                    if peakfile:
-                        input = os.path.basename(input.name if tar else input)
-                        d[input].loc[-1] = d[input].columns
-                        d[input] = d[input].sort_index().reset_index(drop=True)
-                        d[input].columns = eval(peakfile.group(0))
-                    out.update(d)
-        except Exception as e:
+        if drop.search(input.name if tar else input):
             key = os.path.basename(input.name if tar else input)
-            out.update(note(key, e))
-        return self.out.update(out)
+            return self.out.update(note(key, "not imported"))
+        else:
+            out = {}
+            try:
+                if xls.search(input.name if tar else input):
+                    out.update(self.read_excel(input, tar=tar))
+                else:
+                    d = self.read_csv(input, tar=tar)
+                    is_empty = [v.empty for v in d.values()][0]
+                    if is_empty:
+                        raise Exception("empty table")
+                    else:
+                        peakfile = peak.search(
+                            input.name.lower() if tar else input.lower()
+                        )
+                        if peakfile:
+                            input = os.path.basename(input.name if tar else input)
+                            d[input].loc[-1] = d[input].columns
+                            d[input] = d[input].sort_index().reset_index(drop=True)
+                            d[input].columns = eval(peakfile.group(0))
+                        out.update(d)
+            except Exception as e:
+                key = os.path.basename(input.name if tar else input)
+                out.update(note(key, e))
+            return self.out.update(out)
 
     def from_tar(self, input):
         with tarfile.open(input, "r:*") as tar:
             for member in tar:
                 if member.isfile():
-                    if not drop.search(member.name):
-                        self.from_flat(member, tar)
-                    else:
-                        key = os.path.basename(member.name)
-                        self.out.update(note(key, "not imported"))
+                    self.from_flat(member, tar)
 
     def find_header(self, df, n=20):
         head = df.head(n)
