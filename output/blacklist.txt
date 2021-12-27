@@ -1,3 +1,8 @@
+GSE137869_RAW.tar
+GSE71831_RPE1-deltaDXZ4a_Intrachromosomal.tar.gz
+GSE57215_RAW.tar
+GSE71831_RPE1-WT_Interchromosomal.tar.gz
+GSE52059_RAW.tar
 GSE71831_RAW.tar
 GSE82144_RAW.tar
 GSE147756_RAW.tar
