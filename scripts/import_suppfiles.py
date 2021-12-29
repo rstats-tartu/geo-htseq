@@ -13,12 +13,11 @@ from scipy.stats import binom
 from pandas.api.types import is_string_dtype
 from pathlib import Path
 import numbers
-
+import xlrd
 
 xls = re.compile("xls")
-drop = "series_matrix\.txt\.gz$|filelist\.txt$|readme|\.bam(\.tdf|$)|\.bai(\.gz|$)|\.sam(\.gz|$)|\.csfasta|\.fa(sta)?(\.gz|\.bz2|\.txt\.gz|$)|\.f(a|n)a(\.gz|$)|(big)?[Ww]ig|\.bw(\.|$)|\.bed([Gg]raph)?(\.tdf|\.gz|\.bz2|\.tar\.gz|\.txt\.gz|$)|(broad_)?lincs|\.tdf$|\.hic$|\.rds$|README"
+drop = "series_matrix\.txt\.gz$|filelist\.txt$|readme|\.bam(\.tdf|$)|\.bai(\.gz|$)|\.sam(\.gz|$)|\.csfasta|\.fa(sta)?(\.gz|\.bz2|\.txt\.gz|$)|\.f(a|n)a(\.gz|$)|\.wig|\.big[Ww]ig$|\.bw(\.|$)|\.bed([Gg]raph)?(\.tdf|\.gz|\.bz2|\.txt\.gz|$)|(broad_)?lincs|\.tdf$|\.hic$|\.rds(\.gz|$)|README|\.tar\.gz$|\.mtx(\.gz$|$)"
 drop = re.compile(drop)
-gse = re.compile("GSE\d+_")
 pv_str = "p[^a-zA-Z]{0,4}val"
 pv = re.compile(pv_str)
 adj = re.compile("adj|fdr|corr|thresh")
@@ -82,7 +81,10 @@ class ImportSuppfiles(object):
             out = {}
             try:
                 if xls.search(input.name if tar else input):
-                    out.update(self.read_excel(input, tar=tar))
+                    try:
+                        out.update(self.read_excel(input, tar=tar))
+                    except Exception as e:
+                        out.update(self.read_csv(input, tar=tar))
                 else:
                     d = self.read_csv(input, tar=tar)
                     is_empty = [v.empty for v in d.values()][0]
