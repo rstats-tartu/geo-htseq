@@ -1,5 +1,6 @@
 import os
 import re
+from scripts.import_suppfiles import drop
 
 # Drop some offending files 
 BLACKLIST_FILE = "output/blacklist.txt"
@@ -8,7 +9,13 @@ with open(BLACKLIST_FILE) as h:
 
 SUPPFILENAMES_FILE = "output/sample_of_giga_suppfiles.txt"
 with open(SUPPFILENAMES_FILE, "r") as f:
-    SUPPFILENAMES=[os.path.basename(line.rstrip()) for line in f.readlines() if os.path.basename(line.rstrip()) not in BLACKLIST]
+    SUPPFILENAMES = [os.path.basename(line.rstrip()) for line in f.readlines() if line.strip() != ""]
+
+# Drop alignment files, sequence files, binary files, README, etc
+SUPPFILENAMES = [file for file in SUPPFILENAMES if not bool(drop.search(file))]
+
+# Drop files in blacklist
+SUPPFILENAMES = [file for file in SUPPFILENAMES if file not in BLACKLIST]
 
 EMAIL="taavi.pall@ut.ee"
 p = re.compile("GSE\\d+")
