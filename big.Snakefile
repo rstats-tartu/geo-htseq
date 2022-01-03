@@ -36,7 +36,7 @@ rule download_suppfiles:
         runtime = lambda wildcards, attempt: attempt * 120
     shell:
         """
-        curl -sS -o {output[0]} --user anonymous:{EMAIL} ftp://ftp.ncbi.nlm.nih.gov/geo/series/{params.stub}nnn/{params.id}/{output[0]} 2> {log}
+        curl -sS -H 'Expect:' -o {output[0]} --user anonymous:{EMAIL} ftp://ftp.ncbi.nlm.nih.gov/geo/series/{params.stub}nnn/{params.id}/{output[0]} 2> {log}
         """
 
 
