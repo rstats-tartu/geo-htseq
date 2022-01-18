@@ -21,6 +21,8 @@ SUPPFILENAMES = [file for file in SUPPFILENAMES if file not in BLACKLIST]
 EMAIL="taavi.pall@ut.ee"
 p = re.compile("GSE\\d+")
 
+
+localrules: all, download_suppfiles
 rule all:
     input: expand(["output/tmp/parsed_suppfiles__{suppfilename}__.csv"], suppfilename=SUPPFILENAMES), "output/parsed_suppfiles__giga__.csv"
 
