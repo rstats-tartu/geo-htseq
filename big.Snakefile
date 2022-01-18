@@ -2,14 +2,15 @@ import os
 import re
 from scripts.import_suppfiles import drop
 
+# Suppfilenames
+SUPPFILENAMES_FILE = config["suppfilenames"]
+with open(SUPPFILENAMES_FILE, "r") as f:
+    SUPPFILENAMES = [os.path.basename(line.rstrip()) for line in f.readlines() if line.strip() != ""]
+
 # Drop some offending files 
 BLACKLIST_FILE = "output/blacklist.txt"
 with open(BLACKLIST_FILE) as h:
     BLACKLIST = [os.path.basename(line.rstrip()) for line in h.readlines()]
-
-SUPPFILENAMES_FILE = "output/sample_of_giga_suppfiles.txt"
-with open(SUPPFILENAMES_FILE, "r") as f:
-    SUPPFILENAMES = [os.path.basename(line.rstrip()) for line in f.readlines() if line.strip() != ""]
 
 # Drop alignment files, sequence files, binary files, README, etc
 SUPPFILENAMES = [file for file in SUPPFILENAMES if not bool(drop.search(file))]
@@ -23,6 +24,7 @@ p = re.compile("GSE\\d+")
 rule all:
     input: expand(["output/tmp/parsed_suppfiles__{suppfilename}__.csv"], suppfilename=SUPPFILENAMES), "output/parsed_suppfiles__giga__.csv"
 
+
 # Download filterd supplementary files
 rule download_suppfiles:
     output: 
@@ -30,8 +32,8 @@ rule download_suppfiles:
     log:
         "log/download__{suppfilename}__.log"
     params:
-        id=lambda wildcards: p.search(wildcards.suppfilename).group(0),
-        stub=lambda wildcards: p.search(wildcards.suppfilename).group(0)[0:-3],
+        id=lambda wildcards: p.search(wildcards.suppfilename.upper()).group(0),
+        stub=lambda wildcards: p.search(wildcards.suppfilename.upper()).group(0)[0:-3],
     resources:
         runtime = lambda wildcards, attempt: attempt * 120
     shell:
