@@ -75,4 +75,4 @@ rule merge_parsed_suppfiles:
     mem_mb = 4000,
     runtime = 120,
   script:
-    "scripts/concat_tabs.py"
+    "python3 -u scripts/concat_tabs.py --tabs {input} --out {output}"

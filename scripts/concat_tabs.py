@@ -1,4 +1,5 @@
 import pandas as pd
+import argparse
 
 
 def safely_read_csv(path, **kwargs):
@@ -13,5 +14,12 @@ def concatenate_tables(input, sep=","):
     return pd.concat(frames, sort=False)
 
 
-with open(snakemake.output[0], "w") as out:
-    concatenate_tables(snakemake.input).to_csv(out, index=False)
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--tabs", nargs="+", help="paths to input files to be concatenated")
+    parser.add_argument("--out", metavar="FILE", help="output file", required=True)
+    args = parser.parse_args()
+
+    with open(args.out, "w") as out:
+        concatenate_tables(args.tabs).to_csv(out, index=False)
