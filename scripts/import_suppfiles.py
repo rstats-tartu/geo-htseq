@@ -56,7 +56,7 @@ gappedpeak = [
     "name",
     "score",
     "strand",
-    " thickStart",
+    "thickStart",
     "thickEnd",
     "itemRgb",
     "blockCount",
@@ -95,13 +95,15 @@ class ImportSuppfiles(object):
                             input.name.lower() if tar else input.lower()
                         )
                         if peakfile:
-                            input = os.path.basename(input.name if tar else input)
-                            d[input].loc[-1] = d[input].columns
-                            d[input] = d[input].sort_index().reset_index(drop=True)
-                            d[input].columns = eval(peakfile.group(0))
+                            key = os.path.basename(input.name if tar else input)
+                            d[key].loc[-1] = d[key].columns
+                            d[key] = d[key].sort_index().reset_index(drop=True)
+                            d[key].columns = eval(peakfile.group(0))
                         out.update(d)
             except Exception as e:
                 key = os.path.basename(input.name if tar else input)
+                if peakfile:
+                    e = f"Misspecified '{peakfile.group(0)}' file; {e}" 
                 out.update(note(key, e))
             return self.out.update(out)
 
