@@ -14,9 +14,13 @@ from pandas.api.types import is_string_dtype
 from pathlib import Path
 import numbers
 import xlrd
+import openpyxl
+import warnings
+
+warnings.filterwarnings("error")
 
 xls = re.compile("xls")
-drop = "series_matrix\.txt\.gz$|filelist\.txt$|readme|\.bam(\.tdf|$)|\.bai(\.gz|$)|\.sam(\.gz|$)|\.csfasta|\.fa(sta)?(\.gz|\.bz2|\.txt\.gz|$)|\.f(a|n)a(\.gz|$)|\.wig|\.big[Ww]ig$|\.bw(\.|$)|\.bed([Gg]raph)?(\.tdf|\.gz|\.bz2|\.txt\.gz|$)|(broad_)?lincs|\.tdf$|\.hic$|\.rds(\.gz|$)|README|\.tar\.gz$|\.mtx(\.gz$|$)"
+drop = "series_matrix\.txt\.gz$|filelist\.txt$|readme|\.bam(\.tdf|$)|\.bai(\.gz|$)|\.sam(\.gz|$)|\.csfasta|\.fa(sta)?(\.gz|\.bz2|\.txt\.gz|$)|\.f(a|n)a(\.gz|$)|\.wig|\.big[Ww]ig$|\.bw(\.|$)|\.bed([Gg]raph)?(\.tdf|\.gz|\.bz2|\.txt\.gz|$)|(broad_)?lincs|\.tdf$|\.hic$|\.rds(\.gz|$)|README|\.tar\.gz$|\.mtx(\.gz$|$)|dge\.txt\.gz$"
 drop = re.compile(drop)
 pv_str = "p[^a-zA-Z]{0,4}val"
 pv = re.compile(pv_str)
@@ -83,6 +87,9 @@ class ImportSuppfiles(object):
                 if xls.search(input.name if tar else input):
                     try:
                         out.update(self.read_excel(input, tar=tar))
+                    except UserWarning as w:
+                        key = os.path.basename(input.name if tar else input)
+                        out.update(note(key, w))
                     except Exception as e:
                         out.update(self.read_csv(input, tar=tar))
                 else:
@@ -102,8 +109,9 @@ class ImportSuppfiles(object):
                         out.update(d)
             except Exception as e:
                 key = os.path.basename(input.name if tar else input)
+                peakfile = peak.search(input.name.lower() if tar else input.lower())
                 if peakfile:
-                    e = f"Misspecified '{peakfile.group(0)}' file; {e}" 
+                    e = f"Misspecified '{peakfile.group(0)}' file; {e}"
                 out.update(note(key, e))
             return self.out.update(out)
 
@@ -115,13 +123,15 @@ class ImportSuppfiles(object):
 
     def find_header(self, df, n=20):
         head = df.head(n)
-        idx = 0
-        for col in head:
-            s = head[col]
-            match = s.str.contains(pv_str, na=False)
-            if any(match):
-                idx = s.index[match].tolist()[0] + 1
-                break
+        matches = [
+            i[0]
+            for i in [
+                [i for i, x in enumerate(head[col].str.contains(pv_str, na=False)) if x]
+                for col in head
+            ]
+            if i
+        ]
+        idx = min(matches) + 1 if matches else 0
         if idx == 0:
             for index, row in head.iterrows():
                 if all([isinstance(i, str) for i in row if i is not np.nan]):
@@ -207,6 +217,8 @@ class ImportSuppfiles(object):
         sheets = [i for i in sheets if "README" not in i]
         for sheet in sheets:
             df = wb.parse(sheet, comment="#")
+            if df.empty:
+                df = wb.parse(sheet)
             if verbose > 1:
                 print("df after import:\n", df)
             if not df.empty:
