@@ -14,7 +14,9 @@ from pandas.api.types import is_string_dtype
 from pathlib import Path
 import numbers
 import warnings
-warnings.filterwarnings("error")
+
+class FormatError(Exception):
+    pass
 
 xls = re.compile("xls")
 drop = "series_matrix\.txt\.gz$|filelist\.txt$|readme|\.bam(\.tdf|$)|\.bai(\.gz|$)|\.sam(\.gz|$)|\.csfasta|\.fa(sta)?(\.gz|\.bz2|\.txt\.gz|$)|\.f(a|n)a(\.gz|$)|\.wig|\.big[Ww]ig$|\.bw(\.|$)|\.bed([Gg]raph)?(\.tdf|\.gz|\.bz2|\.txt\.gz|$)|(broad_)?lincs|\.tdf$|\.hic$|\.rds(\.gz|$)|README|\.tar\.gz$|\.mtx(\.gz$|$)|dge\.txt\.gz$|umis?\.txt\.gz$"
@@ -84,10 +86,7 @@ class ImportSuppfiles(object):
                 if xls.search(input.name if tar else input):
                     try:
                         out.update(self.read_excel(input, tar=tar))
-                    except UserWarning as w:
-                        key = os.path.basename(input.name if tar else input)
-                        out.update(note(key, w))
-                    except Exception as e:
+                    except ValueError as e:
                         out.update(self.read_csv(input, tar=tar))
                 else:
                     d = self.read_csv(input, tar=tar)
@@ -207,9 +206,14 @@ class ImportSuppfiles(object):
     def excel_helper(self, input, input_name, verbose=0):
         tabs = {}
         if input_name.endswith("gz") or isinstance(input, (gzip.GzipFile)):
-            wb = pd.ExcelFile(gzip.open(input))
+            excel_file = gzip.open(input)
         else:
-            wb = pd.ExcelFile(input)
+            excel_file = input
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            wb = pd.ExcelFile(excel_file)
+            if len(w):
+                raise FormatError(f'Format error: the data source could not be successfully parsed: Excel document does not have a sheet 1')
         sheets = wb.sheet_names
         sheets = [i for i in sheets if "README" not in i]
         for sheet in sheets:
