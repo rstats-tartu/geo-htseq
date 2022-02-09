@@ -1,3 +1,15 @@
+GSE157360_AK192_RNAseq_counts.csv.gz
+GSE108473_RAW.tar
+GSE141320_heatshock_60_ratio.csv.gz
+GSE141320_mazF100_ratio.csv.gz
+GSE141320_chlor_60_ratio.csv.gz
+GSE141320_chlor_15_ratio.csv.gz
+GSE141320_chlor_30_ratio.csv.gz
+GSE141320_mazF10_ratio.csv.gz
+GSE141320_mazF1_ratio.csv.gz
+GSE141320_mazF5_ratio.csv.gz
+GSE81105_RAW.tar
+GSE141320_mazF5_ratio.csv.gz
 GSE130306_RAW.tar
 GSE137869_RAW.tar
 GSE71831_RPE1-deltaDXZ4a_Intrachromosomal.tar.gz
