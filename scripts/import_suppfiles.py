@@ -15,8 +15,10 @@ from pathlib import Path
 import numbers
 import warnings
 
+
 class FormatError(Exception):
     pass
+
 
 xls = re.compile("xls")
 drop = "series_matrix\.txt\.gz$|filelist\.txt$|readme|\.bam(\.tdf|$)|\.bai(\.gz|$)|\.sam(\.gz|$)|\.csfasta|\.fa(sta)?(\.gz|\.bz2|\.txt\.gz|$)|\.f(a|n)a(\.gz|$)|\.wig|\.big[Ww]ig$|\.bw(\.|$)|\.bed([Gg]raph)?(\.tdf|\.gz|\.bz2|\.txt\.gz|$)|(broad_)?lincs|\.tdf$|\.hic$|\.rds(\.gz|$)|README|\.tar\.gz$|\.mtx(\.gz$|$)|dge\.txt\.gz$|umis?\.txt\.gz$"
@@ -213,7 +215,9 @@ class ImportSuppfiles(object):
             warnings.simplefilter("always")
             wb = pd.ExcelFile(excel_file)
             if len(w):
-                raise FormatError(f'Format error: the data source could not be successfully parsed: Excel document does not have a sheet 1')
+                raise FormatError(
+                    f"Format error: the data source could not be successfully parsed: Excel document does not have a sheet 1"
+                )
         sheets = wb.sheet_names
         sheets = [i for i in sheets if "README" not in i]
         for sheet in sheets:
