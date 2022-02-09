@@ -22,7 +22,7 @@ EMAIL="taavi.pall@ut.ee"
 p = re.compile("GSE\\d+")
 
 
-localrules: all, download_suppfiles
+localrules: all
 rule all:
     input: expand(["output/tmp/parsed_suppfiles__{suppfilename}__.csv"], suppfilename=SUPPFILENAMES), "output/parsed_suppfiles__giga__.csv"
 
@@ -30,7 +30,7 @@ rule all:
 # Download filterd supplementary files
 rule download_suppfiles:
     output: 
-        temp("suppl/{suppfilename}")
+        pipe(temp("suppl/{suppfilename}"))
     log:
         "log/download__{suppfilename}__.log"
     params:
