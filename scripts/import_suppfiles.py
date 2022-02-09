@@ -216,7 +216,7 @@ class ImportSuppfiles(object):
             wb = pd.ExcelFile(excel_file)
             if len(w):
                 raise FormatError(
-                    f"Format error: the data source could not be successfully parsed: Excel document does not have a sheet 1"
+                    "Format error: the data source could not be successfully parsed: Excel document does not have a sheet 1"
                 )
         sheets = wb.sheet_names
         sheets = [i for i in sheets if "README" not in i]
