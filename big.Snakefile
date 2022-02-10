@@ -30,14 +30,14 @@ rule all:
 # Download filterd supplementary files
 rule download_suppfiles:
     output: 
-        pipe(temp("suppl/{suppfilename}"))
+        temp("suppl/{suppfilename}")
     log:
         "log/download__{suppfilename}__.log"
     params:
         id=lambda wildcards: p.search(wildcards.suppfilename.upper()).group(0),
         stub=lambda wildcards: p.search(wildcards.suppfilename.upper()).group(0)[0:-3],
     resources:
-        runtime = lambda wildcards, attempt: attempt * 120
+        runtime = lambda wildcards, attempt: attempt * 1440
     shell:
         """
         curl -sS -H 'Expect:' -o {output[0]} --user anonymous:{EMAIL} ftp://ftp.ncbi.nlm.nih.gov/geo/series/{params.stub}nnn/{params.id}/{output[0]} 2> {log}
