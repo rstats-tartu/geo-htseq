@@ -57,7 +57,7 @@ rule import_suppfiles:
   conda: 
     "envs/geo-query.yaml"
   resources:
-    mem_mb = lambda wildcards, input: min(128000, max([int(16 * (input.size // 1e6)), 4000])),
+    mem_mb = lambda wildcards, input: min(200000, max([int(16 * (input.size // 1e6)), 4000])),
     runtime = lambda wildcards, attempt, input: min(1440, attempt * (5 + int(360 * input.size // 1e9))),
   shell:
     """
