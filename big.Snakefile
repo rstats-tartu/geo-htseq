@@ -13,7 +13,7 @@ with open(BLACKLIST_FILE) as h:
     BLACKLIST = [os.path.basename(line.rstrip()) for line in h.readlines()]
 
 # Drop alignment files, sequence files, binary files, README, etc
-SUPPFILENAMES = [file for file in SUPPFILENAMES if not bool(drop.search(file))]
+SUPPFILENAMES = [file for file in SUPPFILENAMES if not bool(drop.search(file.lower()))]
 
 # Drop files in blacklist
 SUPPFILENAMES = [file for file in SUPPFILENAMES if file not in BLACKLIST]
