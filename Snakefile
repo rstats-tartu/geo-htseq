@@ -104,7 +104,7 @@ rule merge_parsed_suppfiles:
         mem_mb=16000,
         runtime=120,
     script:
-        "python3 -u scripts/concat_tabs.py --tabs {input} --out {output}"
+        "scripts/concat_tabs_sm.py"
 
 
 rule archive:
@@ -117,4 +117,6 @@ rule archive:
         mem_mb=16000,
         runtime=120,
     shell:
-        "tar -czvf {output[0]} {input}"
+        """
+        tar -czvf {output[0]} {input}
+        """
