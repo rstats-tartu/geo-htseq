@@ -103,8 +103,9 @@ rule merge_parsed_suppfiles:
     resources:
         mem_mb=16000,
         runtime=120,
-    script:
-        "scripts/concat_tabs_sm.py"
+    run:
+        import subprocess as sp
+        sp.run("python3 -u scripts/concat_tabs.py --tabs {input} --out {output}", shell=True)
 
 
 rule archive:
