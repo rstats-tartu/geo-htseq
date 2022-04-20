@@ -5,19 +5,17 @@ from snakemake.utils import min_version
 
 min_version("6.0")
 EMAIL = "taavi.pall@ut.ee"
+BLACKLIST_FILE = "blacklist.txt"
 p = re.compile("GSE\\d+")
 
 
-module geo_query:
+module query:
     snakefile:
         "query.smk"
 
 
-use rule * from geo_query as query_*
+use rule * from query as query_*
 
-
-# Drop some files
-BLACKLIST_FILE = "blacklist.txt"
 
 # Suppfilenames
 def get_parsed_suppfiles(wildcards):
