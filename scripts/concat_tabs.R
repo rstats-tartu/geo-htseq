@@ -10,7 +10,7 @@ ncols <- unlist(lapply(dfs, ncol))
 short <- dfs[ncols == 8]
 long <- dfs[ncols == 9]
 cols <- colnames(long[[1]])
-short1 <- lapply(head(short), function(x) {x["Set"] <- NA; x[,cols]})
+short1 <- lapply(short, function(x) {x["Set"] <- NA; x[,cols]})
 
 # Concatenate data frames
 res <- do.call(rbind, c(short1, long))
