@@ -98,15 +98,13 @@ rule merge_parsed_suppfiles:
         get_parsed_suppfiles,
     output:
         "output/parsed_suppfiles.csv",
-    conda:
-        "envs/environment.yaml"
     resources:
-        mem_mb=16000,
+        mem_mb=4000,
         runtime=120,
-    run:
-        import subprocess as sp
-        sp.run("python3 -u scripts/concat_tabs.py --tabs {input} --out {output}", shell=True)
-
+    envmodules:
+        "any/R/4.1.2-X"
+    script:
+        "scripts/concat_tabs.R"
 
 rule archive:
     input:
