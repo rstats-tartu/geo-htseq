@@ -1,321 +1,112 @@
 import os
-LAST_DATE = "2020-12-31"
-QUERY = 'expression profiling by high throughput sequencing[DataSet Type] AND ("2000-01-01"[PDAT] : "{}"[PDAT])'.format(LAST_DATE)
+import re
+from scripts.import_suppfiles import drop
+from snakemake.utils import min_version
+
+min_version("6.0")
+
+
+module geo_query:
+    snakefile:
+        "rules/query.smk"
+
+
+use rule * from geo_query as query_*
+
+
+# Drop some files
+BLACKLIST_FILE = "blacklist.txt"
+
+# Suppfilenames
+def get_parsed_suppfiles(wildcards):
+    SUPPFILENAMES_FILE = checkpoints.query_suppfilenames.get().output[
+        0
+    ]  # config["suppfilenames"]
+    with open(SUPPFILENAMES_FILE, "r") as f:
+        SUPPFILENAMES = [
+            os.path.basename(line.rstrip())
+            for line in f.readlines()
+            if line.strip() != ""
+        ]
+
+    with open(BLACKLIST_FILE) as h:
+        BLACKLIST = [os.path.basename(line.rstrip()) for line in h.readlines()]
+
+    # Drop alignment files, sequence files, binary files, README, etc
+    SUPPFILENAMES = [
+        file for file in SUPPFILENAMES if not bool(drop.search(file.lower()))
+    ]
+
+    # Drop files in blacklist
+    SUPPFILENAMES = [file for file in SUPPFILENAMES if file not in BLACKLIST]
+    return expand(
+        ["output/tmp/parsed_suppfiles__{suppfilename}__.csv"],
+        suppfilename=SUPPFILENAMES,
+    )
+
+
 EMAIL = "taavi.pall@ut.ee"
+p = re.compile("GSE\\d+")
 
-onsuccess:
-    print("Workflow finished, no error")
-    shell("mail -s 'Forkflow finished successfully' {EMAIL} < {log}")
 
-onerror:
-    print("An error occurred")
-    shell("mail -s 'An error occurred' {EMAIL} < {log}")
-
-localrules: all, filter_suppfilenames
-
-K = 15
-N = 10
 rule all:
-  input: 
-    "output/document_summaries.csv",
-    "output/single-cell.csv",
-    "output/parsed_suppfiles.csv", 
-    "output/publications.csv",
-    "output/scopus_citedbycount.csv",
-    "output/suppfilenames.txt",
-    "output/suppfilenames_filtered.txt",
-    "output/spots.csv",
-    "output/geo-htseq-until-{}.tar.gz".format(LAST_DATE),
-    expand("output/downloading_suppfiles_{k}.done", 
-            k = list(range(0, K, 1)))
-
-
-# Queries HT-seq expression profiling experiments
-# Requires NCBI api_key as NCBI_APIKEY environment variable
-rule geo_query:
-  output: 
-    "output/document_summaries.csv"
-  params:
-    email = EMAIL,
-    api_key = os.environ["NCBI_APIKEY"],
-    query = QUERY,
-    db = "gds",
-    retmax = 100000,
-    batch_size = 500
-  conda:
-    "envs/geo-query.yaml"
-  resources:
-    runtime = 120
-  script:
-    "scripts/geo_query.py"
-
-
-# Single-cell experiment accessions
-rule single_cell:
-  output: 
-    "output/single-cell.csv"
-  params:
-    email = EMAIL,
-    api_key = os.environ["NCBI_APIKEY"],
-    query = QUERY + ' AND "single-cell"[All Fields]',
-    db = "gds",
-    retmax = 25000,
-    columns = ["Accession"]
-  conda:
-    "envs/geo-query.yaml"
-  resources:
-    runtime = 120
-  script:
-    "scripts/geo_query.py"
-
-
-# Split GEO document summaries
-rule split_document_summaries:
-  input:
-    rules.geo_query.output
-  output:
-    expand("output/tmp/document_summaries_{k}.csv", k = list(range(0, K, 1)))
-  params:
-    chunks = K
-  conda:
-    "envs/geo-query.yaml"
-  resources:
-    runtime = 120
-  script:
-    "scripts/split_df.py"
-
-
-# Download supplementary file names
-rule download_suppfilenames:
-  input: 
-    "output/tmp/document_summaries_{k}.csv"
-  output: 
-    "output/tmp/suppfilenames_{k}.txt"
-  log:
-    "log/download_suppfilenames_{k}.log"
-  params:
-    email = EMAIL,
-    dirs = "suppl",
-    size = 200,
-  conda:
-    "envs/geo-query.yaml"
-  resources:
-    runtime = lambda wildcards, attempt: 90 + (attempt * 30)
-  shell:
-    """
-    python3 -u scripts/download_suppfilenames.py --input {input} --output {output} --email {params.email} --dirs {params.dirs} --size {params.size} 2> {log}
-    """
-
-# Merge suppfilenames
-rule suppfilenames:
-  input:
-    expand("output/tmp/suppfilenames_{k}.txt", k = list(range(0, K, 1)))
-  output:
-    "output/suppfilenames.txt"
-  resources:
-    runtime = 120
-  shell:
-    """
-    for file in {input}; do grep "^suppl" $file >> {output}; done
-    """
-
-# Download read run data
-rule download_spots:
-  input: 
-    "output/tmp/document_summaries_{k}.csv"
-  output: 
-    "output/tmp/spots_{k}.csv"
-  params:
-    email = EMAIL,
-    api_key = os.environ["NCBI_APIKEY"],
-    retmax = 100,
-    max_tries = 3
-  shadow:
-    "minimal"
-  conda:
-    "envs/geo-query.yaml"
-  resources:
-    runtime = 2440
-  script:
-    "scripts/read_runs.py"
-
-
-rule merge_spots:
     input:
-        expand("output/tmp/spots_{k}.csv", k = list(range(0, K, 1)))
-    output:
-        "output/spots.csv"
-    resources:
-        runtime = 120
-    run:
-        import pandas as pd
-        with open(output[0], "a") as output_handle:
-  	      for file in input:
-        	  spots = pd.read_csv(file, sep=",")
-          	  spots.to_csv(
-                	output_handle,
-                	sep=",",
-                	mode="a",
-                	header=not output_handle.tell(),
-                	index=False,
-           		)	
+        rules.query_all.input,
+        "output/parsed_suppfiles.csv",
+    default_target: True
 
-
-# Filter supplementary file names by filename extension
-rule filter_suppfilenames:
-  input: 
-    rules.download_suppfilenames.output
-  output: 
-    "output/tmp/suppfilenames_filtered_{k}.txt"
-  conda:
-    "envs/geo-query.yaml"
-  resources:
-    runtime = 120
-  script:
-    "scripts/filter_suppfilenames.py"
-
-
-rule suppfilenames_filtered:
-  input:
-    expand("output/tmp/suppfilenames_filtered_{k}.txt", k = list(range(0, K, 1)))
-  output:
-    "output/suppfilenames_filtered.txt"
-  resources:
-    runtime = 20
-  shell:
-    """
-    cat {input} > {output}
-    """
 
 # Download filterd supplementary files
 rule download_suppfiles:
-  input: 
-    rules.filter_suppfilenames.output
-  output: 
-    touch("output/downloading_suppfiles_{k}.done")
-  log:
-    "log/download_suppfiles_{k}.log"
-  params:
-    email = EMAIL,
-    maxfilesize=int(1e9),
-    batchsize = 200,
-    dir = ".",
-  conda:
-    "envs/geo-query.yaml"
-  resources:
-    runtime = 1440 #lambda wildcards, attempt: 90 + (attempt * 30)
-  shell:
-    """
-    python3 -u scripts/download_suppfiles.py --input {input} --email {params.email} --maxfilesize {params.maxfilesize} --batchsize {params.batchsize} --dir {params.dir} 2> {log}
-    """
-
-
-# Split list of supplementary files
-# dir is the location of suppl/ folder
-# Drop some offending files 
-BLACKLIST_FILE = "output/blacklist.txt"
-with open(BLACKLIST_FILE) as h:
-    BLACKLIST = [os.path.basename(i.rstrip()) for i in h.readlines()]
-
-rule split_suppfiles_list_for_import:
-  input: 
-    rules.filter_suppfilenames.output,
-    rules.download_suppfiles.output
-  output: 
-    expand("output/tmp/suppfilenames_filtered_{{k}}_{n}.txt", n = list(range(0, N, 1)))
-  params:
-    chunks = N,
-    dir = ".",
-    blacklist = BLACKLIST
-  conda: 
-    "envs/geo-query.yaml"
-  resources:
-    runtime = 120
-  script:
-    "scripts/split_lines.py"
+    output:
+        temp("suppl/{suppfilename}"),
+    log:
+        "log/download__{suppfilename}__.log",
+    params:
+        id=lambda wildcards: p.search(wildcards.suppfilename.upper()).group(0),
+        stub=lambda wildcards: p.search(wildcards.suppfilename.upper()).group(0)[0:-3],
+    resources:
+        runtime=lambda wildcards, attempt: attempt * 1440,
+    shell:
+        """
+        curl -sS -H 'Expect:' -o {output[0]} --user anonymous:{EMAIL} ftp://ftp.ncbi.nlm.nih.gov/geo/series/{params.stub}nnn/{params.id}/{output[0]} 2> {log}
+        """
 
 
 # Import supplementary data
 rule import_suppfiles:
-  input: 
-    "output/tmp/suppfilenames_filtered_{k}_{n}.txt"
-  output: 
-    "output/tmp/parsed_suppfiles_{k}_{n}.csv"
-  log:
-    "log/import_suppfiles_{k}_{n}.log"
-  params:
-    f"--var basemean=10 logcpm=1 rpkm=1 fpkm=1 aveexpr=3.32 --bins 40 --fdr 0.05 --pi0method lfdr -v --blacklist {BLACKLIST_FILE}"
-  conda: 
-    "envs/geo-query.yaml"
-  resources:
-    mem_mb = 64000,
-    runtime = 480,
-  shell:
-    """
-    python3 -u scripts/import_suppfiles.py --list {input} --out {output} {params} 2> {log}
-    """
-
-
-# Merge chunks
-rule merge_parsed_suppfiles:
-  input: 
-    expand("output/tmp/parsed_suppfiles_{k}_{n}.csv", k = list(range(0, K, 1)), n = list(range(1, N, 1)))
-  output: 
-    "output/parsed_suppfiles.csv"
-  conda: 
-    "envs/geo-query.yaml"
-  resources:
-    mem_mb = 4000,
-    runtime = 120
-  script:
-    "scripts/concat_tabs.py"
-    
-
-# Download publication metadata
-rule download_publications:
-  input: 
-    rules.geo_query.output
-  output: 
-    "output/publications.csv"
-  params: 
-    email = EMAIL,
-    api_key = os.environ["NCBI_APIKEY"],
-    batch_size = 500
-  conda:
-    "envs/geo-query.yaml"
-  resources:
-    runtime = 360
-  script:
-    "scripts/download_publications.py"
-
-
-# Download citations
-rule download_citations:
-  input: 
-    rules.geo_query.output
-  output: 
-    "output/scopus_citedbycount.csv"
-  params:
-    api_key = os.environ["ELSEVIER_GEOSEQ"]
-  conda:
-    "envs/geo-query.yaml"
-  resources:
-    runtime = lambda wildcards, attempt: 120 + (attempt * 60)
-  script:
-    "scripts/download_scopus_citations.py"
-
-
-rule archive:
     input:
-        "output/document_summaries.csv",
-        "output/single-cell.csv",
-        "output/parsed_suppfiles.csv", 
-        "output/publications.csv",
-        "output/scopus_citedbycount.csv",
-        "output/suppfilenames.txt",
-        "output/suppfilenames_filtered.txt",
-        "output/spots.csv"
+        "suppl/{suppfilename}",
     output:
-        "output/geo-htseq-until-{}.tar.gz".format(LAST_DATE)
+        "output/tmp/parsed_suppfiles__{suppfilename}__.csv",
+    log:
+        "log/import__{suppfilename}__.log",
+    params:
+        f"--var basemean=10 logcpm=1 rpkm=1 fpkm=1 aveexpr=3.32 --bins 40 --fdr 0.05 --pi0method lfdr --blacklist {BLACKLIST_FILE}",
+    conda:
+        "envs/environment.yaml"
+    resources:
+        mem_mb=lambda wildcards, input: min(
+            200000, max([int(32 * (input.size // 1e6)), 4000])
+        ),
+        runtime=lambda wildcards, attempt, input: min(
+            1440, attempt * (5 + int(360 * input.size // 1e9))
+        ),
     shell:
-        "tar -czvf {output[0]} {input}"
+        """
+        python3 -u scripts/import_suppfiles.py --file {input} --out {output} {params} 2> {log}
+        """
+
+
+rule merge_parsed_suppfiles:
+    input:
+        get_parsed_suppfiles,
+    output:
+        "output/parsed_suppfiles.csv",
+    conda:
+        "envs/environment.yaml"
+    resources:
+        mem_mb=4000,
+        runtime=120,
+    script:
+        "python3 -u scripts/concat_tabs.py --tabs {input} --out {output}"
