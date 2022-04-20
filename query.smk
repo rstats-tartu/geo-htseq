@@ -1,10 +1,10 @@
 import os
 
 LAST_DATE = "2020-12-31"
+EMAIL = "taavi.pall@ut.ee"
 QUERY = 'expression profiling by high throughput sequencing[DataSet Type] AND ("2000-01-01"[PDAT] : "{}"[PDAT])'.format(
     LAST_DATE
 )
-EMAIL = "taavi.pall@ut.ee"
 
 
 K = 15

@@ -4,11 +4,13 @@ from scripts.import_suppfiles import drop
 from snakemake.utils import min_version
 
 min_version("6.0")
+EMAIL = "taavi.pall@ut.ee"
+p = re.compile("GSE\\d+")
 
 
 module geo_query:
     snakefile:
-        "rules/query.smk"
+        "query.smk"
 
 
 use rule * from geo_query as query_*
@@ -19,9 +21,7 @@ BLACKLIST_FILE = "blacklist.txt"
 
 # Suppfilenames
 def get_parsed_suppfiles(wildcards):
-    SUPPFILENAMES_FILE = checkpoints.query_suppfilenames.get().output[
-        0
-    ]  # config["suppfilenames"]
+    SUPPFILENAMES_FILE = checkpoints.query_suppfilenames.get().output[0]
     with open(SUPPFILENAMES_FILE, "r") as f:
         SUPPFILENAMES = [
             os.path.basename(line.rstrip())
@@ -45,14 +45,11 @@ def get_parsed_suppfiles(wildcards):
     )
 
 
-EMAIL = "taavi.pall@ut.ee"
-p = re.compile("GSE\\d+")
-
-
 rule all:
     input:
         rules.query_all.input,
         "output/parsed_suppfiles.csv",
+        "output/geo-htseq.tar.gz",
     default_target: True
 
 
@@ -110,3 +107,13 @@ rule merge_parsed_suppfiles:
         runtime=120,
     script:
         "python3 -u scripts/concat_tabs.py --tabs {input} --out {output}"
+
+
+rule archive:
+    input:
+        rules.query_all.input,
+        "output/parsed_suppfiles.csv",
+    output:
+        "output/geo-htseq.tar.gz",
+    shell:
+        "tar -czvf {output[0]} {input}"
