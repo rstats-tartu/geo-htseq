@@ -101,7 +101,7 @@ rule merge_parsed_suppfiles:
     conda:
         "envs/environment.yaml"
     resources:
-        mem_mb=4000,
+        mem_mb=16000,
         runtime=120,
     script:
         "python3 -u scripts/concat_tabs.py --tabs {input} --out {output}"
@@ -113,5 +113,8 @@ rule archive:
         "output/parsed_suppfiles.csv",
     output:
         "output/geo-htseq.tar.gz",
+    resources:
+        mem_mb=16000,
+        runtime=120,
     shell:
         "tar -czvf {output[0]} {input}"
