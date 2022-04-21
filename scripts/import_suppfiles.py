@@ -13,12 +13,16 @@ from scipy.stats import binom
 from pandas.api.types import is_string_dtype
 from pathlib import Path
 import numbers
+import warnings
+
+
+class FormatError(Exception):
+    pass
 
 
 xls = re.compile("xls")
-drop = "series_matrix\.txt\.gz|filelist\.txt|readme|\.bam|\.sam|\.csfasta|\.fa(sta)?|\.f(a|n)a|(big)?wig|\.bed(graph)?|(broad_)?lincs"
+drop = "^gsm\d+|series_matrix\.txt\.gz$|filelist\.txt$|readme|\.bam(\.tdf|$)|\.bai(\.gz|$)|\.sam(\.gz|$)|\.csfasta|\.fa(sta)?(\.gz|\.bz2|\.txt\.gz|$)|\.f(a|n)a(\.gz|$)|\.wig|\.big[Ww]ig$|\.bw(\.|$)|\.bed([Gg]raph)?(\.tdf|\.gz|\.bz2|\.txt\.gz|$)|(broad_)?lincs|\.tdf$|\.hic$|\.rds(\.gz|$)|\.tar\.gz$|\.mtx(\.gz$|$)|dge\.txt\.gz$|umis?\.txt\.gz$"
 drop = re.compile(drop)
-gse = re.compile("GSE\d+_")
 pv_str = "p[^a-zA-Z]{0,4}val"
 pv = re.compile(pv_str)
 adj = re.compile("adj|fdr|corr|thresh")
@@ -27,172 +31,240 @@ mtabs = re.compile("\w+\t{2,}\w+")
 tab = re.compile("\t")
 fields = ["Type", "Class", "Conversion", "pi0", "FDR_pval", "hist", "note"]
 PValSum = collections.namedtuple("PValSum", fields, defaults=[np.nan] * len(fields))
+narrowpeak = [
+    "chrom",
+    "chromStart",
+    "chromEnd",
+    "name",
+    "score",
+    "strand",
+    "signalValue",
+    "pValue",
+    "qValue",
+    "peak",
+]  # BED6+4
+broadpeak = [
+    "chrom",
+    "chromStart",
+    "chromEnd",
+    "name",
+    "score",
+    "strand",
+    "signalValue",
+    "pValue",
+    "qValue",
+]  # BED6+3
+gappedpeak = [
+    "chrom",
+    "chromStart",
+    "chromEnd",
+    "name",
+    "score",
+    "strand",
+    "thickStart",
+    "thickEnd",
+    "itemRgb",
+    "blockCount",
+    "blockSizes",
+    "blockStarts",
+    "signalValue",
+    "pValue",
+    "qValue",
+]  # BED12+3
+peak = re.compile("(narrow|broad|gapped)peak")
+
+
+class ImportSuppfiles(object):
+    def __init__(self):
+        self.out = {}
+
+    def from_flat(self, input, tar=None):
+        if drop.search(input.name.lower() if tar else input.lower()):
+            key = os.path.basename(input.name if tar else input)
+            return self.out.update(note(key, "not imported"))
+        else:
+            out = {}
+            try:
+                if xls.search(input.name if tar else input):
+                    try:
+                        out.update(self.read_excel(input, tar=tar))
+                    except ValueError as e:
+                        out.update(self.read_csv(input, tar=tar))
+                else:
+                    d = self.read_csv(input, tar=tar)
+                    is_empty = [v.empty for v in d.values()][0]
+                    if is_empty:
+                        raise Exception("empty table")
+                    else:
+                        peakfile = peak.search(
+                            input.name.lower() if tar else input.lower()
+                        )
+                        if peakfile:
+                            key = os.path.basename(input.name if tar else input)
+                            d[key].loc[-1] = d[key].columns
+                            d[key] = d[key].sort_index().reset_index(drop=True)
+                            d[key].columns = eval(peakfile.group(0))
+                        out.update(d)
+            except Exception as e:
+                key = os.path.basename(input.name if tar else input)
+                peakfile = peak.search(input.name.lower() if tar else input.lower())
+                if peakfile:
+                    e = f"Misspecified '{peakfile.group(0)}' file; {e}"
+                out.update(note(key, e))
+            return self.out.update(out)
+
+    def from_tar(self, input):
+        with tarfile.open(input, "r:*") as tar:
+            for member in tar:
+                if member.isfile():
+                    self.from_flat(member, tar)
+
+    def find_header(self, df, n=20):
+        head = df.head(n)
+        matches = [
+            i[0]
+            for i in [
+                [i for i, x in enumerate(head[col].str.contains(pv_str, na=False)) if x]
+                for col in head
+            ]
+            if i
+        ]
+        idx = min(matches) + 1 if matches else 0
+        if idx == 0:
+            for index, row in head.iterrows():
+                if all([isinstance(i, str) for i in row if i is not np.nan]):
+                    idx = index + 1
+                    break
+        return idx
+
+    def csv_helper(self, input, input_name, csv, verbose=0):
+        # Get comments and set rows to skip
+        r = pd.read_csv(csv, sep=None, engine="python", iterator=True, nrows=1000)
+        comment = None
+        sep = r._engine.data.dialect.delimiter
+        columns = r._engine.columns
+        if isinstance(input, (tarfile.ExFileObject)):
+            with csv as h:
+                first_line = h.readline()
+        elif input_name.endswith("gz") or isinstance(input, (gzip.GzipFile)):
+            with gzip.open(input) as h:
+                first_line = h.readline().decode("utf-8").rstrip()
+        else:
+            with open(input, "r") as h:
+                first_line = h.readline().rstrip()
+        more_tabs_than_sep = len(tab.findall(first_line)) > len(
+            re.findall(sep, first_line)
+        )
+        if re.search("^#", first_line) or more_tabs_than_sep:
+            comment = "#"
+            # Get delimiter
+            r = pd.read_csv(
+                csv, sep=None, engine="python", iterator=True, skiprows=20, nrows=1000
+            )
+            sep = r._engine.data.dialect.delimiter
+            columns = r._engine.columns
+        if ws.search(sep):
+            sep = "\s+"
+        if mtabs.search(first_line):
+            sep = "\t+"
+        # Import file
+        if isinstance(input, (tarfile.ExFileObject)) and input_name.endswith("gz"):
+            with gzip.open(input) as h:
+                df = pd.read_csv(h, sep=sep, comment=comment, encoding="unicode_escape")
+        else:
+            df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape")
+        # Check and fix column names
+        # Case of extra level of delimiters in column names
+        if len(df.columns) > len(columns):
+            df = pd.read_csv(
+                input,
+                header=None,
+                skiprows=[0],
+                sep=sep,
+                comment=comment,
+                encoding="unicode_escape",
+            ).drop([0])
+            df.columns = columns
+        unnamed = ["Unnamed" in i for i in df.columns]
+        # Case of empty rows before header
+        if all(unnamed):
+            idx = self.find_header(df)
+            if idx > 0:
+                df = pd.read_csv(
+                    input,
+                    sep=sep,
+                    comment=comment,
+                    skiprows=idx,
+                    encoding="unicode_escape",
+                )
+        # Case of anonymous row names
+        if unnamed[-1] & sum(unnamed) == 1:
+            if any([pv.search(i) for i in df.columns]):
+                df.columns = [df.columns[-1]] + list(df.columns[:-1])
+        if verbose > 1:
+            print("df after import:\n", df)
+        return {os.path.basename(input_name): df}
+
+    def excel_helper(self, input, input_name, verbose=0):
+        tabs = {}
+        if input_name.endswith("gz") or isinstance(input, (gzip.GzipFile)):
+            excel_file = gzip.open(input)
+        else:
+            excel_file = input
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            wb = pd.ExcelFile(excel_file)
+            if len(w):
+                raise FormatError(
+                    "Format error: the data source could not be successfully parsed: Excel document does not have a sheet 1"
+                )
+        sheets = wb.sheet_names
+        sheets = [i for i in sheets if "README" not in i]
+        for sheet in sheets:
+            df = wb.parse(sheet, comment="#")
+            if df.empty:
+                df = wb.parse(sheet)
+            if verbose > 1:
+                print("df after import:\n", df)
+            if not df.empty:
+                pu = sum(["Unnamed" in i for i in list(df.columns)]) / len(df.columns)
+                if pu >= 2 / 3:
+                    idx = self.find_header(df)
+                    if idx > 0:
+                        df = wb.parse(sheet, skiprows=idx)
+                tabs.update({os.path.basename(input_name) + "-sheet-" + sheet: df})
+        return tabs
+
+    def read_csv(self, input, tar=None):
+        if isinstance(input, (tarfile.TarInfo)):
+            input_name = os.path.basename(input.name)
+            with tar.extractfile(input) as h:
+                if input_name.endswith("gz"):
+                    with gzip.open(h) as gz:
+                        csv = io.StringIO(gz.read().decode("unicode_escape"))
+                else:
+                    csv = io.StringIO(h.read().decode("unicode_escape"))
+            with tar.extractfile(input) as h:
+                out = self.csv_helper(h, input_name, csv)
+        else:
+            input_name = input
+            csv = input
+            out = self.csv_helper(input, input_name, csv)
+        return out
+
+    def read_excel(self, input, tar=None):
+        if isinstance(input, (tarfile.TarInfo)):
+            input_name = os.path.basename(input.name)
+            with tar.extractfile(input) as h:
+                out = self.excel_helper(h, input_name)
+        else:
+            input_name = input
+            out = self.excel_helper(input, input_name)
+        return out
 
 
 def raw_pvalues(i):
     return bool(pv.search(i.lower()) and not adj.search(i.lower()))
-
-
-def find_header(df, n=20):
-    head = df.head(n)
-    idx = 0
-    for col in head:
-        s = head[col]
-        match = s.str.contains(pv_str, na=False)
-        if any(match):
-            idx = s.index[match].tolist()[0] + 1
-            break
-    if idx == 0:
-        for index, row in head.iterrows():
-            if all([isinstance(i, str) for i in row if i is not np.nan]):
-                idx = index + 1
-                break
-    return idx
-
-
-def csv_helper(input, input_name, csv, verbose=0):
-    # Get comments and set rows to skip
-    r = pd.read_csv(csv, sep=None, engine="python", iterator=True, nrows=1000)
-    comment = None
-    sep = r._engine.data.dialect.delimiter
-    columns = r._engine.columns
-    if isinstance(input, (tarfile.ExFileObject)):
-        with csv as h:
-            first_line = h.readline()
-    elif input_name.endswith("gz") or isinstance(input, (gzip.GzipFile)):
-        with gzip.open(input) as h:
-            first_line = h.readline().decode("utf-8").rstrip()
-    else:
-        with open(input, "r") as h:
-            first_line = h.readline().rstrip()
-    more_tabs_than_sep = len(tab.findall(first_line)) > len(re.findall(sep, first_line))
-    if re.search("^#", first_line) or more_tabs_than_sep:
-        comment = "#"
-        # Get delimiter
-        r = pd.read_csv(
-            csv, sep=None, engine="python", iterator=True, skiprows=20, nrows=1000
-        )
-        sep = r._engine.data.dialect.delimiter
-        columns = r._engine.columns
-    if ws.search(sep):
-        sep = "\s+"
-    if mtabs.search(first_line):
-        sep = "\t+"
-    # Import file
-    if isinstance(input, (tarfile.ExFileObject)) and input_name.endswith("gz"):
-        with gzip.open(input) as h:
-            df = pd.read_csv(h, sep=sep, comment=comment, encoding="unicode_escape")
-    else:
-        df = pd.read_csv(input, sep=sep, comment=comment, encoding="unicode_escape")
-    # Check and fix column names
-    # Case of extra level of delimiters in column names
-    if len(df.columns) > len(columns):
-        df = pd.read_csv(
-            input,
-            header=None,
-            skiprows=[0],
-            sep=sep,
-            comment=comment,
-            encoding="unicode_escape",
-        ).drop([0])
-        df.columns = columns
-    unnamed = ["Unnamed" in i for i in df.columns]
-    # Case of empty rows before header
-    if all(unnamed):
-        idx = find_header(df)
-        if idx > 0:
-            df = pd.read_csv(
-                input, sep=sep, comment=comment, skiprows=idx, encoding="unicode_escape"
-            )
-    # Case of anonymous row names
-    if unnamed[-1] & sum(unnamed) == 1:
-        if any([pv.search(i) for i in df.columns]):
-            df.columns = [df.columns[-1]] + list(df.columns[:-1])
-    if verbose > 1:
-        print("df after import:\n", df)
-    return {os.path.basename(input_name): df}
-
-
-def excel_helper(input, input_name, verbose=0):
-    tabs = {}
-    if input_name.endswith("gz") or isinstance(input, (gzip.GzipFile)):
-        wb = pd.ExcelFile(gzip.open(input))
-    else:
-        wb = pd.ExcelFile(input)
-    sheets = wb.sheet_names
-    sheets = [i for i in sheets if "README" not in i]
-    for sheet in sheets:
-        df = wb.parse(sheet, comment="#")
-        if verbose > 1:
-            print("df after import:\n", df)
-        if not df.empty:
-            pu = sum(["Unnamed" in i for i in list(df.columns)]) / len(df.columns)
-            if pu >= 2 / 3:
-                idx = find_header(df)
-                if idx > 0:
-                    df = wb.parse(sheet, skiprows=idx)
-            tabs.update({os.path.basename(input_name) + "-sheet-" + sheet: df})
-    return tabs
-
-
-def read_csv(input, tar=None):
-    if isinstance(input, (tarfile.TarInfo)):
-        input_name = os.path.basename(input.name)
-        with tar.extractfile(input) as h:
-            if input_name.endswith("gz"):
-                with gzip.open(h) as gz:
-                    csv = io.StringIO(gz.read().decode("unicode_escape"))
-            else:
-                csv = io.StringIO(h.read().decode("unicode_escape"))
-        with tar.extractfile(input) as h:
-            out = csv_helper(h, input_name, csv)
-    else:
-        input_name = input
-        csv = input
-        out = csv_helper(input, input_name, csv)
-    return out
-
-
-def read_excel(input, tar=None):
-    if isinstance(input, (tarfile.TarInfo)):
-        input_name = os.path.basename(input.name)
-        with tar.extractfile(input) as h:
-            out = excel_helper(h, input_name)
-    else:
-        input_name = input
-        out = excel_helper(input, input_name)
-    return out
-
-
-def import_flat(input, tar=None):
-    out = {}
-    try:
-        if xls.search(input.name if tar else input):
-            out.update(read_excel(input, tar=tar))
-        else:
-            d = read_csv(input, tar=tar)
-            is_empty = [v.empty for v in d.values()][0]
-            if is_empty:
-                raise Exception("empty table")
-            else:
-                out.update(d)
-    except Exception as e:
-        if tar:
-            key = os.path.basename(input.name)
-        else:
-            key = os.path.basename(input)
-        out.update(note(key, e))
-    return out
-
-
-def import_tar(input):
-    out = {}
-    with tarfile.open(input, "r:*") as tar:
-        for member in tar:
-            if member.isfile():
-                if not drop.search(member.name):
-                    out.update(import_flat(member, tar))
-    return out
 
 
 def filter_pvalue_tables(input, pv=None, adj=None):
@@ -246,7 +318,7 @@ def summarise_pvalue_tables(
     pvalues_check = fix_column_dtype(pvalues)
     for v in var:
         label = v
-        if v is "value":
+        if v == "value":
             v = "^value_\d"
             label = "fpkm"
         exprs = df.filter(regex=v, axis=1)
@@ -529,6 +601,104 @@ def parse_key(k, filename):
     return key
 
 
+def parse_suppfiles(
+    file=None,
+    list=None,
+    blacklist=None,
+    vars=["basemean=10", "fpkm=0.5", "logcpm=-0.3", "rpkm=0.5", "aveexpr=3.32"],
+    fdr=0.5,
+    pi0method="lfdr",
+    bins=30,
+    verbose=False,
+    **kwargs,
+):
+    def single_true(iterable):
+        i = iter(iterable)
+        return any(i) and not any(i)
+
+    assert single_true(
+        [file, list]
+    ), "Provide either supplementary file name (file) or file with supplementary file names (list)."
+
+    var = dict(map(lambda s: s.split("="), vars))
+    VAR = {k: float(v) for k, v in var.items()}
+    VAR.update({"value": VAR["fpkm"]})
+    BINS = bins + 1
+    FDR = fdr
+
+    if file:
+        input = file
+    elif list:
+        input = []
+        with list as f:
+            for line in f:
+                input.append(line.rstrip())
+
+    blacklist = []
+    if blacklist:
+        with blacklist as f:
+            for line in f:
+                file = os.path.basename(line.rstrip())
+                blacklist.append(file)
+
+    # Keep only inputs that exist
+    input = [i for i in input if os.path.isfile(i)]
+
+    # Drop files in blacklist
+    if blacklist:
+        input = [i for i in input if os.path.basename(i) not in blacklist]
+
+    assert len(input) > 0, "No files to process."
+
+    if verbose:
+        print("Working on ", input)
+
+    res = {}
+    for path in input:
+        filename = os.path.basename(path)
+        frames = ImportSuppfiles()
+        if tarfile.is_tarfile(path):
+            frames.from_tar(path)
+        else:
+            frames.from_flat(path)
+        frames = {
+            k: v
+            if all(i in fields for i in v.columns)
+            else summarise_pvalue_tables(v, var=VAR.keys())
+            if any(
+                [raw_pvalues(i) for i in v.columns if not isinstance(i, numbers.Number)]
+            )
+            else pd.DataFrame(PValSum(note="no pvalues")._asdict(), index=[0])
+            for k, v in frames.out.items()
+        }
+        pv_stats = {
+            k: v
+            if all(i in fields for i in v.columns)
+            else pd.DataFrame(PValSum(note="all p-values are NaN")._asdict(), index=[0])
+            if v.empty
+            else summarise_pvalues(
+                v,
+                bins=BINS,
+                fdr=FDR,
+                var={k: v for k, v in VAR.items() if "value" not in k},
+                pi0_method=pi0method,
+                verbose=verbose,
+            )
+            for k, v in frames.items()
+        }
+        for k, v in pv_stats.items():
+            res.update({parse_key(k, filename): v})
+
+    result = pd.concat(
+        [df for df in res.values()],
+        keys=[k for k in res.keys()],
+        names=["id"],
+        sort=False,
+    )
+
+    return result
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -567,7 +737,7 @@ if __name__ == "__main__":
         help="method to calculate pi0, string, default is 'lfdr'",
     )
     parser.add_argument(
-        "--verbose", "-v", help="increase output verbosity", action="count", default=0
+        "--verbose", "-v", help="increase output verbosity", action="store_true"
     )
     parser.add_argument(
         "--blacklist",
@@ -576,77 +746,8 @@ if __name__ == "__main__":
         help="file with filenames to skip importing, one per line",
     )
     args = parser.parse_args()
-    var = dict(map(lambda s: s.split("="), args.vars))
-    VAR = {k: float(v) for k, v in var.items()}
-    VAR.update({"value": VAR["fpkm"]})
-    BINS = args.bins + 1
-    FDR = args.fdr
 
-    if args.file:
-        input = args.file
-    elif args.list:
-        input = []
-        with args.list as f:
-            for line in f:
-                input.append(line.rstrip())
+    df = parse_suppfiles(**args.__dict__)
 
-    blacklist = []
-    if args.blacklist:
-        with args.blacklist as f:
-            for line in f:
-                file = os.path.basename(line.rstrip())
-                blacklist.append(file)
-
-    # Keep only inputs that exist
-    input = [i for i in input if os.path.isfile(i)]
-
-    # Drop files in blacklist
-    if blacklist:
-        input = [i for i in input if os.path.basename(i) not in blacklist]
-
-    if len(input) == 0:
-        Path(args.out).touch()
-        sys.exit()
-    out = {}
-    for path in input:
-        if args.verbose > 0:
-            print("working on", path)
-        filename = os.path.basename(path)
-        if tarfile.is_tarfile(path):
-            frames = import_tar(path)
-        else:
-            frames = import_flat(path)
-        frames = {
-            k: summarise_pvalue_tables(v, var=VAR.keys())
-            if any(
-                [raw_pvalues(i) for i in v.columns if not isinstance(i, numbers.Number)]
-            )
-            else pd.DataFrame(PValSum(note="no pvalues")._asdict(), index=[0])
-            for k, v in frames.items()
-        }
-        pv_stats = {
-            k: v
-            if all(i in fields for i in v.columns)
-            else pd.DataFrame(PValSum(note="all p-values are NaN")._asdict(), index=[0])
-            if v.empty
-            else summarise_pvalues(
-                v,
-                bins=BINS,
-                fdr=FDR,
-                var={k: v for k, v in VAR.items() if "value" not in k},
-                pi0_method=args.pi0method,
-                verbose=args.verbose,
-            )
-            for k, v in frames.items()
-        }
-        for k, v in pv_stats.items():
-            out.update({parse_key(k, filename): v})
-
-    result = pd.concat(
-        [df for df in out.values()],
-        keys=[k for k in out.keys()],
-        names=["id"],
-        sort=False,
-    )
     with open(args.out, "w") as f:
-        result.reset_index(level="id").to_csv(f, index=False)
+        df.reset_index(level="id").to_csv(f, index=False)
