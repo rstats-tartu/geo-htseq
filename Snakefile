@@ -51,6 +51,9 @@ rule all:
     default_target: True
 
 
+localrules: all, merge_parsed_suppfiles
+
+
 # Download filterd supplementary files
 rule download_suppfiles:
     output:
@@ -92,7 +95,10 @@ rule import_suppfiles:
         python3 -u scripts/import_suppfiles.py --file {input} --out {output} {params} 2> {log}
         """
 
-
+# Script uses base R only, so any modern R version should be good to go.
+# Run this script 'locally' in same node as main Snakemake, batch 
+# submission can cause too long argument error, 
+# as there are potentially 70K+ files to concatenate.
 rule merge_parsed_suppfiles:
     input:
         get_parsed_suppfiles,
