@@ -22,23 +22,28 @@ Raw P value sets with anti-conservative shape were used to calculate the pi0 sta
 
 * To get started you need to download and install miniconda3 and create conda environment with snakemake
 * Go to <https://docs.conda.io/en/latest/miniconda.html> for download and installation instructions of miniconda3
-* Create conda environment with snakemake
+* Create conda environment with snakemake, essentially as described in <https://snakemake.readthedocs.io/en/stable/getting_started/installation.html>
 
 ```bash
-conda create -n snakemake-env -c bioconda snakemake
+conda create -c bioconda -c conda-forge -n snakemake snakemake
 ```
 
 * (Fork and) clone this repository 
 
 ```bash
-git clone https://github.com/tpall/geo-htseq.git
+git clone https://github.com/rstats-tartu/geo-htseq.git
+```
+
+* cd to working directory and activate conda environment
+
+```bash
+cd geo-htseq
+conda activate snakemake
 ```
 
 * Dry run workflow
 
 ```bash
-cd geo-rnaseq
-conda activate snakemake-env
 snakemake -n
 ```
 
@@ -47,10 +52,10 @@ snakemake -n
     - [Elsevier API key](https://dev.elsevier.com) as ELSEVIER_GEOSEQ environment variable
 
 
-* We have been running this workflow in SLURM cluster using following command. *cluster.json* file contains cluster configuration info (e.g. time, mem) for jobs. 
+* Run workflow. 
 
 ```bash
-snakemake --use-conda --cluster-config cluster.json --cluster "sbatch -J {cluster.name} -p {cluster.partition} -t {cluster.time} --mem {cluster.mem} --output {cluster.output}" -j
+snakemake --use-conda -j
 ```
 
 
