@@ -214,12 +214,12 @@ class ImportSuppfiles(object):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
             wb = pd.ExcelFile(excel_file)
-            if len(w):
-                raise FormatError(
-                    "Format error: the data source could not be successfully parsed: Excel document does not have a sheet 1"
-                )
         sheets = wb.sheet_names
         sheets = [i for i in sheets if "README" not in i]
+        if len(wb.sheet_names) == 0:
+            raise FormatError(
+                "Format error: the data source could not be successfully parsed: Excel document does not have sheets"
+            )
         for sheet in sheets:
             df = wb.parse(sheet, comment="#")
             if df.empty:
