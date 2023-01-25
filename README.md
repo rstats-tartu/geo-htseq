@@ -8,7 +8,7 @@
 
 Assessing the quality of experiments, both directly and through replication attempts, is becoming a grave concern in biomedicine. This is especially true in omics experiments, where thousands of independent measurements are done in parallel, with the understanding that only a small minority will probe scientifically meaningful effects – a state of affairs conductive to mistaking false positives for scientific discoveries.  
 
-Here, we assessed the quality of the high-throughput sequencing experiments submitted to Entrez GEO database until 2019-12-31.
+Here, we assessed the quality of the high-throughput sequencing experiments submitted to Entrez GEO database until 2020-12-31.
 
 ### Descripton of the workflow ###
 
