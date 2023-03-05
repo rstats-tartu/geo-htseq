@@ -6,20 +6,21 @@ from snakemake.utils import min_version
 min_version("6.0")
 EMAIL = "taavi.pall@ut.ee"
 BLACKLIST_FILE = "blacklist.txt"
+SUPPFILENAMES_FILE = config["suppfilenames_file"]
 p = re.compile("GSE\\d+")
 
 
-module query:
-    snakefile:
-        "query.smk"
+# module query:
+#     snakefile:
+#         "query.smk"
 
 
-use rule * from query as query_*
+# use rule * from query as query_*
 
 
 # Suppfilenames
 def get_parsed_suppfiles(wildcards):
-    SUPPFILENAMES_FILE = checkpoints.query_suppfilenames.get().output[0]
+    # SUPPFILENAMES_FILE = checkpoints.query_suppfilenames.get().output[0]
     with open(SUPPFILENAMES_FILE, "r") as f:
         SUPPFILENAMES = [
             os.path.basename(line.rstrip())
@@ -45,9 +46,9 @@ def get_parsed_suppfiles(wildcards):
 
 rule all:
     input:
-        rules.query_all.input,
+        # rules.query_all.input,
         "output/parsed_suppfiles.csv",
-        "output/geo-htseq.tar.gz",
+        # "output/geo-htseq.tar.gz",
     default_target: True
 
 
@@ -80,7 +81,7 @@ rule import_suppfiles:
     log:
         "log/import__{suppfilename}__.log",
     params:
-        f"--var basemean=10 logcpm=1 rpkm=1 fpkm=1 aveexpr=3.32 --bins 40 --fdr 0.05 --pi0method lfdr --blacklist {BLACKLIST_FILE}",
+        f"--var basemean=10 logcpm=1 rpkm=1 fpkm=1 aveexpr=3.32 --bins 40 --fdr 0.05 --pi0method smoother --blacklist {BLACKLIST_FILE}",
     conda:
         "envs/environment.yaml"
     resources:
@@ -112,16 +113,16 @@ rule merge_parsed_suppfiles:
     script:
         "scripts/concat_tabs.R"
 
-rule archive:
-    input:
-        rules.query_all.input,
-        "output/parsed_suppfiles.csv",
-    output:
-        "output/geo-htseq.tar.gz",
-    resources:
-        mem_mb=16000,
-        runtime=120,
-    shell:
-        """
-        tar -czvf {output[0]} {input}
-        """
+# rule archive:
+#     input:
+#         rules.query_all.input,
+#         "output/parsed_suppfiles.csv",
+#     output:
+#         "output/geo-htseq.tar.gz",
+#     resources:
+#         mem_mb=16000,
+#         runtime=120,
+#     shell:
+#         """
+#         tar -czvf {output[0]} {input}
+#         """

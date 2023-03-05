@@ -381,6 +381,17 @@ def get_hist_class(counts, fdr):
     return Class
 
 
+# from https://stackoverflow.com/a/33532498
+def p_adjust_bh(p):
+    """Benjamini-Hochberg p-value correction for multiple hypothesis testing."""
+    p = np.asfarray(p)
+    by_descend = p.argsort()[::-1]
+    by_orig = by_descend.argsort()
+    steps = float(len(p)) / np.arange(len(p), 0, -1)
+    q = np.minimum(1, np.minimum.accumulate(steps * p[by_descend]))
+    return q[by_orig]
+
+
 # https://gdsctools.readthedocs.io/en/master/_modules/gdsctools/qvalue.html#QValue
 def estimate_pi0(
     pv,
@@ -572,7 +583,7 @@ def summarise_pvalues(
             else:
                 pi0.append(np.nan)
         # Number of effects < FDR
-        fdr_effects = [sum(i["pvalue"] < fdr) for i in pv_sets]
+        fdr_effects = [sum(p_adjust_bh(i["pvalue"]) < fdr) for i in pv_sets]
         out.update(
             {
                 name: pd.DataFrame(
